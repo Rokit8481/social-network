@@ -21,6 +21,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('accounts.urls')),
+    # path('channels/', include('channels.urls')),
+    # path('messenger/', include('messenger.urls')),
+    # path('notifications/', include('notifications.urls')),
+    # path('posts/', include('posts.urls')),
 ]
 
 if settings.DEBUG:
