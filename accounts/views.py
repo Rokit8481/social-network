@@ -27,7 +27,7 @@ class RegisterView(CreateView):
     model = User
     template_name = 'accounts/register.html'
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy('users_list')
 
 class UsersListView(LoginRequiredMixin, ListView):
     model = User
@@ -36,3 +36,13 @@ class UsersListView(LoginRequiredMixin, ListView):
     paginate_by = 10
     login_url = reverse_lazy('login')
     redirect_field_name = 'next'
+
+class UserDetailView(LoginRequiredMixin, DetailView):
+    model = User
+    template_name = 'accounts/user_detail.html'
+    context_object_name = 'user_detail'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+    login_url = reverse_lazy('login')
+    redirect_field_name = 'next'
+    

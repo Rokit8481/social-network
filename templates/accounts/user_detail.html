@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User Detail - {{ user_detail.username }}{% endblock %}
+
+{% block content %}
+<h2>Деталі користувача</h2>
+<div class="user-detail">
+    <div class="avatar">
+        {% if user_detail.avatar %}
+            <img src="{{ user_detail.avatar.url }}" alt="{{ user_detail.username }}" width="100" class="rounded-circle">
+        {% else %}
+            <span class="text-muted">Аватар не завантажено</span>
+        {% endif %}
+    </div>
+    <p><strong>Ім'я користувача:</strong> {{ user_detail.username }}</p>
+    <p><strong>Ім'я:</strong> {{ user_detail.first_name }}</p>
+    <p><strong>Прізвище:</strong> {{ user_detail.last_name }}</p>
+    <p><strong>Емейл:</strong> {{ user_detail.email }}</p>
+    <p><strong>Мобільний:</strong> {{ user_detail.mobile }}</p>
+    <p><strong>Біо:</strong> {{ user_detail.bio }}</p>
+    <p><strong>День народження:</strong> {{ user_detail.birthday }}</p>
+</div>
+<a href="{% url 'users_list' %}" class="btn btn-primary">Назад до списку користувачів</a>
+{% endblock %}

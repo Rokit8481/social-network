@@ -6,6 +6,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th>Айді</th>
             <th>Аватар</th>
             <th>Ім'я користувача</th>
             <th>Ім'я</th>
@@ -19,6 +20,7 @@
     <tbody>
         {% for user in users %}
         <tr>
+            <td>{{ user.id }}</td>
             <td>
                 {% if user.avatar %}
                     <img src="{{ user.avatar.url }}" alt="{{ user.username }}" width="50" class="rounded-circle">
@@ -26,7 +28,7 @@
                     <span class="text-muted">—</span>
                 {% endif %}
             </td>
-            <td>{{ user.username }}</td>
+            <td><a href={% url "user_detail" user.slug %} style="text-decoration: none;">{{ user.username }}<a></td>
             <td>{{ user.first_name }}</td>
             <td>{{ user.last_name }}</td>
             <td>{{ user.email }}</td>
