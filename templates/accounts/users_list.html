@@ -6,21 +6,20 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Айді</th>
-            <th>Аватар</th>
-            <th>Ім'я користувача</th>
-            <th>Ім'я</th>
-            <th>Прізвище</th>
-            <th>Емейл</th>
-            <th>Мобільний</th>
-            <th>Біо</th>
-            <th>День народження</th>
+
+            <th>Avatar</th>
+            <th>Username</th>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Bio</th>
+            <th>Bithday</th>
         </tr>
     </thead>
     <tbody>
         {% for user in users %}
         <tr>
-            <td>{{ user.id }}</td>
             <td>
                 {% if user.avatar %}
                     <img src="{{ user.avatar.url }}" alt="{{ user.username }}" width="50" class="rounded-circle">
@@ -38,7 +37,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="8">Користувачів немає</td>
+            <td colspan="8">No users</td>
         </tr>
         {% endfor %}
     </tbody>

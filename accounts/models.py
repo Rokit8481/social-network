@@ -19,8 +19,30 @@ class UserProfile(AbstractUser):
 
         super().delete(*args, **kwargs)
 
-        
     class Meta:
         verbose_name = 'User Profile'
         verbose_name_plural = 'User Profiles'
         ordering = ['username']
+
+class Follow(models.Model):
+    follower = models.ForeignKey(
+        UserProfile,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Follower'
+    )
+    following = models.ForeignKey(
+        UserProfile,
+        on_delete=models.CASCADE,
+        related_name='followers',
+        verbose_name='Following'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Follow'
+        verbose_name_plural = 'Follows'
+        unique_together = ('follower', 'following')
+
+    def __str__(self):
+        return f"{self.follower} → {self.following}"
