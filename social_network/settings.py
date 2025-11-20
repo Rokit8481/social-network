@@ -38,9 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'phonenumber_field',
     'accounts',
-    'channels',
+    'groups',
     'messenger',
     'notifications',
     'posts',
@@ -75,7 +76,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'social_network.wsgi.application'
+ASGI_APPLICATION = 'social_network.asgi.application'
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

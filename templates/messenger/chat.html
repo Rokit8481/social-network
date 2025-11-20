@@ -1,0 +1,513 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+  body {
+    background: linear-gradient(270deg, #1e1e2f, #171720, #1a1a26, #171720, #1e1e2f);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+    color: #e5e5e5;
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .container {
+    color: #e5e5e5;
+  }
+
+  .list-group-item {
+    background-color: #2b2b3b;
+    color: #e0e0e0;
+    border: 1px solid #3a3a4a;
+    transition: 0.2s;
+  }
+  .list-group-item:hover {
+    background-color: #383850;
+    color: #fff;
+  }
+
+  .btn-outline-secondary, .btn-outline-primary {
+    border-color: #555;
+    color: #ddd;
+  }
+  .btn-outline-secondary:hover, .btn-outline-primary:hover {
+    background-color: #444;
+    color: #fff;
+  }
+
+  .active-chat {
+    background: linear-gradient(45deg, #4f46e5, #3b82f6);
+    color: white !important;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+  }
+  .active-chat:hover {
+    background: linear-gradient(45deg, #4338ca, #2563eb);
+    color: white;
+  }
+
+  #chat-box {
+    background-color: #20202c;
+    color: #e5e5e5;
+  }
+
+  .message-content.bg-light {
+    background-color: #2d2d3b !important;
+    color: #f0f0f0 !important;
+    border: 1px solid #444;
+  }
+
+  .message-content.bg-primary {
+    background: linear-gradient(45deg, #2563eb, #1d4ed8) !important;
+  }
+
+  .message-content.editing {
+    box-shadow: 0 0 12px 2px orange;
+  }
+
+  /* реакції */
+  .reaction-btn {
+    transition: 0.2s;
+    color: #fff;
+  }
+
+  .active-reaction-btn {
+    background: linear-gradient(45deg, #f59e0b, #d97706);
+    color: #fff;
+    box-shadow: 0 0 8px #f59e0b;
+  }
+
+  .reaction-inactive-btn {
+    background: linear-gradient(45deg, #6d28d9, #8b5cf6);
+    color: #fff;
+  }
+
+  .reaction-new-btn {
+    background: linear-gradient(45deg, #06b6d4, #0891b2);
+    color: #fff;
+  }
+
+  .emoji-picker {
+    position: absolute;
+    background: #2a2a3a;
+    border: 1px solid #444;
+    padding: 8px;
+    border-radius: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 340px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  }
+
+  .emoji-choice {
+    cursor: pointer;
+    font-size: 1.3em;
+    transition: transform 0.1s;
+  }
+  .emoji-choice:hover {
+    transform: scale(1.3);
+  }
+
+  input.form-control, select.form-select {
+    background-color: #2b2b3b !important;
+    border: 1px solid #555 !important;
+    color: #e5e5e5 !important;
+  }
+  input.form-control::placeholder {
+    color: #aaa !important;
+  }
+
+  button.btn-primary {
+    background-color: #3b82f6;
+    border-color: #2563eb;
+  }
+  button.btn-primary:hover {
+    background-color: #2563eb;
+  }
+</style>
+
+<div class="container mt-4">
+
+  <div class="d-flex justify-content-center mb-3">
+    <button id="btn-chats" class="btn btn-outline-secondary">Чати</button>
+    <button id="btn-users" class="btn btn-outline-primary ms-2">Користувачі</button>
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+      <div id="user-list" class="list-group d-none">
+        {% for user in users %}
+          <form method="post" action="{% url 'create_chat' %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <button type="submit" class="list-group-item list-group-item-action">
+              {{ user.username }}
+            </button>
+          </form>
+        {% empty %}
+          <p class="text-muted px-3">Немає інших користувачів.</p>
+        {% endfor %}
+      </div>
+
+      <div id="chat-list" class="list-group">
+        <a href="{% url 'create_group' %}" class="mb-2 btn btn-outline-primary text-light">➕ Створити чат</a>
+        {% for c in chats %}
+          <a href="{% url 'chat' c.id %}"
+            class="list-group-item list-group-item-action {% if c.pk == chat.pk %}active-chat{% endif %}">
+            {% if c.is_group %}
+              💬 {{ c.title }}
+            {% else %}
+              👤 {{ c }}
+            {% endif %}
+          </a>
+        {% empty %}
+          <div class="text-muted text-center mt-2">Немає чатів</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <h3 class="text-light">
+        {% if chat.is_group %}
+          {{ chat.title }}
+        {% else %}
+          {{ chat }}
+        {% endif %}
+        {% if chat.id %}
+          <a href="{% url 'chat_edit' chat.id %}" class="btn btn-sm btn-outline-secondary ms-2">Редагувати</a>
+          <a href="#" class="btn btn-sm btn-outline-danger ms-2" id="chat-delete-btn">Видалити</a>
+        {% endif %}
+      </h3>
+
+      {% if chat.id %}
+        <div id="chat-box" class="p-4 mb-3 rounded shadow-sm"
+          style="height:600px; overflow-y:auto; border:1px solid #444;
+          {% if chat.background %}
+            background: url('{{ chat.background.url }}') no-repeat center center;
+            background-size: cover;
+          {% else %}
+            background: #1f1f2e;
+          {% endif %}">
+          {% for message in messages %}
+            <div class="d-flex {% if message.user == request.user %}justify-content-end{% else %}justify-content-start{% endif %} mb-2">
+              <div class="p-2 border rounded message-content {% if message.user == request.user %}bg-primary text-white{% else %}bg-light{% endif %}"
+                  style="max-width: 80%; width: fit-content; word-wrap: break-word;"
+                  data-message-id="{{ message.id }}">
+                <div class="text-muted" style="font-size: 0.7em;">{{ message.created_at|date:"H:i, d M Y" }}</div>
+                <strong>{{ message.user.username }}:</strong>
+                <span class="message-text"> {{ message.text|linebreaksbr }} </span>
+                <div class="mt-1 message-reactions">
+                  <div class="reactions-list d-inline-block">
+                    {% for reaction in message.reaction_counts %}
+                      <button class="reaction-btn mb-2 mt-2 me-2 p-2 border rounded
+                        {% if message.user_reacted_emoji == reaction.emoji %}
+                          active-reaction-btn
+                        {% else %}
+                          reaction-inactive-btn
+                        {% endif %}"
+                        data-emoji="{{ reaction.emoji }}">
+                        {{ reaction.emoji }} <small>×{{ reaction.count }}</small>
+                      </button>
+                    {% endfor %}
+                  </div>
+                  <div class="emoji-picker d-none">
+                    {% for emoji, label in emoji_choices %}
+                      <span class="emoji-choice" data-emoji="{{ emoji }}">{{ emoji }}</span>
+                    {% endfor %}
+                    {% if message.user == request.user %}
+                      <div class="justify-content-between align-content-between d-flex mt-2">
+                        <a href='#' class="btn btn-sm btn-outline-danger ms-2 message-delete-btn fs-6" data-message-id="{{ message.id }}">Видалити</a>
+                        <a href='{% url "message_edit" message.pk %}' class="btn btn-sm btn-outline-warning ms-2 message-update-btn fs-6" data-message-id="{{ message.id }}">Редагувати</a>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <form id="message-form" class="d-flex" method="post" action="javascript:void(0)">
+          {% csrf_token %}
+          {{ form.text }}
+          <button type="submit" class="btn btn-primary ms-2">Надіслати</button>
+        </form>
+
+      {% else %}
+        <div id="chat-box" class="p-4 mb-3 rounded shadow-sm justify-content-center align-items-center d-flex"
+          style="height:600px; overflow-y:auto; border:1px solid #444; background:#1e1e2a;">
+          <p class="card text-center border-2 p-2 m-2 fs-4 bg-dark text-light">
+            Виберіть чат або користувача, щоб почати спілкування.
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+  document.getElementById('btn-users').addEventListener('click', function() {
+    document.getElementById('user-list').classList.remove('d-none');
+    document.getElementById('chat-list').classList.add('d-none');
+  
+    this.classList.replace('btn-outline-primary', 'btn-primary');      
+    document.getElementById('btn-chats').classList.replace('btn-primary', 'btn-outline-secondary'); 
+  });
+  
+  document.getElementById('btn-chats').addEventListener('click', function() {
+    document.getElementById('chat-list').classList.remove('d-none');
+    document.getElementById('user-list').classList.add('d-none');
+  
+    this.classList.replace('btn-outline-secondary', 'btn-primary');     
+    document.getElementById('btn-users').classList.replace('btn-primary', 'btn-outline-primary'); 
+  });
+  
+  const chatId = {{ chat.id|default:'null' }};
+  const chatBox = document.querySelector('#chat-box');
+  const form = document.querySelector('#message-form');
+  const textInput = form.querySelector('input[name="text"]');
+  const currentUser = "{{ request.user.username }}";
+  
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const socket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${chatId}/`);
+  
+  function createReactionButton(emoji, count) {
+    const btn = document.createElement('button');
+    btn.classList.add('reaction-btn', 'mb-2', 'mt-2', 'me-2', 'p-2', 'border', 'rounded');
+    btn.classList.add('reaction-new-btn');
+    btn.dataset.emoji = emoji;
+    btn.innerHTML = `${emoji} <small>×${count}</small>`;
+  
+    btn.addEventListener('click', () => {
+      const messageId = btn.closest('.message-content').dataset.messageId;
+      socket.send(JSON.stringify({
+        type: 'reaction_update',
+        message_id: messageId,
+        emoji: emoji
+      }));
+    });
+  
+    return btn;
+  }
+  
+  socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+  
+    if (data.type === 'chat_message') {
+      const isOwn = data.user === currentUser;
+      const messageHTML = `
+        <div class="d-flex justify-content-${isOwn ? 'end' : 'start'} mb-2">
+          <div class="p-2 border rounded message-content ${isOwn ? 'bg-primary text-white' : 'bg-light'}"
+               data-message-id="${data.id}"
+               style="max-width:80%; width:fit-content; word-wrap:break-word;">
+            <div class="text-muted" style="font-size:0.7em;">${data.time}</div>
+            <strong>${data.user}:</strong> 
+            <span class="message-text">${data.text}</span>
+            <div class="mt-1 message-reactions">
+              <div class="reactions-list d-inline-block"></div>
+              <div class="emoji-picker d-none" 
+                   style="position:absolute; background:#fff; border:1px solid #ccc; padding:5px; border-radius:5px; z-index:1000; display:flex; flex-wrap:wrap; gap:3px; max-width:335px;">
+                {% for emoji, label in emoji_choices %}
+                  <span class="emoji-choice" data-emoji="{{ emoji }}" 
+                        style="cursor:pointer; font-size:1.2em;">{{ emoji }}</span>
+                {% endfor %}
+                {% if message.user == request.user %}
+                  <div class="justify-content-between align-content-between d-flex mt-2">
+                    <div style="width:100%; height:1px; border-bottom:1px solid #ccc; margin:5px 0;"></div>
+                      <a href='#' class="btn btn-sm btn-outline-danger ms-2 message-delete-btn fs-6" data-message-id="${data.id}" style="cursor:pointer;">Видалити</a>
+                    <div style="width:100%; height:1px; border-bottom:1px solid #ccc; margin:5px 0;"></div>
+                      <a href='{% url "message_edit" message.pk %}' class="btn btn-sm btn-outline-warning ms-2 message-update-btn fs-6" data-message-id="${data.id}" style="cursor:pointer;">Редагувати</a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      chatBox.insertAdjacentHTML('beforeend', messageHTML);
+      scrollToBottom();
+      attachRightClickEvents();
+      attachEmojiClickEvents();
+    }
+  
+    if (data.type === 'reaction_update') {
+      const msgEl = document.querySelector(`[data-message-id="${data.message_id}"]`);
+      if (!msgEl) return;
+  
+      const list = msgEl.querySelector('.reactions-list');
+      list.innerHTML = '';
+  
+      data.counts.forEach(r => {
+        const btn = createReactionButton(r.emoji, r.count);
+        list.appendChild(btn);
+      });
+    }
+    if (data.type === 'message_deleted') {
+      const msg = document.querySelector(`[data-message-id="${data.message_id}"]`);
+      if (msg) msg.remove();
+    }
+    if (data.type === 'update_message') { 
+      const msgEl = document.querySelector(`[data-message-id="${data.id}"]`);
+      if (msgEl) {
+        const messageTextEl = msgEl.querySelector('.message-text');
+        if (messageTextEl) {
+          messageTextEl.innerText = data.text;
+          msgEl.classList.remove('editing');
+        }
+      }
+    }    
+  };
+
+  document.querySelectorAll('.reaction-btn').forEach(btn => {
+    const emoji = btn.dataset.emoji;
+    btn.addEventListener('click', () => {
+      const messageId = btn.closest('.message-content').dataset.messageId;
+      socket.send(JSON.stringify({
+        type: 'reaction_update',
+        message_id: messageId,
+        emoji: emoji
+      }));
+    });
+  });
+  
+  const deleteChatBtn = document.getElementById('chat-delete-btn');
+  {% if chat.id  %}
+  deleteChatBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    const confirmed = confirm("Ви впевнені що хочете видалити цей чат?");
+    if (!confirmed) return;
+    fetch("{% url 'chat_delete' chat.id %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Accept": "application/json",
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) window.location.href = data.redirect_url;
+    })
+    .catch(err => console.error(err));
+  });
+  {% endif %}
+  
+  document.querySelectorAll('.message-delete-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (!confirm("Ви впевнені що хочете видалити це повідомлення?")) return;
+  
+      const messageId = this.dataset.messageId;
+  
+      socket.send(JSON.stringify({
+        type: "delete_message",
+        message_id: messageId
+      }));
+    });
+  });
+  
+
+  let editingMessageId = null;
+  const sendBtn = form.querySelector('button[type="submit"]');
+
+  document.querySelectorAll(".message-update-btn").forEach(btn => {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const messageBlock = this.closest('.message-content');
+      const messageId = this.dataset.messageId;
+      const messageTextEl = messageBlock.querySelector('.message-text');
+      const messageText = messageTextEl ? messageTextEl.innerText.trim() : '';
+
+      document.querySelectorAll('.message-content').forEach(el => el.classList.remove('editing'));
+      messageBlock.classList.add('editing');
+
+
+      textInput.value = messageText;
+      textInput.focus();
+
+      editingMessageId = messageId;
+      sendBtn.textContent = "Зберегти зміни";
+      sendBtn.classList.remove("btn-primary");
+      sendBtn.classList.add("btn-warning");
+    });
+  });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const text = textInput.value.trim();
+    if (!text) return;
+  
+    if (editingMessageId) {
+      socket.send(JSON.stringify({
+        type: "update_message",
+        message_id: editingMessageId,
+        text: text
+      }));
+    
+      textInput.value = "";
+      editingMessageId = null;
+      sendBtn.textContent = "Надіслати";
+      sendBtn.classList.remove("btn-warning");
+      sendBtn.classList.add("btn-primary");
+    }
+    else {
+      socket.send(JSON.stringify({
+        type: 'chat_message',
+        text: text
+      }));
+      textInput.value = '';
+    }    
+  });  
+
+  function scrollToBottom() {
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+  
+  function attachRightClickEvents() {
+    document.querySelectorAll('.message-content').forEach(msg => {
+      msg.oncontextmenu = e => {
+        e.preventDefault();
+        document.querySelectorAll('.emoji-picker').forEach(p => p.classList.add('d-none'));
+        const picker = msg.querySelector('.emoji-picker');
+        if (!picker) return;
+        picker.style.top = (e.clientY + window.scrollY) + 'px';
+        picker.style.left = (e.clientX + window.scrollX) + 'px';
+        picker.classList.remove('d-none');
+      };
+    });
+  }
+  
+  function attachEmojiClickEvents() {
+    document.querySelectorAll('.emoji-choice').forEach(choice => {
+      choice.onclick = () => {
+        const emoji = choice.dataset.emoji;
+        const picker = choice.closest('.emoji-picker');
+        const messageId = picker.closest('.message-content').dataset.messageId;
+  
+        socket.send(JSON.stringify({
+          type: 'reaction_update',
+          message_id: messageId,
+          emoji: emoji
+        }));
+  
+        picker.classList.add('d-none');
+      };
+    });
+  }
+  
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.emoji-picker')) {
+      document.querySelectorAll('.emoji-picker').forEach(p => p.classList.add('d-none'));
+    }
+  });
+  
+  attachRightClickEvents();
+  attachEmojiClickEvents();
+  scrollToBottom();
+  
+</script>
+{% endblock %}
