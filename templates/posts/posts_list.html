@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Posts{% endblock %}
+
+{% block content %}
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPostModal">
+        Create Post
+    </button>
+
+    <hr>
+
+    {% for post in posts %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h4><a href={% url "post-detail" post_pk=post.pk %} class='text-decoration-none'>{{ post.title }}</a></h4>
+                <p>{{ post.content|truncatechars:"100" }}</p>
+                
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+                <button class="like-btn btn btn-light border px-3" style="border-radius: 12px;" data-post-id="{{ post.id }}">
+                  ❤️ <span class="likes-count">{{ post.likes.count }}</span>
+                </button>
+
+            </div>
+        </div>
+    {% endfor %}
+
+</div>
+
+
+<div class="modal fade" id="createPostModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Create Post</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="modal-body">
+            {{ form.as_p }}
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Create</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
