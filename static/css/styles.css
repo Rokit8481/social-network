@@ -1,3 +1,216 @@
+body {
+    background: linear-gradient(270deg, #1e1e2f, #171720, #1a1a26, #171720, #1e1e2f);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+    color: #e5e5e5;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    color: #e5e5e5;
+}
+
+.list-group-item {
+    background-color: #2b2b3b;
+    color: #e0e0e0;
+    border: 1px solid #3a3a4a;
+    transition: 0.2s;
+}
+
+.list-group-item:hover {
+    background-color: #383850;
+    color: #fff;
+}
+
+.btn-outline-secondary, .btn-outline-primary {
+    border-color: #555;
+    color: #ddd;
+}
+
+.btn-outline-secondary:hover, .btn-outline-primary:hover {
+    background-color: #444;
+    color: #fff;
+}
+
+.active-chat {
+    background: linear-gradient(45deg, #4f46e5, #3b82f6);
+    color: white !important;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+.active-chat:hover {
+    background: linear-gradient(45deg, #4338ca, #2563eb);
+    color: white;
+}
+
+#chat-box {
+    background-color: #20202c;
+    color: #e5e5e5;
+}
+
+.message-content.bg-light {
+    background-color: #2d2d3b !important;
+    color: #f0f0f0 !important;
+    border: 1px solid #444;
+}
+
+.message-content.bg-primary {
+    background: linear-gradient(45deg, #2563eb, #1d4ed8) !important;
+}
+
+.message-content.editing {
+    box-shadow: 0 0 12px 2px orange;
+}
+
+/* реакції */
+.reaction-btn {
+    transition: 0.2s;
+    color: #fff;
+}
+
+.active-reaction-btn {
+    background: linear-gradient(45deg, #f59e0b, #d97706);
+    color: #fff;
+    box-shadow: 0 0 8px #f59e0b;
+}
+
+.reaction-inactive-btn {
+    background: linear-gradient(45deg, #6d28d9, #8b5cf6);
+    color: #fff;
+}
+
+.reaction-new-btn {
+    background: linear-gradient(45deg, #06b6d4, #0891b2);
+    color: #fff;
+}
+
+.emoji-picker {
+    position: absolute;
+    background: #2a2a3a;
+    border: 1px solid #444;
+    padding: 8px;
+    border-radius: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 340px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.6);
+}
+
+.emoji-choice {
+    cursor: pointer;
+    font-size: 1.3em;
+    transition: transform 0.1s;
+}
+
+.emoji-choice:hover {
+    transform: scale(1.3);
+}
+
+input.form-control, select.form-select {
+    background-color: #2b2b3b !important;
+    border: 1px solid #555 !important;
+    color: #e5e5e5 !important;
+}
+
+input.form-control::placeholder {
+    color: #aaa !important;
+}
+
+button.btn-primary {
+    background-color: #3b82f6;
+    border-color: #2563eb;
+}
+button.btn-primary:hover {
+    background-color: #2563eb;
+}
+
+.form-card {
+    background-color: rgba(35, 35, 50, 0.95);
+    border-radius: 16px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    color: #e5e5e5;
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+}
+
+.card-title {
+    color: #60a5fa;
+    text-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
+}
+
+input.form-control,
+select.form-select {
+    background-color: #2b2b3b !important;
+    border: 1px solid #555 !important;
+    color: #e5e5e5 !important;
+}
+
+input.form-control::placeholder {
+    color: #aaa !important;
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #16a34a, #22c55e);
+    border: none;
+    color: #fff;
+    font-weight: 500;
+    transition: all 0.25s;
+}
+
+.btn-success:hover {
+    background: linear-gradient(45deg, #15803d, #16a34a);
+    box-shadow: 0 0 10px rgba(22, 163, 74, 0.7);
+    transform: translateY(-1px);
+}
+
+label {
+    color: #ccc;
+}
+
+.alert-danger {
+    background-color: rgba(180, 30, 30, 0.2);
+    border-color: #b91c1c;
+    color: #fca5a5;
+}
+
+label.form-label {
+    color: #ccc;
+  }
+
+input.form-control,
+select.form-select {
+    background-color: #2b2b3b !important;
+    border: 1px solid #555 !important;
+    color: #e5e5e5 !important;
+}
+
+input.form-control::placeholder {
+    color: #aaa !important;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #2563eb, #3b82f6);
+    border: none;
+    transition: all 0.25s;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #1e3a8a, #2563eb);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+    transform: translateY(-1px);
+}
+
 .profile-header {
     display: flex;
     align-items: center;
