@@ -36,16 +36,29 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-      <form method="POST">
+      <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="modal-body">
-            {{ form.as_p }}
+          <div class="mb-1">
+            {{ form.title }}
+          </div>
+          <div class="mb-1">
+            {{ form.content }}
+          </div>
+          <div class="mb-1">
+            {{ form.people_tags }}
+          </div>
+          
+          <div class="mb-3">
+              <label for="id_files" class="form-label">Files</label>
+              <input type="file" name="files" id="id_files" multiple class="form-control">
+          </div>
         </div>
-
+        
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Create</button>
+            <button type="submit" class="btn btn-success">Create</button>
         </div>
-      </form>
+    </form>
 
     </div>
   </div>
