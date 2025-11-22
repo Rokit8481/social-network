@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+import os
 
 User = get_user_model()
 
@@ -31,6 +32,15 @@ class File(BaseModel):
 
     def __str__(self):
         return f"File for {self.post.title}"
+    
+    @property
+    def file_type(self):
+        ext = os.path.splitext(self.file.name)[1].lower()
+        if ext in [".jpg", ".jpeg", ".png", ".gif"]:
+            return "image"
+        if ext in [".mp4", ".mov", ".webm"]:
+            return "video"
+        return "other"
     
     class Meta:
         verbose_name = 'File'

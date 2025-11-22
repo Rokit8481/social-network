@@ -12,6 +12,9 @@ User = get_user_model()
 class PostsListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         posts = Post.objects.all().order_by('-created_at')
+        for post in posts:
+            post.has_tags = post.people_tags.exists()
+
         form = PostForm()
         return render(request, 'posts/posts_list.html', {
             'posts': posts,
@@ -19,7 +22,7 @@ class PostsListView(LoginRequiredMixin, View):
         })
 
     def post(self, request, *args, **kwargs):
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)    
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
