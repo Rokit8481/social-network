@@ -109,7 +109,7 @@ class CreateGroupView(CreateView):
     model = Chat
     form_class = GroupForm
     template_name = 'messenger/create_group.html'
-    success_url = reverse_lazy('main')
+    success_url = reverse_lazy('messenger_main')
 
     def form_valid(self, form):
         form.instance.is_group = True
