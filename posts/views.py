@@ -27,6 +27,7 @@ class PostsListView(LoginRequiredMixin, View):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+            form.save_m2m()
 
             for f in request.FILES.getlist('files'):
                 File.objects.create(post=post, file=f)

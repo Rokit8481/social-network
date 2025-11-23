@@ -76,8 +76,7 @@
                             👁️ {{ viewers_count }} views
                         </div>
                     </div>
-                </div>
-                {% if post.people_tags %}
+                {% if post.people_tags.exists %}
                     <div class="mt-2">
                         👥 Tagged:
                         {% for user in post.people_tags.all %}
@@ -88,7 +87,6 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                
                 </div>
 
             </div>
