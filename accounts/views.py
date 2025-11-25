@@ -5,8 +5,10 @@ from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from accounts.models import Follow
-from accounts.forms import CustomUserCreationForm, CustomAuthenticationForm
-from django.contrib.auth import get_user_model
+from posts.models import Post
+from django.contrib import messages
+from accounts.forms import CustomUserCreationForm, CustomAuthenticationForm, UserEditForm
+from django.contrib.auth import get_user_model, update_session_auth_hash
 
 User = get_user_model()
 
@@ -15,14 +17,12 @@ class CustomLoginView(LoginView):
     redirect_authenticated_user = True
     form_class = CustomAuthenticationForm 
 
-
 class CustomLogoutView(View):
     next_page = reverse_lazy('login')
 
     def get(self, request, *args, **kwargs):
         logout(request)
         return redirect(self.next_page)
-        
 
 class RegisterView(CreateView):
     model = User
@@ -38,6 +38,58 @@ class UsersListView(LoginRequiredMixin, ListView):
     login_url = reverse_lazy('login')
     redirect_field_name = 'next'
 
+class EditUserView(LoginRequiredMixin, View):
+    template_name = 'accounts/edit_user.html'
+    login_url = reverse_lazy('login')
+    redirect_field_name = 'next'
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        form = UserEditForm(instance=user)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        form = UserEditForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('user_detail', slug=user.slug)
+        return render(request, self.template_name, {'form': form})
+
+class ChangePasswordView(LoginRequiredMixin, View):
+    template_name = 'accounts/change_password.html'
+
+    def get(self, request, slug, *args, **kwargs):
+        if request.user.slug != slug:
+            return redirect('user_detail', slug=request.user.slug)
+
+        return render(request, self.template_name)
+
+    def post(self, request, slug, *args, **kwargs):
+        if request.user.slug != slug:
+            return redirect('user_detail', slug=request.user.slug)
+
+        user = request.user
+
+        old_password = request.POST.get("old_password")
+        new_password1 = request.POST.get("new_password1")
+        new_password2 = request.POST.get("new_password2")
+
+        if not user.check_password(old_password):
+            messages.error(request, "Old password is incorrect.")
+            return render(request, self.template_name)
+            
+        if new_password1 != new_password2:
+            messages.error(request, "New passwords do not match.")
+            return render(request, self.template_name)
+
+        user.set_password(new_password1)
+        user.save()
+
+        update_session_auth_hash(request, user)
+
+        messages.success(request, "Password successfully changed!")
+        return redirect('user_detail', slug=user.slug)
 
 class UserDetailView(LoginRequiredMixin, View):
     template_name = 'accounts/user_detail.html'
@@ -54,12 +106,12 @@ class UserDetailView(LoginRequiredMixin, View):
         followers_count = user_detail.followers.count()
         following_count = user_detail.following.count()
 
-        is_following = False
-        if request.user.is_authenticated:
-            is_following = Follow.objects.filter(
-                follower=request.user,
-                following=user_detail
-            ).exists()
+        is_following = Follow.objects.filter(
+            follower=request.user,
+            following=user_detail
+        ).exists()
+
+        posts = Post.objects.filter(author=user_detail).order_by("-created_at")
 
         context = {
             "user_detail": user_detail,
@@ -68,10 +120,11 @@ class UserDetailView(LoginRequiredMixin, View):
             "followers_count": followers_count,
             "following_count": following_count,
             "is_following": is_following,
+            "posts": posts,
         }
 
         return render(request, self.template_name, context)
-    
+
 class ToggleFollowView(LoginRequiredMixin, View):
     login_url = reverse_lazy('login')
     redirect_field_name = 'next'
