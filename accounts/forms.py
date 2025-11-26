@@ -30,6 +30,25 @@ class CustomUserCreationForm(UserCreationForm):
             'password2': forms.PasswordInput(attrs={'class': 'form-control'}),
         }
 
+class UserEditForm(forms.ModelForm):
+    mobile = PhoneNumberField(
+        widget=RegionalPhoneNumberWidget(attrs={'class': 'form-control'}),
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'first_name', 'last_name', 'email', 
+            'bio', 'avatar', 'mobile', 'birthday'
+        )
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'birthday': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
