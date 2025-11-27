@@ -12,3 +12,5 @@ db.sqlite3
 db.sqlite3-journal
 media/avatars/
 media/post_files/
+media/backgrounds/
+media/group_messages/

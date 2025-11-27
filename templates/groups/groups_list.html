@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Groups{% endblock %}
+
+{% block content %}
+<div class="container groups-list">
+  <h1>Groups</h1>
+
+  {% if groups %}
+    <div class="groups-grid">
+      {% for group in groups %}
+        <article class="group-card">
+          <header>
+            <h2 class="group-title">{{ group.title }}</h2>
+            <p class="group-meta">Created by <strong>{{ group.creator.username }}</strong> · {{ group.members.count }} members</p>
+          </header>
+
+          <div class="group-body">
+            <p class="group-desc">{{ group.description|default:"No description" }}</p>
+            {% if group.tags.all %}
+              <div class="group-tags">
+                {% for tag in group.tags.all %}
+                  <span class="tag">#{{ tag.name }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No groups found.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

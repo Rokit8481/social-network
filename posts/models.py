@@ -1,15 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from accounts.models import BaseModel
 import os
 
 User = get_user_model()
-
-class BaseModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
 
 class Post(BaseModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts', verbose_name='Author')
