@@ -169,12 +169,11 @@
                 <hr>
 
                 <div class="d-flex justify-content-between align-items-center">
-                    <button class="btn btn-light border px-3 like-btn"
+                    <button class="like-btn btn btn-light border px-3"
                             data-post-id="{{ post.id }}"
                             style="border-radius: 12px;">
-                        ❤️ <span class="likes-count">{{ post.likes.count }}</span>
+                            ❤️ <span class="likes-count">{{ post.likes.count }}</span>
                     </button>
-
                     <div class="text-muted small">
                         👁️ {{ post.viewers.count }} views |
                         💬 {{ post.comments.count }} comments

@@ -30,6 +30,9 @@ class CreateChatView(LoginRequiredMixin, View):
             chat = Chat.objects.create(is_group=False)
             chat.users.add(current_user, other_user)
 
+            chat.title = other_user.username
+            chat.save()
+            
         return redirect('chat', chat_pk=chat.id)
     
 # Вью для редагування чату/групи
@@ -159,7 +162,10 @@ class ChatView(LoginRequiredMixin, View):
                     user=request.user
                 )
             }
-
+            if chat.is_group == False:
+                chat.title = User.objects.exclude(id=request.user.id).filter(chats__id=chat.id).first().username
+                chat.save()
+                
             for msg in messages:
                 msg.reaction_counts = (
                     msg.reactions.values("emoji")
