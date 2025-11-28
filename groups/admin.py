@@ -1,12 +1,5 @@
 from django.contrib import admin
-from .models import Group, GroupMessage, GroupMessageFile, Tags
-
-class TagsInline(admin.TabularInline):
-    model = Tags
-    extra = 1
-    fields = ('name',)
-    readonly_fields = ()
-    show_change_link = True
+from .models import Group, GroupMessage, GroupMessageFile, Tag
 
 class GroupMessageFileInline(admin.TabularInline):
     model = GroupMessageFile
@@ -21,7 +14,7 @@ class GroupMessageInline(admin.TabularInline):
     fields = ('sender', 'content', 'slug')
     readonly_fields = ('slug',)
     show_change_link = True
-    inlines = [GroupMessageFileInline]  
+    inlines = [GroupMessageFileInline]
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
@@ -29,8 +22,9 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ('title', 'creator__username', 'slug')
     list_filter = ('created_at',)
     readonly_fields = ('slug',)
-    inlines = [TagsInline, GroupMessageInline]
-
+    inlines = [GroupMessageInline]
+    filter_horizontal = ('tags',) 
+    
 @admin.register(GroupMessage)
 class GroupMessageAdmin(admin.ModelAdmin):
     list_display = ('group', 'sender', 'slug', 'created_at')
@@ -45,8 +39,7 @@ class GroupMessageFileAdmin(admin.ModelAdmin):
     search_fields = ('message__slug', 'file')
     list_filter = ('created_at',)
 
-@admin.register(Tags)
-class TagsAdmin(admin.ModelAdmin):
-    list_display = ('name', 'group')
-    search_fields = ('name', 'group__title')
-    list_filter = ('group',)
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)

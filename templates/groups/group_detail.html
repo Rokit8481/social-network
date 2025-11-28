@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ group.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card p-4">
+        <h2 class="mb-1">{{ group.title }}</h2>
+
+        <p class="text-muted">Members: {{ group.members.count }}</p>
+
+        <div class="mt-2">
+            <strong>Tags:</strong><br>
+
+            {% for tag in tags %}
+                <span class="badge bg-secondary tag-item mb-1"
+                      data-index="{{ forloop.counter0 }}"
+                      {% if forloop.counter > 3 %} style="display:none" {% endif %}>
+                    <a href="{% url 'groups_list' %}?tag={{ tag.name }}">#{{ tag.name }}</a>
+                </span>
+            {% endfor %}
+
+            {% if tags|length > 3 %}
+                <div class="mt-2">
+                    <button id="show-more-tags" class="btn btn-link p-0 me-3">Show more...</button>
+                    <button id="hide-tags" class="btn btn-link p-0" style="display:none">Hide</button>
+                </div>
+            {% endif %}
+        </div>
+
+        <hr class="mt-3">
+
+        <div class="mt-3">
+            {% for msg in messages %}
+                <div class="mb-3">
+                    <strong>{{ msg.sender.username }}</strong>
+                    <small class="text-muted">{{ msg.created_at|date:"d.m.Y H:i" }}</small>
+                    <p class="mb-1">{{ msg.content }}</p>
+
+                    {% if msg.files.all %}
+                        <div class="ms-3">
+                            {% for f in msg.files.all %}
+                                <a href="{{ f.file.url }}" download>{{ f.file.name }}</a><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <hr>
+            {% endfor %}
+
+            {% if not messages %}
+                <p class="text-muted">No messages yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const TAGS_TO_SHOW = 3;
+    const showBtn = document.getElementById('show-more-tags');
+    const hideBtn = document.getElementById('hide-tags');
+    const tags = Array.from(document.querySelectorAll('.tag-item'));
+
+    if (!showBtn && !hideBtn) return;
+
+    function countHidden() {
+        return tags.filter(t => t.style.display === 'none').length;
+    }
+
+    function countExtraVisible() {
+        return tags.filter((t, i) => i >= TAGS_TO_SHOW && t.style.display !== 'none').length;
+    }
+
+    function updateButtons() {
+        const hidden = countHidden();
+        const extraVisible = countExtraVisible();
+        showBtn.style.display = hidden > 0 ? 'inline-block' : 'none';
+        hideBtn.style.display = extraVisible > 0 ? 'inline-block' : 'none';
+    }
+    updateButtons();
+
+    showBtn.addEventListener('click', function () {
+        const hiddenTags = tags.filter(t => t.style.display === 'none');
+        for (let i = 0; i < 3 && i < hiddenTags.length; i++) {
+            hiddenTags[i].style.display = 'inline-block';
+        }
+        updateButtons();
+    });
+
+    hideBtn.addEventListener('click', function () {
+        tags.forEach((t, idx) => {
+            if (idx >= TAGS_TO_SHOW) t.style.display = 'none';
+        });
+        updateButtons();
+    });
+})();
+</script>
+{% endblock %}

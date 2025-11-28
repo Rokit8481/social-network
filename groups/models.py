@@ -10,6 +10,23 @@ def generate_code():
 
 User = get_user_model()
 
+class Tag(BaseModel):
+    name = models.CharField(max_length=100, unique=True, verbose_name='Tag Name', null=False, blank=False)
+
+    class Meta:
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
+        ordering = ['name']
+        
+    def save(self, *args, **kwargs):
+        formatted = slugify(self.name).replace('-', '_')
+        formatted = '_'.join(filter(None, formatted.split('_')))
+        self.name = formatted
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+    
 class Group(BaseModel):
     title = models.CharField(max_length=200, verbose_name='Title', null=False, blank=False)
     description = models.TextField(verbose_name='Description', null=True, blank=True)
@@ -17,6 +34,7 @@ class Group(BaseModel):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_groups', null=False)
     admins = models.ManyToManyField(User, related_name='admin_groups', blank=True)
     members = models.ManyToManyField(User, related_name='members_in_groups', blank=True)
+    tags = models.ManyToManyField(Tag, related_name='groups', blank=True)
 
     class Meta:
         verbose_name = 'Group'
@@ -41,24 +59,6 @@ class Group(BaseModel):
         return user in self.admins.all()
     def is_member(self, user):
         return user in self.members.all()
-    
-class Tags(BaseModel):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='tags', null=False)
-    name = models.CharField(max_length=100, unique=True, verbose_name='Tag Name', null=False, blank=False)
-
-    class Meta:
-        verbose_name = 'Tag'
-        verbose_name_plural = 'Tags'
-        ordering = ['name']
-        
-    def save(self, *args, **kwargs):
-        formatted = slugify(self.name).replace('-', '_')
-        formatted = '_'.join(filter(None, formatted.split('_')))
-        self.name = formatted
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
     
 class GroupMessage(BaseModel):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='messages', null=False)
