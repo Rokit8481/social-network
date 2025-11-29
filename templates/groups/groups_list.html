@@ -35,10 +35,15 @@
 
                         <div class="mb-2">
                             {% for tag in group.tags.all %}
-                                <a href="?{% for t in selected_tags %}tag={{ t }}&{% endfor %}tag={{ tag.name }}" class="badge bg-secondary me-1">
+                                <a href="?{% for t in selected_tags %}tag={{ t }}&{% endfor %}tag={{ tag.name }}" class="badge bg-secondary me-1 text-decoration-none text-light">
                                     #{{ tag.name }}
                                 </a>
                             {% endfor %}
+                            {% if group.tags.all.count > 3 %}
+                                <div class="badge bg-secondary me-1">
+                                    +{{group.tags.all.count|add:"-3"}} more
+                                </div>
+                            {% endif %}
                         </div>
 
                         <a href="{% url 'group_detail' group.slug %}" class="btn btn-outline-primary btn-sm">Open group</a>

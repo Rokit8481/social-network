@@ -43,14 +43,18 @@ class Group(BaseModel):
 
     def __str__(self):
         return self.title
+    
+    def add_creator(self, user):
+        self.members.add(user)
+        self.admins.add(user)
     def add_admin(self, user):
         if user not in self.members.all():
             self.members.add(user)
         self.admins.add(user)  
-    def remove_admin(self, user):
-        self.admins.remove(user)
     def add_member(self, user):
         self.members.add(user)
+    def remove_admin(self, user):
+        self.admins.remove(user)
     def remove_member(self, user):
         self.members.remove(user)
         if user in self.admins.all():
@@ -59,6 +63,7 @@ class Group(BaseModel):
         return user in self.admins.all()
     def is_member(self, user):
         return user in self.members.all()
+    
     
 class GroupMessage(BaseModel):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='messages', null=False)

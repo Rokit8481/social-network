@@ -12,7 +12,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'users_list' %}">Social Network</a>
+        <a class="navbar-brand" href="{% url 'users_list' %}"><i class="bi bi-house"></i></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -20,13 +20,16 @@
             <ul class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'user_detail' user.slug %}">Hello there!, {{ user.username }}</a>
+                        <a class="nav-link" href="{% url 'user_detail' user.slug %}"><i class="bi bi-person-circle fs-6" aria-hidden="true"></i></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'posts-list' %}">Posts</a>  
+                        <a class="nav-link" href="{% url 'posts-list' %}"><i class="bi bi-journal-text fs-6"></i></a>  
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'messenger_main' %}"><i class="bi bi-chat-left-text-fill"></i></a>
+                        <a class="nav-link" href="{% url 'messenger_main' %}"><i class="bi bi-chat-dots fs-6"></i></a>
+                    </li>
+                    <li>
+                        <a class="nav-link" href="{% url "groups_list" %}"><i class="bi bi-collection fs-6" aria-label="Пабліки"></i></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>

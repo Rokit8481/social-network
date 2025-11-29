@@ -14,10 +14,11 @@
             <strong>Tags:</strong><br>
 
             {% for tag in tags %}
-                <span class="badge bg-secondary tag-item mb-1"
-                      data-index="{{ forloop.counter0 }}"
-                      {% if forloop.counter > 3 %} style="display:none" {% endif %}>
-                    <a href="{% url 'groups_list' %}?tag={{ tag.name }}">#{{ tag.name }}</a>
+                <span class="badge bg-secondary tag-item mb-1" data-index="{{ forloop.counter0 }}" 
+                {% if forloop.counter > 3 %} 
+                style="display:none"
+                {% endif %}>
+                    <a href="{% url 'groups_list' %}?tag={{ tag.name }}" class="text-decoration-none text-light">#{{ tag.name }}</a>
                 </span>
             {% endfor %}
 
@@ -31,7 +32,20 @@
 
         <hr class="mt-3">
 
-        <div class="mt-3">
+        {% if user_is_admin %}
+        <div class="card p-3">
+            <h5>New Message</h5>
+            <form id="new-message-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <textarea name="content" id="id_content" class="form-control" rows="3" placeholder="Write a message..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+                <div id="message-errors" class="text-danger mt-2"></div>
+            </form>
+        </div>
+        {% endif %}
+        <div class="mt-3 messages">
             {% for msg in messages %}
                 <div class="mb-3">
                     <strong>{{ msg.sender.username }}</strong>
@@ -94,6 +108,51 @@
             if (idx >= TAGS_TO_SHOW) t.style.display = 'none';
         });
         updateButtons();
+    });
+})();
+(function() {
+    const form = document.getElementById('new-message-form');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const url = "{% url 'group_message_ajax' group.slug %}";
+        const formData = new FormData(form);
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const errorsDiv = document.getElementById('message-errors');
+            if (data.success) {
+                errorsDiv.textContent = "";
+                const container = document.querySelector('.messages');
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'mb-3';
+                msgDiv.innerHTML = `
+                    <div class="mt-3">
+                        <div class="mb-3">
+                            <strong>${data.sender}</strong>
+                            <small class="text-muted">${data.created_at}</small>
+                            <p class="mb-1">${data.content}</p>
+                        </div>
+                        <hr>
+                    </div>
+                `;
+                container.insertBefore(msgDiv, container.firstChild);
+
+                form.reset();
+            } else {
+                errorsDiv.textContent = JSON.stringify(data.errors);
+            }
+        })
+        .catch(err => console.error(err));
     });
 })();
 </script>
