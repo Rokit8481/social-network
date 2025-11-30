@@ -5,9 +5,10 @@ from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from accounts.models import Follow
-from posts.models import Post
+from posts.models import Post, PostLike
 from django.contrib import messages
 from accounts.forms import CustomUserCreationForm, CustomAuthenticationForm, UserEditForm
+from groups.models import Group
 from django.contrib.auth import get_user_model, update_session_auth_hash
 
 User = get_user_model()
@@ -111,12 +112,20 @@ class UserDetailView(LoginRequiredMixin, View):
             following=user_detail
         ).exists()
 
+        user_groups = Group.objects.filter(members=user_detail)
+
+        posts_user_liked = Post.objects.filter(
+            id__in=PostLike.objects.filter(user=user_detail).values_list('post_id', flat=True)
+        ).order_by('-created_at')
+
         posts = Post.objects.filter(author=user_detail).order_by("-created_at")
 
         context = {
             "user_detail": user_detail,
             "followers": followers,
             "following": following,
+            "posts_user_liked": posts_user_liked,
+            "user_groups": user_groups,
             "followers_count": followers_count,
             "following_count": following_count,
             "is_following": is_following,

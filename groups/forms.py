@@ -27,8 +27,12 @@ class EditGroupForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if user:
-            self.fields['admins'].queryset = self.fields['admins'].queryset.exclude(id=user.id)
-            self.fields['members'].queryset = self.fields['members'].queryset.exclude(id=user.id)
+            if self.instance.pk: 
+                self.fields['admins'].queryset = self.fields['admins'].queryset.exclude(id=user.id) | self.instance.admins.filter(id=user.id)
+                self.fields['members'].queryset = self.fields['members'].queryset.exclude(id=user.id) | self.instance.members.filter(id=user.id)
+            else:
+                self.fields['admins'].queryset = self.fields['admins'].queryset.exclude(id=user.id)
+                self.fields['members'].queryset = self.fields['members'].queryset.exclude(id=user.id)
 
 class GroupMessageForm(forms.ModelForm):
     class Meta:

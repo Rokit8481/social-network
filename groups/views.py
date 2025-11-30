@@ -33,6 +33,9 @@ class GroupsListView(LoginRequiredMixin, View):
         if selected_tags:
             groups = groups.filter(tags__name__in=selected_tags).distinct()
 
+        for group in groups:
+            group.user_is_member = group.is_member(request.user)
+
         all_tags = Tag.objects.all().order_by('name')
         context = {
             "groups": groups,
@@ -46,6 +49,7 @@ class GroupDetailView(MemberRequiredMixin, View):
     def get(self, request, slug):
         group = get_object_or_404(Group, slug=slug)
         user_is_admin = group.is_admin(request.user)
+        user_is_member = group.is_member(request.user)
         messages = group.messages.all().order_by('-created_at')
         tags = group.tags.all()
 
@@ -53,6 +57,7 @@ class GroupDetailView(MemberRequiredMixin, View):
             'group': group,
             'messages': messages,
             'user_is_admin': user_is_admin,
+            'user_is_member': user_is_member,
             'tags': tags,
         }
         return render(request, 'groups/group_detail.html', context)
@@ -103,6 +108,50 @@ class EditGroupView(AdminRequiredMixin, View):
             return redirect(self.success_url)
         return render(request, self.template_name, {"form": form, "group": group})
     
+class JoinGroupView(LoginRequiredMixin, View):
+    def post(self, request, slug, *args, **kwargs):
+        group = get_object_or_404(Group, slug=slug)
+        group.members.add(request.user)
+        return redirect('group_detail', slug=group.slug)
+
+class LeaveGroupView(MemberRequiredMixin, View):
+    def post(self, request, slug, *args, **kwargs):
+        group = get_object_or_404(Group, slug=slug)
+        if group.is_creator(request.user):
+            group.delete()
+        else:
+            if group.is_admin(request.user):
+                group.admins.remove(request.user)
+                group.members.remove(request.user)
+            else:
+                group.members.remove(request.user)
+        return redirect('groups_list')
+
+class EditGroupMessageAjaxView(AdminRequiredMixin, View):
+    form_class = GroupMessageForm
+
+    def post(self, request, slug, message_id, *args, **kwargs):
+        group = get_object_or_404(Group, slug=slug)
+        message = get_object_or_404(GroupMessage, id=message_id, group=group)
+        form = self.form_class(request.POST, request.FILES, instance=message)
+        if form.is_valid():
+            message = form.save()
+
+            return JsonResponse({
+                'success': True,
+                'message_id': message.id,
+                'content': message.content,
+                'updated_at': message.updated_at.strftime('%d.%m.%Y %H:%M'),
+            })
+        return JsonResponse({'success': False, 'errors': form.errors})
+
+class DeleteGroupMessageAjaxView(AdminRequiredMixin, View):
+    def post(self, request, slug, message_id, *args, **kwargs):
+        group = get_object_or_404(Group, slug=slug)
+        message = get_object_or_404(GroupMessage, id=message_id, group=group)
+        message.delete()
+        return JsonResponse({'success': True, 'message_id': message_id})
+    
 class GroupMessageAjaxView(AdminRequiredMixin, View):
     form_class = GroupMessageForm
 
@@ -120,6 +169,6 @@ class GroupMessageAjaxView(AdminRequiredMixin, View):
                 'message_id': message.id,
                 'content': message.content,
                 'sender': message.sender.username,
-                'created_at': message.created_at.strftime('%Y-%m-%d %H:%M'),
+                'created_at': message.created_at.strftime('%d.%m.%Y %H:%M'),
             })
         return JsonResponse({'success': False, 'errors': form.errors})

@@ -59,11 +59,12 @@ class Group(BaseModel):
         self.members.remove(user)
         if user in self.admins.all():
             self.admins.remove(user)
+    def is_creator(self, user):
+        return self.creator == user
     def is_admin(self, user):
-        return user in self.admins.all()
+        return self.admins.filter(id=user.id).exists()
     def is_member(self, user):
-        return user in self.members.all()
-    
+        return self.members.filter(id=user.id).exists()
     
 class GroupMessage(BaseModel):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='messages', null=False)
