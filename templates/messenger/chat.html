@@ -34,7 +34,7 @@
             {% if c.is_group %}
               💬 {{ c.title }}
             {% else %}
-              👤 {{ c }}
+              👤 {{ c.title }}
             {% endif %}
           </a>
         {% empty %}
@@ -45,11 +45,7 @@
 
     <div class="col-md-9">
       <h3 class="text-light">
-        {% if chat.is_group %}
           {{ chat.title }}
-        {% else %}
-          {{ chat }}
-        {% endif %}
         {% if chat.id %}
           <a href="{% url 'chat_edit' chat.id %}" class="btn btn-sm btn-outline-secondary ms-2">Edit</a>
           <a href="#" class="btn btn-sm btn-outline-danger ms-2" id="chat-delete-btn">Delete</a>
