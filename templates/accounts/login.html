@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}Логін{% endblock %}
+{% block title %}Log in{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-5">
-        <h2 class="mb-3">Логін</h2>
+        <h2 class="mb-3">Log in</h2>
         <form method="post">
             {% csrf_token %}
             {{ form.non_field_errors }}
@@ -18,9 +18,9 @@
                 {{ form.password }}
                 {{ form.password.errors }}
             </div>
-            <button type="submit" class="btn btn-primary">Увійти</button>
+            <button type="submit" class="btn btn-primary">Sumbit</button>
         </form>
-        <p class="mt-2">Нема акаунту? <a href="{% url 'register' %}">Зареєструватися</a></p>
+        <p class="mt-2">No account? <a href="{% url 'register' %}">Sing in</a></p>
     </div>
 </div>
 {% endblock %}

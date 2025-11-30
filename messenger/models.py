@@ -1,15 +1,9 @@
 from django.db import models
 from .choices.emoji import EMOJI_CHOICES
 from django.contrib.auth import get_user_model
+from accounts.models import BaseModel
 
 User = get_user_model()
-
-class BaseModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
 
 class Chat(BaseModel):
     users = models.ManyToManyField(User, related_name='chats', blank=False)
