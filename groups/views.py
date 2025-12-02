@@ -77,6 +77,7 @@ class CreateGroupView(LoginRequiredMixin, View):
             group = form.save(commit=False)
             group.creator = request.user
             group.save()
+            group.tags.set(form.cleaned_data['tags'])
             form.save_m2m()
             group.add_creator(request.user)
             return redirect(self.success_url)
