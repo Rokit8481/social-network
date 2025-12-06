@@ -6,20 +6,20 @@ User = get_user_model()
 
 class Notification(BaseModel):
     class EventType(models.TextChoices):
-        # MESSENGER
+        # MESSENGER 0/2
         NEW_MESSENGER_MESSAGE = "new_messenger_message", "New messenger message"
         MESSAGE_LIKE = "message_like", "Message like"
         
-        # POSTS
+        # POSTS 0/4
         NEW_POST = "new_post", "New post"
         POST_LIKE = "post_like", "Post like"
         NEW_COMMENT = "new_comment", "New comment"
         COMMENT_LIKE = "comment_like", "Comment like"
 
-        # ACCOUNTS
+        # ACCOUNTS 1/1
         NEW_FOLLOWER = "new_follower", "New follower"
 
-        # GROUPS
+        # GROUPS 2/2
         NEW_GROUP_MESSAGE = "new_group_messsage", " New group message"
         JOIN_GROUP = "join_group", "Join group"
 
