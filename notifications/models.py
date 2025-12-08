@@ -10,11 +10,12 @@ class Notification(BaseModel):
         NEW_MESSENGER_MESSAGE = "new_messenger_message", "New messenger message"
         MESSAGE_LIKE = "message_like", "Message like"
         
-        # POSTS 0/4
+        # POSTS 5/5
         NEW_POST = "new_post", "New post"
         POST_LIKE = "post_like", "Post like"
         NEW_COMMENT = "new_comment", "New comment"
         COMMENT_LIKE = "comment_like", "Comment like"
+        TAGGED_IN_POST = "tagged_in_post", " Tagged in post"
 
         # ACCOUNTS 1/1
         NEW_FOLLOWER = "new_follower", "New follower"

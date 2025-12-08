@@ -6,33 +6,6 @@ from notifications.models import Notification
 
 User = get_user_model()
 
-# @receiver(post_save, sender=Follow)
-# def create_follow_notification(sender, instance, created, **kwargs):
-#     if not created:
-#         return
-
-#     follower = instance.follower
-#     following = instance.following
-
-#     if follower == following:
-#         return
-
-#     already = Notification.objects.filter(
-#         to_user=following,
-#         from_user=follower,
-#         event_type=Notification.EventType.NEW_FOLLOWER,
-#         target_type=Notification.TargetType.USER,
-#         target_id=following.id
-#     ).exists()
-
-#     if not already:
-#         Notification.create_notification(
-#             to_user=following,
-#             from_user=follower,
-#             event_type=Notification.EventType.NEW_FOLLOWER,
-#             target=following
-#         )
-
 @receiver(post_save, sender=GroupMessage)
 def create_new_group_message_notification(sender, instance, created, **kwargs):
     if not created:
