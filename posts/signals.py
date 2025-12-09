@@ -100,7 +100,6 @@ def create_new_comment_like_notification(sender, instance, created, **kwargs):
     
     comment_like = instance
     comment = comment_like.comment
-    post = comment.post
     like_author = comment_like.user
     comment_author = comment.user
 

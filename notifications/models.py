@@ -6,10 +6,10 @@ User = get_user_model()
 
 class Notification(BaseModel):
     class EventType(models.TextChoices):
-        # MESSENGER 0/2
+        # MESSENGER 2/2
         NEW_MESSENGER_MESSAGE = "new_messenger_message", "New messenger message"
-        MESSAGE_LIKE = "message_like", "Message like"
-        
+        MESSAGE_REACTION = "message_reaction", "Message reaction"
+
         # POSTS 5/5
         NEW_POST = "new_post", "New post"
         POST_LIKE = "post_like", "Post like"
@@ -29,6 +29,7 @@ class Notification(BaseModel):
         USER = "user", "User"
         POST = "post", "Post"
         COMMENT = "comment", "Comment"
+        REACTION = "reaction", "Reaction"
         MESSAGE = "message", "Message"
         GROUP = "group", "Group"
         CHAT = "chat", "Chat"
@@ -38,6 +39,7 @@ class Notification(BaseModel):
         "UserProfile": TargetType.USER,
         "Post": TargetType.POST,
         "Comment": TargetType.COMMENT,
+        "Reaction": TargetType.REACTION,
         "Message": TargetType.MESSAGE,
         "Group": TargetType.GROUP,
         "Chat": TargetType.CHAT,
