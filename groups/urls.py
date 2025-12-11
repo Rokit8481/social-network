@@ -6,7 +6,7 @@ from groups.views import GroupsListView, GroupDetailView,\
 
 urlpatterns = [
     path('', GroupsListView.as_view(), name='groups_list'),
-    path("create/", CreateGroupView.as_view(), name="create_group"),
+    path("create/", CreateGroupView.as_view(), name="create_groups_group"),
     path("<slug:slug>/", GroupDetailView.as_view(), name="group_detail"),
     path("<slug:slug>/edit/", EditGroupView.as_view(), name="edit_group"),
     path("<slug:slug>/join/", JoinGroupView.as_view(), name="join_group"),
