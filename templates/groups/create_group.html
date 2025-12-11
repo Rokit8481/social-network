@@ -32,5 +32,16 @@
 	</form>
 </div>
 
+<script>
+$(document).ready(function() {
+    $('.select2-tags').select2({
+        tags: true,
+        tokenSeparators: [','],
+        placeholder: 'Виберіть або створіть новий тег'
+    });
+});
+</script>
+
+
 {% endblock %}
 
