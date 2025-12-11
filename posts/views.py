@@ -6,8 +6,10 @@ from posts.models import Post, PostLike, Comment, CommentLike, File
 from posts.forms import PostForm, CommentForm
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.core.exceptions import PermissionDenied
 
 User = get_user_model()
+
 
 class PostsListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -119,3 +121,53 @@ class PostDetailView(LoginRequiredMixin, View):
             'comments': comments,
             'comment_form': form,
         })
+
+
+class PostEditView(LoginRequiredMixin, View):
+    model = Post
+    template_name = "posts/post_edit.html"
+    form_class = PostForm
+    success_url = reverse_lazy("posts-list")
+
+    def get(self, request, post_pk, *args, **kwargs):
+        post = get_object_or_404(self.model, pk=post_pk)
+
+        if post.author != request.user:
+            raise PermissionDenied
+
+        form = self.form_class(instance=post)
+        return render(request, self.template_name, {"form": form, "post": post})
+    
+    def post(self, request, post_pk, *args, **kwargs):
+        post = get_object_or_404(self.model, pk=post_pk)
+        form = self.form_class(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.save()
+            form.save_m2m()
+
+            for f in request.FILES.getlist('files'):
+                File.objects.create(post=post, file=f)
+            
+            return redirect(self.success_url)
+        return render(request, self.template_name, {"form": form, "post": post})
+
+class PostDeleteView(LoginRequiredMixin, View):
+    def post(self, request, post_pk):
+        post = get_object_or_404(Post, pk=post_pk)
+        
+        if post.author != request.user:
+            raise PermissionDenied
+        
+        post.delete()
+        return redirect('posts-list')
+    
+class CommentDeleteView(LoginRequiredMixin, View):
+    def post(self, request, comment_pk, post_pk):
+        comment = get_object_or_404(Comment, pk=comment_pk)
+
+        if comment.user != request.user:
+            raise PermissionDenied
+
+        comment.delete()
+        return redirect('post-detail', post_pk=post_pk)

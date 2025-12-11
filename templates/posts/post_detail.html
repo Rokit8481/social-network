@@ -8,19 +8,34 @@
     <div class="row justify-content-center">
         <div class="col-md-7">
             <div class="card shadow-sm border-0" style="border-radius: 16px; overflow: hidden;">
-                <div class="card-header bg-white d-flex align-items-center" style="border-radius: 16px 16px 0 0;">
-                    <img src="{{ post.author.avatar.url }}"
-                         alt="avatar"
-                         class="rounded-circle me-3"
-                         width="48" height="48">
-                    <div>
-                        <h6 class="fw-bold mb-0">
-                            <a href="{% url 'user_detail' post.author.slug %}" class="text-decoration-none text-dark">
-                                {{ post.author.username }}
-                            </a>
-                        </h6>
-                        <small class="text-muted">{{ post.created_at|date:"d M Y, H:i" }}</small>
+                <div class="card-header bg-white d-flex align-items-center justify-content-between" style="border-radius: 16px 16px 0 0;">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ post.author.avatar.url }}"
+                            alt="avatar"
+                            class="rounded-circle me-3"
+                            width="48" height="48">
+                        <div>
+                            <h6 class="fw-bold mb-0">
+                                <a href="{% url 'user_detail' post.author.slug %}" class="text-decoration-none text-dark">
+                                    {{ post.author.username }}
+                                </a>
+                            </h6>
+                            <small class="text-muted">{{ post.created_at|date:"d M Y, H:i" }}</small>
+                        </div>
                     </div>
+                    {% if post.author == request.user %}
+                    <div class="gap-2 d-flex">
+                        <a href="{% url 'post_edit' post.pk %}" class="btn btn-sm btn-warning">
+                            ✏️ Edit
+                        </a>
+                        <form method="POST" action="{% url 'post_delete' post.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this post?')">
+                                🗑️ Delete
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <h2 class="fw-bold mb-3">{{ post.title }}</h2>
@@ -75,40 +90,59 @@
         </div>
         <div class="col-md-5">
             <div class="card shadow-sm border-0 d-flex flex-column"
-                 style="height: 75vh; border-radius: 16px; overflow: hidden;">
-                <div id="comments-box"
-                     class="flex-grow-1 overflow-auto p-3"
-                     style="background: #fafafa;">
-                    <h5 class="mb-3">Comments</h5>
-                    <div id="comments">
-                        {% for comment in comments %}
-                        <div class="comment mb-2 p-2 border rounded bg-white"
-                             data-comment-id="{{ comment.id }}">
-                            <strong>{{ comment.user.username }}</strong>:
-                            {{ comment.content }}
-                            <br>
-                            <button class="like-comment-btn btn btn-sm btn-light px-2 mt-1"
-                                    data-comment-id="{{ comment.id }}">
-                                👍 <span class="comment-likes-count">{{ comment.likes.count }}</span>
-                            </button>
-                        </div>
-                        {% empty %}
-                        <p class="text-muted">No comments yet.</p>
-                        {% endfor %}
+             style="height: 75vh; border-radius: 16px; overflow: hidden;">
+            <div id="comments-box"
+                 class="flex-grow-1 overflow-auto p-3"
+                 style="background: #fafafa;">
+                <h5 class="mb-3">Comments</h5>
+                <div id="comments">
+                {% for comment in comments %}
+                <div class="comment mb-2 p-2 border rounded bg-white"
+                     data-comment-id="{{ comment.id }}">
+                    <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>{{ comment.user.username }}</strong>:
+                        {{ comment.content }}
                     </div>
+                    {% if comment.user == request.user %}
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-link p-0" type="button" data-bs-toggle="dropdown">
+                        ⋮
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <form method="POST" action="{% url 'comment_delete' post.pk comment.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Delete this comment?')">
+                                🗑️ Delete
+                            </button>
+                            </form>
+                        </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                    </div>
+                    <br>
+                    <button class="like-comment-btn btn btn-sm btn-light px-2 mt-1"
+                        data-comment-id="{{ comment.id }}">
+                    👍 <span class="comment-likes-count">{{ comment.likes.count }}</span>
+                    </button>
                 </div>
-                <div class="p-3 border-top bg-white">
-                    <form method="POST" id="comment-form">
-                        {% csrf_token %}
-                        <div class="mb-2">
-                            {{ comment_form.content }}
-                        </div>
-                        <button class="btn btn-primary w-100">Submit</button>
-                    </form>
+                {% empty %}
+                <p class="text-muted">No comments yet.</p>
+                {% endfor %}
                 </div>
+            </div>
+            <div class="p-3 border-top bg-white">
+                <form method="POST" id="comment-form">
+                {% csrf_token %}
+                <div class="mb-2">
+                    {{ comment_form.content }}
+                </div>
+                <button class="btn btn-primary w-100">Submit</button>
+                </form>
             </div>
         </div>
     </div>
-</div>
 
 {% endblock %}
