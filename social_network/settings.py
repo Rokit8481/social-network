@@ -40,11 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'phonenumber_field',
-    'accounts',
-    'groups',
-    'messenger',
-    'notifications',
-    'posts',
+    'accounts.apps.AccountsConfig',
+    'groups.apps.GroupsConfig',
+    'messenger.apps.MessengerConfig',
+    'notifications.apps.NotificationsConfig',
+    'posts.apps.PostsConfig',
     'main'
 ]
 
