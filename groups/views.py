@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from groups.models import Group, GroupMessage, GroupMessageFile, Tag
-from groups.forms import CreateGroupForm, EditGroupForm, GroupMessageForm
+from groups.forms import EditGroupForm, GroupMessageForm, CreateGroupForm
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 
@@ -77,12 +77,14 @@ class CreateGroupView(LoginRequiredMixin, View):
             group = form.save(commit=False)
             group.creator = request.user
             group.save()
-            group.tags.set(form.cleaned_data['tags'])
             form.save_m2m()
-            group.add_creator(request.user)
-            return redirect(self.success_url)
-        return render(request, self.template_name, {"form": form})
 
+            group.add_creator(request.user)
+
+            return redirect(self.success_url)
+
+        return render(request, self.template_name, {"form": form})
+    
 class EditGroupView(AdminRequiredMixin, View):
     template_name = "groups/edit_group.html"
     form_class = EditGroupForm

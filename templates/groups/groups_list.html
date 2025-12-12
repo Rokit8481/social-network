@@ -45,11 +45,6 @@
                                     #{{ tag.name }}
                                 </a>
                             {% endfor %}
-                            {% if group.tags.all.count > 3 %}
-                                <div class="badge bg-secondary me-1">
-                                    +{{group.tags.all.count|add:"-3"}} more
-                                </div>
-                            {% endif %}
                         </div>
                         {% if group.user_is_member %}
                             <a href="{% url 'group_detail' group.slug %}" class="btn btn-primary btn-sm">View group</a>

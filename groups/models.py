@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
-from django.utils.text import slugify
+from slugify import slugify
 import shortuuid
 import uuid
 
@@ -19,8 +19,7 @@ class Tag(BaseModel):
         ordering = ['name']
         
     def save(self, *args, **kwargs):
-        formatted = slugify(self.name).replace('-', '_')
-        formatted = '_'.join(filter(None, formatted.split('_')))
+        formatted = slugify(self.name, separator="_", lowercase=False)
         self.name = formatted
         super().save(*args, **kwargs)
 

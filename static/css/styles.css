@@ -245,3 +245,7 @@ input.form-control::placeholder {
     margin-right: 10px;
     object-fit: cover;
 }
+
+.select2-container {
+    width: 100% !important;
+}
