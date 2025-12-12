@@ -7,6 +7,7 @@ from posts.forms import PostForm, CommentForm
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
+import json
 
 User = get_user_model()
 
@@ -171,3 +172,29 @@ class CommentDeleteView(LoginRequiredMixin, View):
 
         comment.delete()
         return redirect('post-detail', post_pk=post_pk)
+
+
+class CommentEditView(LoginRequiredMixin, View):
+    def post(self, request, comment_pk, *args, **kwargs):
+        comment = get_object_or_404(Comment, pk=comment_pk, user=request.user)
+        data = json.loads(request.body)
+        content = data.get("content")
+
+        if not content or not content.strip():
+            return JsonResponse({
+                "success": False,
+                "error": "Порожнє повідомлення"
+            }, status=400)
+        
+        comment.content = content
+        comment.save()
+
+        return JsonResponse({
+            "success": True,
+            "comment": {
+                "id": comment.pk,
+                "content": comment.content,
+                "created_at": comment.created_at.strftime("%d-%m-%Y %H:%M"),
+                "updated_at": comment.updated_at.strftime("%d-%m-%Y %H:%M"),
+            }
+        })

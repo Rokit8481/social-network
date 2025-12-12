@@ -7,7 +7,7 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-7">
-            <div class="card shadow-sm border-0" style="border-radius: 16px; overflow: hidden;">
+            <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px; overflow: hidden;">
                 <div class="card-header bg-white d-flex align-items-center justify-content-between" style="border-radius: 16px 16px 0 0;">
                     <div class="d-flex align-items-center">
                         <img src="{{ post.author.avatar.url }}"
@@ -102,7 +102,7 @@
                     <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <strong>{{ comment.user.username }}</strong>:
-                        {{ comment.content }}
+                        <span class="comment-text">{{ comment.content }}</span>
                     </div>
                     {% if comment.user == request.user %}
                     <div class="dropdown">
@@ -114,9 +114,12 @@
                             <form method="POST" action="{% url 'comment_delete' post.pk comment.pk %}" style="display: inline;">
                             {% csrf_token %}
                             <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Delete this comment?')">
-                                🗑️ Delete
+                                Delete
                             </button>
                             </form>
+                        </li>
+                        <li>
+                            <a href='{% url "comment_edit" comment.pk %}' class="dropdown-item text-warning ms-2 comment-update-btn" data-message-id="{{ comment.id }}">Edit</a>
                         </li>
                         </ul>
                     </div>
@@ -139,10 +142,128 @@
                 <div class="mb-2">
                     {{ comment_form.content }}
                 </div>
-                <button class="btn btn-primary w-100">Submit</button>
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
                 </form>
             </div>
         </div>
     </div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const commentForm = document.getElementById("comment-form");
+    const textarea = commentForm.querySelector("textarea");
+    const submitBtn = commentForm.querySelector("button[type='submit']");
+
+    let editingCommentId = null;
+    let originalText = "";
+
+    // ==== 1. НАТИСК НА EDIT ====
+    document.querySelectorAll(".comment-update-btn").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault(); // Зупиняємо перехід по лінці
+
+            editingCommentId = this.dataset.messageId;  // id комента
+            const commentDiv = document.querySelector(`[data-comment-id="${editingCommentId}"]`);
+            const textElement = commentDiv.querySelector(".comment-text");
+            originalText = textElement.textContent.trim();
+
+            // Переносимо текст в textarea
+            textarea.value = originalText;
+            textarea.focus();
+
+            // Приховуємо звичайну кнопку Submit
+            submitBtn.style.display = "none";
+
+            // Додаємо кнопки Save + Cancel
+            addEditButtons();
+        });
+    });
+
+    // ==== 2. Додаємо кнопки Save / Cancel ====
+    function addEditButtons() {
+        if (document.getElementById("save-edit-btn")) return;
+
+        const saveBtn = document.createElement("button");
+        saveBtn.id = "save-edit-btn";
+        saveBtn.className = "btn btn-success w-100 mb-2";
+        saveBtn.textContent = "💾 Save";
+
+        const cancelBtn = document.createElement("button");
+        cancelBtn.id = "cancel-edit-btn";
+        cancelBtn.className = "btn btn-secondary w-100";
+        cancelBtn.textContent = "✖ Cancel";
+
+        commentForm.appendChild(saveBtn);
+        commentForm.appendChild(cancelBtn);
+
+        saveBtn.addEventListener("click", saveEdit);
+        cancelBtn.addEventListener("click", cancelEdit);
+    }
+
+    // ==== 3. SAVE ====
+    async function saveEdit(e) {
+        e.preventDefault();
+
+        const newContent = textarea.value.trim();
+
+        if (!newContent) {
+            alert("Порожнє повідомлення!");
+            return;
+        }
+
+        const response = await fetch(`/posts/comment/${editingCommentId}/edit/`, {
+            method: "POST",
+            headers: {"X-CSRFToken": getCSRF()},
+            body: JSON.stringify({content: newContent})
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert(data.error || "Error");
+            return;
+        }
+
+        // Оновлюємо текст на сторінці
+        const commentDiv = document.querySelector(`[data-comment-id="${editingCommentId}"]`);
+        const textElement = commentDiv.querySelector(".comment-text");
+        textElement.textContent = data.comment.content;
+
+        finishEditing();
+    }
+
+    // ==== 4. CANCEL ====
+    function cancelEdit(e) {
+        e.preventDefault();
+
+        textarea.value = "";
+        finishEditing();
+    }
+
+    // ==== 5. Повертаємо форму в режим "звичайний"
+    function finishEditing() {
+        editingCommentId = null;
+
+        // Повернути кнопку Submit
+        submitBtn.style.display = "block";
+
+        textarea.value = "";
+
+        // Видалити кнопки Save / Cancel
+        document.getElementById("save-edit-btn")?.remove();
+        document.getElementById("cancel-edit-btn")?.remove();
+    }
+
+    // ==== CSRF ====
+    function getCSRF() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
+
+});
+
+</script>
+
 
 {% endblock %}
