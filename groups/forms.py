@@ -2,15 +2,6 @@ from django import forms
 from groups.models import Group, Tag, GroupMessage, GroupMessageFile
 from groups.widgets import TagSelect2Widget
 
-class CreateTag(forms.ModelForm):
-    class Meta:
-        model = Tag
-        fields = ["name"]
-
-        widgets = {
-            "name": forms.TextInput(attrs={'class': "form-control"})
-        }
-
 class CreateGroupForm(forms.ModelForm):
     class Meta:
         model = Group
