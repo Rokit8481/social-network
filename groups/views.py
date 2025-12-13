@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from groups.models import Group, GroupMessage, GroupMessageFile, Tag
 from groups.forms import EditGroupForm, GroupMessageForm, CreateGroupForm
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.http import JsonResponse
 
 User = get_user_model()
@@ -28,23 +29,29 @@ class GroupsListView(LoginRequiredMixin, View):
 
     def get(self, request):
         groups = Group.objects.prefetch_related('tags').order_by("title")
-        selected_tags = request.GET.getlist("tag")
-        
-        if selected_tags:
-            groups = groups.filter(tags__name__in=selected_tags).distinct()
+
+        query = request.GET.get("q", "").strip()
+
+        if query:
+            keywords = query.split()
+
+            q_object = Q()
+            for word in keywords:
+                q_object |= Q(title__icontains=word)
+                q_object |= Q(description__icontains=word)
+                q_object |= Q(tags__name__icontains=word)
+
+            groups = groups.filter(q_object).distinct()
 
         for group in groups:
             group.user_is_member = group.is_member(request.user)
 
-        all_tags = Tag.objects.all().order_by('name')
         context = {
             "groups": groups,
-            "selected_tags": selected_tags,
-            "all_tags": all_tags,
+            "query": query,
         }
         return render(request, self.template_name, context)
-
-
+    
 class GroupDetailView(MemberRequiredMixin, View):
     def get(self, request, slug):
         group = get_object_or_404(Group, slug=slug)

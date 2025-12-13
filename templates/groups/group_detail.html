@@ -37,7 +37,7 @@
                 {% if forloop.counter > 3 %} 
                 style="display:none"
                 {% endif %}>
-                    <a href="{% url 'groups_list' %}?tag={{ tag.name }}" class="text-decoration-none text-light">#{{ tag.name }}</a>
+                    <a href="{% url 'groups_list' %}?q={{ tag.name }}" class="text-decoration-none text-light">#{{ tag.name }}</a>
                 </span>
             {% endfor %}
 
@@ -73,8 +73,8 @@
                 <p class="mb-1 message-content">{{ msg.content }}</p>
 
                 {% if user_is_admin %}
-                    <button class="btn btn-sm btn-outline-secondary edit-message-btn">Edit</button>
-                    <button class="btn btn-sm btn-outline-danger delete-message-btn">Delete</button>
+                    <button class="btn btn-sm btn-outline-secondary edit-message-btn" id="edit-message-id">Edit</button>
+                    <button class="btn btn-sm btn-outline-danger delete-message-btn" id="delete-message-id">Delete</button>
                 {% endif %}
 
                 {% if msg.files.all %}
@@ -183,6 +183,8 @@
 })();
 (function() {
     const container = document.querySelector('.messages');
+    const editBtn = document.getElementById("edit-message-id")
+    const deleteBtn = document.getElementById("delete-message-id")
     if (!container) return;
 
     container.addEventListener('click', function(e) {
@@ -199,6 +201,9 @@
                 <button class="btn btn-sm btn-primary save-edit-btn mt-1">Save</button>
                 <button class="btn btn-sm btn-secondary cancel-edit-btn mt-1">Cancel</button>
             `;
+            
+            editBtn.classList.add('d-none');
+            deleteBtn.classList.add('d-none');
         }
 
         if (e.target.classList.contains('save-edit-btn')) {
@@ -218,7 +223,9 @@
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    msgDiv.querySelector('.message-content').textContent = data.content;
+                    msgDiv.querySelector('.message-content').textContent = data.content;      
+                    editBtn.classList.remove('d-none');
+                    deleteBtn.classList.remove('d-none');
                 } else {
                     alert(JSON.stringify(data.errors));
                 }
