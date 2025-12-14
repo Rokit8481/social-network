@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}{{ post.title }}{% endblock %}
+{% load static %}
 
 {% block content %}
 
@@ -42,26 +43,17 @@
                     <p class="text-dark" style="font-size: 1.1rem; line-height: 1.6;">
                         {{ post.content }}
                     </p>
-                    {% if post.files.all %}
-                    <div class="mt-3">
-                        {% for file in post.files.all %}
-                            <div class="mb-3">
-                                {% if file.file_type  == "image" %}
-                                    <img src="{{ file.file.url }}"
-                                         class="img-fluid rounded"
-                                         style="max-height: 400px; object-fit: cover;">
-                                {% elif file.file_type == "video" %}
-                                    <video class="w-100 rounded" controls>
-                                        <source src="{{ file.file.url }}">
-                                    </video>
-                                {% else %}
-                                    <a href="{{ file.file.url }}" download class="btn btn-outline-secondary">
-                                        📄 {{ file.file.name }}
-                                    </a>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
+                    {% if media_files %}
+                        {% include "posts/files/media_preview.html" %}
+                        {% include "posts/files/media_modal.html" %}
+                    {% endif %}
+
+                    {% if attachments %}
+                        <div class="mt-3">
+                            {% for file in attachments %}
+                                {% include "posts/files/attachments/"|add:file.file_type|add:".html" %}
+                            {% endfor %}
+                        </div>
                     {% endif %}
                     <hr>
                     <div class="d-flex align-items-center justify-content-between mt-3 mb-2">
@@ -148,122 +140,6 @@
         </div>
     </div>
 
-<script>
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const commentForm = document.getElementById("comment-form");
-    const textarea = commentForm.querySelector("textarea");
-    const submitBtn = commentForm.querySelector("button[type='submit']");
-
-    let editingCommentId = null;
-    let originalText = "";
-
-    // ==== 1. НАТИСК НА EDIT ====
-    document.querySelectorAll(".comment-update-btn").forEach(btn => {
-        btn.addEventListener("click", function (e) {
-            e.preventDefault(); // Зупиняємо перехід по лінці
-
-            editingCommentId = this.dataset.messageId;  // id комента
-            const commentDiv = document.querySelector(`[data-comment-id="${editingCommentId}"]`);
-            const textElement = commentDiv.querySelector(".comment-text");
-            originalText = textElement.textContent.trim();
-
-            // Переносимо текст в textarea
-            textarea.value = originalText;
-            textarea.focus();
-
-            // Приховуємо звичайну кнопку Submit
-            submitBtn.style.display = "none";
-
-            // Додаємо кнопки Save + Cancel
-            addEditButtons();
-        });
-    });
-
-    // ==== 2. Додаємо кнопки Save / Cancel ====
-    function addEditButtons() {
-        if (document.getElementById("save-edit-btn")) return;
-
-        const saveBtn = document.createElement("button");
-        saveBtn.id = "save-edit-btn";
-        saveBtn.className = "btn btn-success w-100 mb-2";
-        saveBtn.textContent = "💾 Save";
-
-        const cancelBtn = document.createElement("button");
-        cancelBtn.id = "cancel-edit-btn";
-        cancelBtn.className = "btn btn-secondary w-100";
-        cancelBtn.textContent = "✖ Cancel";
-
-        commentForm.appendChild(saveBtn);
-        commentForm.appendChild(cancelBtn);
-
-        saveBtn.addEventListener("click", saveEdit);
-        cancelBtn.addEventListener("click", cancelEdit);
-    }
-
-    // ==== 3. SAVE ====
-    async function saveEdit(e) {
-        e.preventDefault();
-
-        const newContent = textarea.value.trim();
-
-        if (!newContent) {
-            alert("Порожнє повідомлення!");
-            return;
-        }
-
-        const response = await fetch(`/posts/comment/${editingCommentId}/edit/`, {
-            method: "POST",
-            headers: {"X-CSRFToken": getCSRF()},
-            body: JSON.stringify({content: newContent})
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-            alert(data.error || "Error");
-            return;
-        }
-
-        // Оновлюємо текст на сторінці
-        const commentDiv = document.querySelector(`[data-comment-id="${editingCommentId}"]`);
-        const textElement = commentDiv.querySelector(".comment-text");
-        textElement.textContent = data.comment.content;
-
-        finishEditing();
-    }
-
-    // ==== 4. CANCEL ====
-    function cancelEdit(e) {
-        e.preventDefault();
-
-        textarea.value = "";
-        finishEditing();
-    }
-
-    // ==== 5. Повертаємо форму в режим "звичайний"
-    function finishEditing() {
-        editingCommentId = null;
-
-        // Повернути кнопку Submit
-        submitBtn.style.display = "block";
-
-        textarea.value = "";
-
-        // Видалити кнопки Save / Cancel
-        document.getElementById("save-edit-btn")?.remove();
-        document.getElementById("cancel-edit-btn")?.remove();
-    }
-
-    // ==== CSRF ====
-    function getCSRF() {
-        return document.querySelector("[name=csrfmiddlewaretoken]").value;
-    }
-
-});
-
-</script>
-
+<script src="{% static 'js/posts/script.js' %}"></script>
 
 {% endblock %}

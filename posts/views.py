@@ -11,16 +11,16 @@ import json
 
 User = get_user_model()
 
-
 class PostsListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         posts = Post.objects.all().order_by('-created_at')
         for post in posts:
-            post.has_tags = post.people_tags.exists()
+            post.likes_count = post.likes.count()
 
         form = PostForm()
         return render(request, 'posts/posts_list.html', {
             'posts': posts,
+            'likes_count': post.likes_count,
             'form': form
         })
 
@@ -77,7 +77,7 @@ class ToggleCommentLikeAPI(LoginRequiredMixin, View):
 
 class PostDetailView(LoginRequiredMixin, View):
     def get(self, request, post_pk):
-        post = get_object_or_404(Post, pk=post_pk)
+        post = get_object_or_404(Post.objects.prefetch_related("files"), pk=post_pk)
 
         liked_by_user = PostLike.objects.filter(post=post, user=request.user).exists()
         likes_count = post.likes.count()
@@ -89,6 +89,9 @@ class PostDetailView(LoginRequiredMixin, View):
 
         comments = post.comments.all().select_related("user")
 
+        media_files = [f for f in post.files.all() if f.is_media]
+        attachments = [f for f in post.files.all() if f.is_attachment]
+
         comment_form = CommentForm()
 
         return render(request, 'posts/post_detail.html', {
@@ -96,6 +99,8 @@ class PostDetailView(LoginRequiredMixin, View):
             'liked_by_user': liked_by_user,
             'likes_count': likes_count,
             'viewers_count': viewers_count,
+            'media_files': media_files,
+            'attachments':attachments,
             'comments': comments,
             'comment_form': comment_form,
         })

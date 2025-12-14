@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
+from posts.choices.files import FILE_TYPE_MAP
 import os
 
 User = get_user_model()
@@ -29,13 +30,25 @@ class File(BaseModel):
     
     @property
     def file_type(self):
+        if not self.file:
+            return "other"
+
         ext = os.path.splitext(self.file.name)[1].lower()
-        if ext in [".jpg", ".jpeg", ".png", ".gif"]:
-            return "image"
-        if ext in [".mp4", ".mov", ".webm"]:
-            return "video"
+
+        for file_type, extensions in FILE_TYPE_MAP.items():
+            if ext in extensions:
+                return file_type
+
         return "other"
     
+    @property
+    def is_media(self):
+        return self.file_type in {"image", "video"}
+
+    @property
+    def is_attachment(self):
+        return not self.is_media
+        
     class Meta:
         verbose_name = 'File'
         verbose_name_plural = 'Files'
