@@ -6,9 +6,9 @@
 <div class="container mt-4">
 
     <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#createPostModal" style="border-radius: 12px;">
+        <a class="btn btn-primary px-4 py-2" href="{% url "post_create" %}" style="border-radius: 12px;">
             <i class="bi bi-plus-circle me-1"></i> Create Post
-        </button>
+        </a>
     </div>
 
     {% for post in posts %}
@@ -75,7 +75,7 @@
                 <button class="like-btn btn btn-light border px-3"
                                 data-post-id="{{ post.id }}"
                                 style="border-radius: 12px;">
-                            ❤️ <span class="likes-count">{{ likes_count }}</span>
+                            ❤️ <span class="likes-count">{{ post.likes_count }}</span>
                 </button>
 
                 <div class="text-muted small">

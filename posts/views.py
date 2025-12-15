@@ -24,25 +24,28 @@ class PostsListView(LoginRequiredMixin, View):
             'form': form
         })
 
-    def post(self, request, *args, **kwargs):
-        form = PostForm(request.POST, request.FILES)    
+class CreatePostView(LoginRequiredMixin, View):
+    form_class = PostForm
+    template_name = 'posts/post_create.html'
+    
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+    
+    def post(self, request):
+        form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.save()
             form.save_m2m()
-
+            
             for f in request.FILES.getlist('files'):
                 File.objects.create(post=post, file=f)
-            
             return redirect('posts-list')
+        
+        return render(request, self.template_name, {'form': form})
 
-        posts = Post.objects.all().order_by('-created_at')
-        return render(request, 'posts/posts_list.html', {
-            'posts': posts,
-            'form': form
-        })
-    
 class TogglePostLikeAPI(LoginRequiredMixin, View):
     def post(self, request, post_pk):
         post = get_object_or_404(Post, pk=post_pk)
@@ -145,14 +148,17 @@ class PostEditView(LoginRequiredMixin, View):
         return render(request, self.template_name, {"form": form, "post": post})
     
     def post(self, request, post_pk, *args, **kwargs):
-        post = get_object_or_404(self.model, pk=post_pk)
-        form = self.form_class(request.POST, request.FILES, instance=post)
+        post = get_object_or_404(self.model, pk=post_pk, author=request.user)
+        form = self.form_class(request.POST, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
             post.save()
             form.save_m2m()
 
-            for f in request.FILES.getlist('files'):
+            delete_ids = request.POST.getlist("delete_files")
+            post.files.filter(id__in=delete_ids).delete()
+
+            for f in request.FILES.getlist("files"):
                 File.objects.create(post=post, file=f)
             
             return redirect(self.success_url)

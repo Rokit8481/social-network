@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Edit Post{% endblock %}
+{% load static %}
 
 {% block content %}
 
@@ -41,35 +42,61 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="id_files" class="form-label fw-bold">Add Files</label>
-                            <input 
+                            <label class="form-label fw-semibold">Add files</label>
+
+                            <input
                                 type="file"
+                                id="file-input"
                                 name="files"
-                                id="id_files"
                                 class="form-control"
-                                multiple="multiple"
                             >
-                            <small class="text-muted">You can upload images, videos, or documents</small>
+
+                            <div id="draft-files" class="mt-3"></div>
+
+                            <small class="text-muted">
+                                Add files one by one. You can remove them before publishing.
+                            </small>
                         </div>
 
-                        {% if post.files.all %}
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Current Files</label>
-                            <div class="border rounded p-3 bg-light">
-                                {% for file in post.files.all %}
-                                    <div class="mb-2">
+                        {% if post.files.exists %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Current files</label>
+
+                                <div class="d-flex gap-2 overflow-auto py-2">
+
+                                    {% for file in post.files.all %}
+
                                         {% if file.file_type == "image" %}
-                                            <img src="{{ file.file.url }}" class="img-thumbnail" style="max-height: 100px;">
+                                            <img src="{{ file.file.url }}"
+                                                class="rounded border"
+                                                style="width:100px; height:100px; object-fit:cover;">
+
                                         {% elif file.file_type == "video" %}
-                                            📹 {{ file.file.name }}
+                                            <video class="rounded border"
+                                                style="width:100px; height:100px; object-fit:cover;"
+                                                muted>
+                                                <source src="{{ file.file.url }}">
+                                            </video>
+
                                         {% else %}
-                                            📄 {{ file.file.name }}
+                                            <a href="{{ file.file.url }}"
+                                            target="_blank"
+                                            class="d-flex flex-column justify-content-center align-items-center border rounded text-decoration-none text-dark p-2"
+                                            style="width:100px; height:100px;">
+
+                                                <div style="font-size:26px;">📎</div>
+                                                <div class="small text-truncate w-100 text-center">
+                                                    {{ file.file.name|cut:"post_files/" }}
+                                                </div>
+                                            </a>
                                         {% endif %}
-                                    </div>
-                                {% endfor %}
+
+                                    {% endfor %}
+
+                                </div>
                             </div>
-                        </div>
                         {% endif %}
+
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-success px-4" style="border-radius: 10px;">
@@ -86,5 +113,7 @@
         </div>
     </div>
 </div>
+
+<script src="{% static 'js/posts/post_form.js' %}"></script>
 
 {% endblock %}
