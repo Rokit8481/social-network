@@ -7,20 +7,18 @@ from posts.forms import PostForm, CommentForm
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 import json
 
 User = get_user_model()
 
 class PostsListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        posts = Post.objects.all().order_by('-created_at')
-        for post in posts:
-            post.likes_count = post.likes.count()
+        posts = Post.objects.all().order_by('-created_at').annotate(likes_count=Count('likes'))
 
         form = PostForm()
         return render(request, 'posts/posts_list.html', {
             'posts': posts,
-            'likes_count': post.likes_count,
             'form': form
         })
 

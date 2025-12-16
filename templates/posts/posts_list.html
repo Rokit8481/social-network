@@ -88,12 +88,15 @@
             {% if post.people_tags.exists %}
                 <div class="mt-2">
                     👥 Tagged:
-                    {% for user in post.people_tags.all %}
+                    {% for user in post.people_tags.all|slice:":3" %}
                         <a href="{% url 'user_detail' user.slug %}" 
                            class="badge bg-secondary text-decoration-none me-1">
                             {{ user.username }}
                         </a>
                     {% endfor %}
+                    {% if post.people_tags.all|length > 3 %}
+                            +{{ post.people_tags.all|length|add:"-3" }}
+                    {% endif %}
                 </div>
             {% endif %}
 

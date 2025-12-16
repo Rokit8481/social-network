@@ -44,14 +44,14 @@
                         {{ post.content }}
                     </p>
                     {% if media_files %}
-                        {% include "posts/files/media_preview.html" %}
-                        {% include "posts/files/media_modal.html" %}
+                        {% include "helpers/files/media_preview.html" %}
+                        {% include "helpers/files/media_modal.html" %}
                     {% endif %}
 
                     {% if attachments %}
                         <div class="mt-3">
                             {% for file in attachments %}
-                                {% include "posts/files/attachments/"|add:file.file_type|add:".html" %}
+                                {% include "helpers/attachments/"|add:file.file_type|add:".html" %}
                             {% endfor %}
                         </div>
                     {% endif %}
