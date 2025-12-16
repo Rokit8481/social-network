@@ -25,18 +25,35 @@
                         </div>
                     </div>
                     {% if post.author == request.user %}
-                    <div class="gap-2 d-flex">
-                        <a href="{% url 'post_edit' post.pk %}" class="btn btn-sm btn-warning">
-                            ✏️ Edit
+                    <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary"
+                            data-bs-toggle="dropdown"
+                            style="border-radius: 10px;">
+                        ⋮
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+                        <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2"
+                            href="{% url 'post_edit' post.pk %}">
+                            ✏️ <span>Редагувати</span>
                         </a>
-                        <form method="POST" action="{% url 'post_delete' post.pk %}" style="display: inline;">
+                        </li>
+
+                        <li>
+                        <form method="POST" action="{% url 'post_delete' post.pk %}">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this post?')">
-                                🗑️ Delete
+                            <button type="submit"
+                                    class="dropdown-item d-flex align-items-center gap-2 text-danger"
+                                    onclick="return confirm('Delete this post?')">
+                            🗑️ <span>Видалити</span>
                             </button>
                         </form>
+                        </li>
+                    </ul>
                     </div>
                     {% endif %}
+
                 </div>
                 <div class="card-body">
                     <h2 class="fw-bold mb-3">{{ post.title }}</h2>
@@ -98,24 +115,45 @@
                     </div>
                     {% if comment.user == request.user %}
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-link p-0" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary"
+                            data-bs-toggle="dropdown"
+                            style="border-radius: 10px;">
                         ⋮
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+                        <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2 comment-update-btn"
+                            href="#"
+                            data-message-id="{{ comment.id }}">
+                            ✏️ <span>Редагувати</span>
+                        </a>
+                        </li>
+
+                        <li>
+                        <button class="dropdown-item d-flex align-items-center gap-2"
+                                data-copy-comment="{{ comment.id }}">
+                            📋 <span>Скопіювати</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
                         <li>
-                            <form method="POST" action="{% url 'comment_delete' post.pk comment.pk %}" style="display: inline;">
+                        <form method="POST"
+                                action="{% url 'comment_delete' post.pk comment.pk %}">
                             {% csrf_token %}
-                            <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Delete this comment?')">
-                                Delete
+                            <button type="submit"
+                                    class="dropdown-item d-flex align-items-center gap-2 text-danger"
+                                    onclick="return confirm('Delete this comment?')">
+                            🗑️ <span>Видалити</span>
                             </button>
-                            </form>
+                        </form>
                         </li>
-                        <li>
-                            <a href='{% url "comment_edit" comment.pk %}' class="dropdown-item text-warning ms-2 comment-update-btn" data-message-id="{{ comment.id }}">Edit</a>
-                        </li>
-                        </ul>
+                    </ul>
                     </div>
                     {% endif %}
+
                     </div>
                     <br>
                     <button class="like-comment-btn btn btn-sm btn-light px-2 mt-1"

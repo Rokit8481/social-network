@@ -136,3 +136,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+document.querySelectorAll("[data-copy-comment]").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const commentId = btn.dataset.copyComment;
+        const commentText = document
+            .querySelector(`[data-comment-id="${commentId}"] .comment-text`)
+            .textContent;
+
+        navigator.clipboard.writeText(commentText);
+    });
+});
