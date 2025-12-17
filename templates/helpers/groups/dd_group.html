@@ -1,0 +1,33 @@
+<div class="dropdown">
+<button class="btn btn-sm btn-outline-secondary"
+        data-bs-toggle="dropdown"
+        style="border-radius: 10px;">
+    ⋮
+</button>      
+    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+        <li>
+        {% if user_is_admin %}
+        <a class="dropdown-item d-flex align-items-center gap-2"
+            href="{% url 'edit_group' group.slug %}">
+            ✏️ <span>Edit Group</span>
+        </a>
+        {% endif %}
+        </li>
+
+        <li>
+        {% if user_is_member %}
+        <form action="{% url 'leave_group' group.slug %}" method="post" style="margin:0">
+            {% csrf_token %}
+            <button type="submit"
+                    class="dropdown-item d-flex align-items-center gap-2 text-danger"
+                    {% if user_is_admin %}
+                        onclick="return confirm('Leave and delete group?')"
+                    {% else %}
+                        onclick="return confirm('Leave group?')"{% endif %}>
+            🗑️ <span>Leave Group</span>
+            </button>
+        </form>
+        {% endif %}
+        </li>
+    </ul>
+</div>

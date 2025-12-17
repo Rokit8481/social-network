@@ -129,12 +129,15 @@ class LeaveGroupView(MemberRequiredMixin, View):
         group = get_object_or_404(Group, slug=slug)
         if group.is_creator(request.user):
             group.delete()
-        else:
-            if group.is_admin(request.user):
-                group.admins.remove(request.user)
-                group.members.remove(request.user)
-            else:
-                group.members.remove(request.user)
+            return redirect('groups_list')
+
+        if group.is_admin(request.user):
+            if group.admins.count() <= 1:
+                return redirect('group_detail', slug=slug)
+
+            group.admins.remove(request.user)
+
+        group.members.remove(request.user)
         return redirect('groups_list')
 
 class EditGroupMessageAjaxView(AdminRequiredMixin, View):

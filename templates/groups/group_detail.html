@@ -9,23 +9,10 @@
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h2 class="mb-0">{{ group.title }}</h2>
 
-            <div class="d-flex gap-2">
-
-                {% if user_is_admin %}
-                    <a href="{% url 'edit_group' group.slug %}" class="btn btn-outline-secondary btn-sm">
-                        Edit Group
-                    </a>
-                {% endif %}
-
-                {% if user_is_member %}
-                    <form action="{% url 'leave_group' group.slug %}" method="post" style="margin:0">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-outline-danger btn-sm">Leave Group</button>
-                    </form>
-                {% endif %}
+            <div>
+            {% include "helpers/groups/dd_group.html" %}
             </div>
         </div>
-
 
         <p class="text-muted">Members: {{ group.members.count }}</p>
 
@@ -33,8 +20,8 @@
             <strong>Tags:</strong><br>
 
             {% for tag in tags %}
-                <span class="badge bg-secondary tag-item mb-1" data-index="{{ forloop.counter0 }}" 
-                {% if forloop.counter > 3 %} 
+                <span class="badge bg-secondary tag-item mb-1" data-index="{{ forloop.counter0 }}"
+                {% if forloop.counter > 3 %}
                 style="display:none"
                 {% endif %}>
                     <a href="{% url 'groups_list' %}?q={{ tag.name }}" class="text-decoration-none text-light">#{{ tag.name }}</a>
@@ -64,18 +51,20 @@
             </form>
         </div>
         {% endif %}
+
         <div class="mt-3 messages">
             {% for msg in messages %}
             <div class="mb-3 message-item" data-id="{{ msg.id }}">
-                <strong>{{ msg.sender.username }}</strong>
-                <small class="text-muted">{{ msg.created_at|date:"d.m.Y H:i" }}</small>
-
-                <p class="mb-1 message-content">{{ msg.content }}</p>
-
-                {% if user_is_admin %}
-                    <button class="btn btn-sm btn-outline-secondary edit-message-btn" id="edit-message-id">Edit</button>
-                    <button class="btn btn-sm btn-outline-danger delete-message-btn" id="delete-message-id">Delete</button>
-                {% endif %}
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ msg.sender.username }}</strong>
+                        <small class="text-muted">{{ msg.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                    <div>
+                        {% include "helpers/groups/dd_group_message.html" with message=msg %}
+                    </div>
+                </div> 
+                <p class="mb-1 message-content">{{ msg.content }}</p>     
 
                 {% if msg.files.all %}
                     <div class="ms-3">
@@ -87,7 +76,6 @@
                 <hr>
             </div>
             {% endfor %}
-
 
             {% if not messages %}
                 <p class="text-muted">No messages yet.</p>
@@ -103,38 +91,39 @@
     const hideBtn = document.getElementById('hide-tags');
     const tags = Array.from(document.querySelectorAll('.tag-item'));
 
-    if (!showBtn || !hideBtn) return;
-
-    function countHidden() {
-        return tags.filter(t => t.style.display === 'none').length;
-    }
-
-    function countExtraVisible() {
-        return tags.filter((t, i) => i >= TAGS_TO_SHOW && t.style.display !== 'none').length;
-    }
-
-    function updateButtons() {
-        const hidden = countHidden();
-        const extraVisible = countExtraVisible();
-        showBtn.style.display = hidden > 0 ? 'inline-block' : 'none';
-        hideBtn.style.display = extraVisible > 0 ? 'inline-block' : 'none';
-    }
-    updateButtons();
-
-    showBtn.addEventListener('click', function () {
-        const hiddenTags = tags.filter(t => t.style.display === 'none');
-        for (let i = 0; i < 3 && i < hiddenTags.length; i++) {
-            hiddenTags[i].style.display = 'inline-block';
+    if (showBtn && hideBtn) {
+        function isHidden(el) {
+            return el.style.display === 'none' || getComputedStyle(el).display === 'none';
+        }
+        function countHidden() {
+            return tags.filter(t => isHidden(t)).length;
+        }
+        function countExtraVisible() {
+            return tags.filter((t, i) => i >= TAGS_TO_SHOW && !isHidden(t)).length;
+        }
+        function updateButtons() {
+            const hidden = countHidden();
+            const extraVisible = countExtraVisible();
+            showBtn.style.display = hidden > 0 ? 'inline-block' : 'none';
+            hideBtn.style.display = extraVisible > 0 ? 'inline-block' : 'none';
         }
         updateButtons();
-    });
 
-    hideBtn.addEventListener('click', function () {
-        tags.forEach((t, idx) => {
-            if (idx >= TAGS_TO_SHOW) t.style.display = 'none';
+        showBtn.addEventListener('click', function () {
+            const hiddenTags = tags.filter(t => isHidden(t));
+            for (let i = 0; i < 3 && i < hiddenTags.length; i++) {
+                hiddenTags[i].style.display = 'inline-block';
+            }
+            updateButtons();
         });
-        updateButtons();
-    });
+
+        hideBtn.addEventListener('click', function () {
+            tags.forEach((t, idx) => {
+                if (idx >= TAGS_TO_SHOW) t.style.display = 'none';
+            });
+            updateButtons();
+        });
+    }
 })();
 (function() {
     const form = document.getElementById('new-message-form');
@@ -167,8 +156,14 @@
                     <small class="text-muted">${data.created_at}</small>
                     <p class="mb-1 message-content">${data.content}</p>
                     {% if user_is_admin %}
-                        <button class="btn btn-sm btn-outline-secondary edit-message-btn">Edit</button>
-                        <button class="btn btn-sm btn-outline-danger delete-message-btn">Delete</button>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown" style="border-radius: 10px;">⋮</button>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+                                <li><button class="dropdown-item edit-message-btn" data-message-id="${data.message_id}">✏️ <span>Edit</span></button></li>
+                                <li><button class="dropdown-item d-flex align-items-center gap-2" data-copy-message="${data.message_id}">📋 <span>Скопіювати</span></button></li>
+                                <li><button class="dropdown-item delete-message-btn text-danger" data-message-id="${data.message_id}">🗑️ <span>Delete</span></button></li>
+                            </ul>
+                        </div>
                     {% endif %}
                     <hr>
                 `;
@@ -178,37 +173,46 @@
                 errorsDiv.textContent = JSON.stringify(data.errors);
             }
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+            console.error(err);
+            document.getElementById('message-errors').textContent = 'Network error';
+        });
     });
 })();
 (function() {
     const container = document.querySelector('.messages');
-    const editBtn = document.getElementById("edit-message-id")
-    const deleteBtn = document.getElementById("delete-message-id")
     if (!container) return;
 
     container.addEventListener('click', function(e) {
-        const msgDiv = e.target.closest('.message-item');
+        const clicked = e.target;
+        const msgDiv = clicked.closest('.message-item');
         if (!msgDiv) return;
         const msgId = msgDiv.dataset.id;
 
-        if (e.target.classList.contains('edit-message-btn')) {
+        if (clicked.closest('.edit-message-btn')) {
             const contentP = msgDiv.querySelector('.message-content');
-            const oldContent = contentP.textContent;
+            const oldContent = contentP ? contentP.textContent : '';
+            msgDiv.dataset.oldContent = oldContent;
 
             contentP.innerHTML = `
-                <textarea class="form-control edit-message-textarea">${oldContent}</textarea>
-                <button class="btn btn-sm btn-primary save-edit-btn mt-1">Save</button>
-                <button class="btn btn-sm btn-secondary cancel-edit-btn mt-1">Cancel</button>
+                <textarea class="form-control edit-message-textarea" rows="3">${oldContent}</textarea>
+                <div class="mt-1">
+                    <button class="btn btn-sm btn-primary save-edit-btn">Save</button>
+                    <button class="btn btn-sm btn-secondary cancel-edit-btn ms-1">Cancel</button>
+                </div>
             `;
-            
-            editBtn.classList.add('d-none');
-            deleteBtn.classList.add('d-none');
+
+            const editBtnLocal = msgDiv.querySelector('.edit-message-btn');
+            const deleteBtnLocal = msgDiv.querySelector('.delete-message-btn');
+            if (editBtnLocal) editBtnLocal.classList.add('d-none');
+            if (deleteBtnLocal) deleteBtnLocal.classList.add('d-none');
+
+            return;
         }
 
-        if (e.target.classList.contains('save-edit-btn')) {
+        if (clicked.closest('.save-edit-btn')) {
             const textarea = msgDiv.querySelector('.edit-message-textarea');
-            const newContent = textarea.value;
+            const newContent = textarea ? textarea.value.trim() : '';
 
             const url = "{% url 'edit_group_message_ajax' group.slug 0 %}".replace('0', msgId);
 
@@ -217,28 +221,53 @@
                 headers: {
                     "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
                     "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
                 },
                 body: new URLSearchParams({content: newContent})
             })
             .then(r => r.json())
             .then(data => {
+                const contentP = msgDiv.querySelector('.message-content');
                 if (data.success) {
-                    msgDiv.querySelector('.message-content').textContent = data.content;      
-                    editBtn.classList.remove('d-none');
-                    deleteBtn.classList.remove('d-none');
+                    if (contentP) contentP.textContent = data.content;
                 } else {
-                    alert(JSON.stringify(data.errors));
+                    alert(JSON.stringify(data.errors || data));
+                    if (msgDiv.dataset.oldContent && contentP) contentP.textContent = msgDiv.dataset.oldContent;
                 }
+
+                const editBtnLocal = msgDiv.querySelector('.edit-message-btn');
+                const deleteBtnLocal = msgDiv.querySelector('.delete-message-btn');
+                if (editBtnLocal) editBtnLocal.classList.remove('d-none');
+                if (deleteBtnLocal) deleteBtnLocal.classList.remove('d-none');
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                alert('Network error');
+                const contentP = msgDiv.querySelector('.message-content');
+                if (msgDiv.dataset.oldContent && contentP) contentP.textContent = msgDiv.dataset.oldContent;
+                const editBtnLocal = msgDiv.querySelector('.edit-message-btn');
+                const deleteBtnLocal = msgDiv.querySelector('.delete-message-btn');
+                if (editBtnLocal) editBtnLocal.classList.remove('d-none');
+                if (deleteBtnLocal) deleteBtnLocal.classList.remove('d-none');
+            });
+
+            return;
         }
 
-        if (e.target.classList.contains('cancel-edit-btn')) {
-            const textarea = msgDiv.querySelector('.edit-message-textarea');
-            msgDiv.querySelector('.message-content').textContent = textarea.value;
+        if (clicked.closest('.cancel-edit-btn')) {
+            const contentP = msgDiv.querySelector('.message-content');
+            if (msgDiv.dataset.oldContent && contentP) {
+                contentP.textContent = msgDiv.dataset.oldContent;
+            }
+            const editBtnLocal = msgDiv.querySelector('.edit-message-btn');
+            const deleteBtnLocal = msgDiv.querySelector('.delete-message-btn');
+            if (editBtnLocal) editBtnLocal.classList.remove('d-none');
+            if (deleteBtnLocal) deleteBtnLocal.classList.remove('d-none');
+
+            return;
         }
 
-        if (e.target.classList.contains('delete-message-btn')) {
+        if (clicked.closest('.delete-message-btn')) {
             if (!confirm('Are you sure you want to delete this message?')) return;
 
             const url = "{% url 'delete_group_message_ajax' group.slug 0 %}".replace('0', msgId);
@@ -258,7 +287,27 @@
                     alert('Failed to delete message');
                 }
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                alert('Network error');
+            });
+
+            return;
+        }
+        const copyBtn = clicked.closest('[data-copy-message]');
+        if (copyBtn) {
+            const textEl = msgDiv.querySelector('.message-content');
+            const text = textEl ? textEl.innerText.trim() : '';
+
+            if (!text) {
+                alert('Нема чого копіювати');
+                return;
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+            }
+            return;
         }
     });
 })();

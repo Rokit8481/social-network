@@ -43,6 +43,12 @@ class Group(BaseModel):
     def __str__(self):
         return self.title
     
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.creator:
+            self.admins.add(self.creator)
+            self.members.add(self.creator)  
     def add_creator(self, user):
         self.members.add(user)
         self.admins.add(user)
@@ -61,7 +67,7 @@ class Group(BaseModel):
     def is_creator(self, user):
         return self.creator == user
     def is_admin(self, user):
-        return self.admins.filter(id=user.id).exists()
+        return user == self.creator or self.admins.filter(id=user.id).exists()
     def is_member(self, user):
         return self.members.filter(id=user.id).exists()
     
