@@ -34,11 +34,20 @@
                         <p>{{ group.description|default:"No description" }}</p>
 
                         <div class="mb-2">
-                            {% for tag in group.tags.all %}
-                                <a href="?{% for t in selected_tags %}tag={{ t }}&{% endfor %}tag={{ tag.name }}" class="badge bg-secondary me-1 text-decoration-none text-light">
-                                    #{{ tag.name }}
-                                </a>
-                            {% endfor %}
+                            {% with tags=group.tags.all %}
+                                {% for tag in tags|slice:":3" %}
+                                    <a href="?{% for t in selected_tags %}q={{ t }}&{% endfor %}q={{ tag.name }}"
+                                    class="badge bg-secondary me-1 text-decoration-none text-light">
+                                        #{{ tag.name }}
+                                    </a>
+                                {% endfor %}
+
+                                {% if tags|length > 3 %}
+                                    <span class="badge bg-secondary text-light">
+                                        +{{ tags|length|add:"-3" }}
+                                    </span>
+                                {% endif %}
+                            {% endwith %}
                         </div>
                         {% if group.user_is_member %}
                             <a href="{% url 'group_detail' group.slug %}" class="btn btn-primary btn-sm">View group</a>
