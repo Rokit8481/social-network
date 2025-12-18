@@ -3,6 +3,7 @@
 {% block title %}Create Group{% endblock title %}
 
 {% block content %}
+{{ form.media }} 
 <div class="container mt-4">
 	<h2>Create Group</h2>
 	<form method="post">
@@ -29,18 +30,10 @@
 
 		<button type="submit" class="btn btn-primary">Create Group</button>
 		<a href="{% url 'groups_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+	{{ form.media.js }}
 	</form>
 </div>
 
-<script>
-$(document).ready(function() {
-    $('.select2-tags').select2({
-        tags: true,
-        tokenSeparators: [','],
-        placeholder: 'Виберіть або створіть новий тег'
-    });
-});
-</script>
 
 
 {% endblock %}

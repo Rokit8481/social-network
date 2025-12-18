@@ -3,8 +3,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from groups.models import Group, GroupMessage, GroupMessageFile, Tag
-from groups.forms import CreateGroupForm, EditGroupForm, GroupMessageForm
+from groups.forms import EditGroupForm, GroupMessageForm, CreateGroupForm
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.http import JsonResponse
 
 User = get_user_model()
@@ -28,23 +29,29 @@ class GroupsListView(LoginRequiredMixin, View):
 
     def get(self, request):
         groups = Group.objects.prefetch_related('tags').order_by("title")
-        selected_tags = request.GET.getlist("tag")
-        
-        if selected_tags:
-            groups = groups.filter(tags__name__in=selected_tags).distinct()
+
+        query = request.GET.get("q", "").strip()
+
+        if query:
+            keywords = query.split()
+
+            q_object = Q()
+            for word in keywords:
+                q_object |= Q(title__icontains=word)
+                q_object |= Q(description__icontains=word)
+                q_object |= Q(tags__name__icontains=word)
+
+            groups = groups.filter(q_object).distinct()
 
         for group in groups:
             group.user_is_member = group.is_member(request.user)
 
-        all_tags = Tag.objects.all().order_by('name')
         context = {
             "groups": groups,
-            "selected_tags": selected_tags,
-            "all_tags": all_tags,
+            "query": query,
         }
         return render(request, self.template_name, context)
-
-
+    
 class GroupDetailView(MemberRequiredMixin, View):
     def get(self, request, slug):
         group = get_object_or_404(Group, slug=slug)
@@ -77,12 +84,14 @@ class CreateGroupView(LoginRequiredMixin, View):
             group = form.save(commit=False)
             group.creator = request.user
             group.save()
-            group.tags.set(form.cleaned_data['tags'])
             form.save_m2m()
-            group.add_creator(request.user)
-            return redirect(self.success_url)
-        return render(request, self.template_name, {"form": form})
 
+            group.add_creator(request.user)
+
+            return redirect(self.success_url)
+
+        return render(request, self.template_name, {"form": form})
+    
 class EditGroupView(AdminRequiredMixin, View):
     template_name = "groups/edit_group.html"
     form_class = EditGroupForm
@@ -120,12 +129,15 @@ class LeaveGroupView(MemberRequiredMixin, View):
         group = get_object_or_404(Group, slug=slug)
         if group.is_creator(request.user):
             group.delete()
-        else:
-            if group.is_admin(request.user):
-                group.admins.remove(request.user)
-                group.members.remove(request.user)
-            else:
-                group.members.remove(request.user)
+            return redirect('groups_list')
+
+        if group.is_admin(request.user):
+            if group.admins.count() <= 1:
+                return redirect('group_detail', slug=slug)
+
+            group.admins.remove(request.user)
+
+        group.members.remove(request.user)
         return redirect('groups_list')
 
 class EditGroupMessageAjaxView(AdminRequiredMixin, View):

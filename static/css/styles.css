@@ -246,6 +246,10 @@ input.form-control::placeholder {
     object-fit: cover;
 }
 
+.select2-container {
+    width: 100% !important;
+}
+
 .media-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
-from django.utils.text import slugify
+from slugify import slugify
 import shortuuid
 import uuid
 
@@ -19,8 +19,7 @@ class Tag(BaseModel):
         ordering = ['name']
         
     def save(self, *args, **kwargs):
-        formatted = slugify(self.name).replace('-', '_')
-        formatted = '_'.join(filter(None, formatted.split('_')))
+        formatted = slugify(self.name, separator="_", lowercase=False)
         self.name = formatted
         super().save(*args, **kwargs)
 
@@ -44,6 +43,12 @@ class Group(BaseModel):
     def __str__(self):
         return self.title
     
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.creator:
+            self.admins.add(self.creator)
+            self.members.add(self.creator)  
     def add_creator(self, user):
         self.members.add(user)
         self.admins.add(user)
@@ -62,7 +67,7 @@ class Group(BaseModel):
     def is_creator(self, user):
         return self.creator == user
     def is_admin(self, user):
-        return self.admins.filter(id=user.id).exists()
+        return user == self.creator or self.admins.filter(id=user.id).exists()
     def is_member(self, user):
         return self.members.filter(id=user.id).exists()
     
