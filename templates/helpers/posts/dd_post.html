@@ -1,0 +1,27 @@
+<div class="dropdown">
+<button class="btn btn-sm btn-outline-secondary"
+        data-bs-toggle="dropdown"
+        style="border-radius: 10px;">
+    ⋮
+</button>
+
+<ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+    <li>
+    <a class="dropdown-item d-flex align-items-center gap-2"
+        href="{% url 'post_edit' post.pk %}">
+        ✏️ <span>Редагувати</span>
+    </a>
+    </li>
+
+    <li>
+    <form method="POST" action="{% url 'post_delete' post.pk %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="dropdown-item d-flex align-items-center gap-2 text-danger"
+                onclick="return confirm('Delete this post?')">
+        🗑️ <span>Видалити</span>
+        </button>
+    </form>
+    </li>
+</ul>
+</div>

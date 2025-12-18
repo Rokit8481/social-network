@@ -129,17 +129,17 @@
         <div class="tab-content mt-3" id="profileTabsContent">
 
         <div class="tab-pane fade show active" id="posts-tab-pane" role="tabpanel">
-            {% include "accounts/partials/posts_list.html" with posts=posts %}
+            {% include "helprers/partials/posts_list.html" with posts=posts %}
         </div>
 
         <div class="tab-pane fade" id="groups-tab-pane" role="tabpanel">
-            {% include "accounts/partials/groups_list.html" with groups=user_groups %}
+            {% include "helprers/partials/groups_list.html" with groups=user_groups %}
         </div>
 
         <div class="tab-pane fade" id="liked-tab-pane" role="tabpanel">
             {% if posts_user_liked %}
                 {% for post in posts_user_liked %}
-                    {% include "accounts/partials/post_item.html" with post=post %}
+                    {% include "helprers/partials/post_item.html" with post=post %}
                 {% endfor %}
             {% else %}
                 <p class="text-muted">This user hasn't liked any posts yet.</p>

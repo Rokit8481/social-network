@@ -1,0 +1,7 @@
+{% if attachments %}
+<div class="mt-3">
+    {% for file in attachments %}
+        {% include "posts/files/attachments/"|add:file.file_type|add:".html" %}
+    {% endfor %}
+</div>
+{% endif %}
