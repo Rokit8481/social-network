@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const newContent = textarea.value.trim();
         if (!newContent) {
-            alert("Порожній коментар");
+            alert("Empty comment not allowed");
             return;
         }
 

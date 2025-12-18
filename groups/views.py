@@ -57,8 +57,17 @@ class GroupDetailView(MemberRequiredMixin, View):
         group = get_object_or_404(Group, slug=slug)
         user_is_admin = group.is_admin(request.user)
         user_is_member = group.is_member(request.user)
-        messages = group.messages.all().order_by('-created_at')
+        messages = group.messages.prefetch_related('files').order_by('-created_at')
         tags = group.tags.all()
+        messages_with_files = []
+        for msg in messages:
+            media_files = [f for f in msg.files.all() if f.is_media]
+            attachments = [f for f in msg.files.all() if f.is_attachment]
+            messages_with_files.append({
+                'message': msg,
+                'media_files': media_files,
+                'attachments': attachments,
+            })
 
         context = {
             'group': group,
@@ -66,6 +75,7 @@ class GroupDetailView(MemberRequiredMixin, View):
             'user_is_admin': user_is_admin,
             'user_is_member': user_is_member,
             'tags': tags,
+            'messages_with_files': messages_with_files,
         }
         return render(request, 'groups/group_detail.html', context)
 

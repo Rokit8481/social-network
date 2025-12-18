@@ -35,17 +35,12 @@
                         {{ post.content }}
                     </p>
                     {% if media_files %}
-                        {% include "helpers/files/media_preview.html" %}
-                        {% include "helpers/files/media_modal.html" %}
+                        {% include "helpers/post_files/media_preview.html" %}
+                        {% include "helpers/post_files/media_modal.html" %}
                     {% endif %}
 
-                    {% if attachments %}
-                        <div class="mt-3">
-                            {% for file in attachments %}
-                                {% include "helpers/attachments/"|add:file.file_type|add:".html" %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+                    {% include "helpers/post_files/attachments.html" %}
+                    
                     <hr>
                     <div class="d-flex align-items-center justify-content-between mt-3 mb-2">
                         <button class="like-btn btn btn-light border px-3"

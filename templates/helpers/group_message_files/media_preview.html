@@ -1,0 +1,27 @@
+<div class="media-grid d-flex flex-nowrap gap-2 overflow-auto">
+    {% for file in media_files|slice:":3" %}
+        <div class="media-item-small media-item-small d-flex align-items-center justify-content-center position-relative"
+        data-bs-toggle="modal"
+        data-bs-target="#mediaModal{{ message.id }}"
+        data-index="{{ forloop.counter0 }}">
+
+            {% if file.file_type == "image" %}
+                <img src="{{ file.file.url }}" style="width:100%; height:100%; object-fit:cover;">
+            {% elif file.file_type == "video" %}
+                <video muted style="width:100%; height:100%; object-fit:cover;">
+                    <source src="{{ file.file.url }}">
+                </video>
+            {% elif file.file_type == "audio" %}
+                <audio controls class="w-100 h-auto">
+                    <source src="{{ file.file.url }}" type="audio/mpeg">
+                </audio>
+            {% endif %}
+
+            {% if forloop.last and media_files|length > 3 %}
+                <div class="media-overlay">
+                    +{{ media_files|length|add:"-3" }}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>

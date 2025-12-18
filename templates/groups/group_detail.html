@@ -53,28 +53,31 @@
         {% endif %}
 
         <div class="mt-3 messages">
-            {% for msg in messages %}
-            <div class="mb-3 message-item" data-id="{{ msg.id }}">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>{{ msg.sender.username }}</strong>
-                        <small class="text-muted">{{ msg.created_at|date:"d.m.Y H:i" }}</small>
-                    </div>
-                    <div>
-                        {% include "helpers/groups/dd_group_message.html" with message=msg %}
-                    </div>
-                </div> 
-                <p class="mb-1 message-content">{{ msg.content }}</p>     
+            {% for item in messages_with_files %}
+                <div class="mb-3 message-item" data-id="{{ item.message.id }}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ item.message.sender.username }}</strong>
+                            <small class="text-muted">{{ item.message.created_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                        <div>
+                            {% include "helpers/groups/dd_group_message.html" with message=item.message %}
+                        </div>
+                    </div> 
+                    <div class="media-grid d-flex flex-nowrap gap-2 overflow-auto">
+                        {% if item.media_files %}
+                            {% include "helpers/group_message_files/media_preview.html" with media_files=item.media_files message=item.message %}
+                            {% include "helpers/group_message_files/media_modal.html" with media_files=item.media_files message=item.message %}
+                        {% endif %}
 
-                {% if msg.files.all %}
-                    <div class="ms-3">
-                        {% for f in msg.files.all %}
-                            <a href="{{ f.file.url }}" download>{{ f.file.name }}</a><br>
-                        {% endfor %}
+                        {% if item.attachments %}
+                            {% include "helpers/group_message_files/attachments.html" with attachments=item.attachments message=item.message %}
+                        {% endif %}
                     </div>
-                {% endif %}
-                <hr>
-            </div>
+                    
+                    <p class="mb-1 mt-3 message-content">{{ item.message.content }}</p>     
+                    <hr>
+                </div>
             {% endfor %}
 
             {% if not messages %}
@@ -180,20 +183,17 @@
                 msgDiv.className = 'mb-3 message-item';
                 msgDiv.dataset.id = data.message_id;
                 msgDiv.innerHTML = `
-                    <strong>${data.sender}</strong>
-                    <small class="text-muted">${data.created_at}</small>
-                    <p class="mb-1 message-content">${data.content}</p>
-                    {% if user_is_admin %}
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown" style="border-radius: 10px;">⋮</button>
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
-                                <li><button class="dropdown-item edit-message-btn" data-message-id="${data.message_id}">✏️ <span>Edit</span></button></li>
-                                <li><button class="dropdown-item d-flex align-items-center gap-2" data-copy-message="${data.message_id}">📋 <span>Скопіювати</span></button></li>
-                                <li><button class="dropdown-item delete-message-btn text-danger" data-message-id="${data.message_id}">🗑️ <span>Delete</span></button></li>
-                            </ul>
-                        </div>
-                    {% endif %}
-                    <hr>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${data.sender}</strong>
+                        <small class="text-muted">${data.created_at}</small>
+                    </div>
+                    <div>
+                        {% include "helpers/groups/dd_group_message.html" with message=msg %}
+                    </div>
+                </div> 
+                <p class="mb-1 message-content">${data.content}</p>
+                <hr>
                 `;
                 container.insertBefore(msgDiv, container.firstChild);
                 form.reset();
@@ -337,6 +337,15 @@
             }
             return;
         }
+    });
+    document.querySelectorAll(".media-item-small").forEach(item => {
+        item.addEventListener("click", () => {
+            const index = item.dataset.index;
+            const carousel = document.querySelector(
+                item.dataset.bsTarget + " .carousel"
+            );
+            bootstrap.Carousel.getOrCreateInstance(carousel).to(index);
+        });
     });
 })();
 </script>
