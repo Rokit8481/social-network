@@ -160,6 +160,12 @@ class EditGroupMessageAjaxView(AdminRequiredMixin, View):
         if form.is_valid():
             message = form.save()
 
+            delete_ids = request.POST.getlist("delete_files")
+            message.files.filter(id__in=delete_ids).delete()
+
+            for f in request.FILES.getlist("files"):
+                GroupMessageFile.objects.create(message=message, file=f)
+
             return JsonResponse({
                 'success': True,
                 'message_id': message.id,
@@ -186,6 +192,9 @@ class GroupMessageAjaxView(AdminRequiredMixin, View):
             message.group = group
             message.sender = request.user
             message.save()
+
+            for f in request.FILES.getlist("files"):
+                GroupMessageFile.objects.create(message=message, file=f)
 
             return JsonResponse({
                 'success': True,

@@ -38,52 +38,66 @@
 
         <hr class="mt-3">
 
-        {% if user_is_admin %}
-        <div class="card p-3">
-            <h5>New Message</h5>
-            <form id="new-message-form" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <textarea name="content" id="id_content" class="form-control" rows="3" placeholder="Write a message..."></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Send</button>
-                <div id="message-errors" class="text-danger mt-2"></div>
-            </form>
-        </div>
-        {% endif %}
+        <div class="card shadow-sm border-0 d-flex flex-column"
+            style="height: 80vh; border-radius: 16px; overflow: hidden;">
 
-        <div class="mt-3 messages">
-            {% for item in messages_with_files %}
+            <div class="flex-grow-1 overflow-auto p-3 messages"
+                style="background:#fafafa">
+
+                {% for item in messages_with_files %}
                 <div class="mb-3 message-item" data-id="{{ item.message.id }}">
-                    <div class="d-flex justify-content-between align-items-center">
+
+                    <div class="d-flex justify-content-between align-items-center mb-1">
                         <div>
                             <strong>{{ item.message.sender.username }}</strong>
-                            <small class="text-muted">{{ item.message.created_at|date:"d.m.Y H:i" }}</small>
+                            <small class="text-muted">
+                                {{ item.message.created_at|date:"d.m.Y H:i" }}
+                            </small>
                         </div>
-                        <div>
-                            {% include "helpers/groups/dd_group_message.html" with message=item.message %}
-                        </div>
-                    </div> 
-                    <div class="media-grid d-flex flex-nowrap gap-2 overflow-auto">
-                        {% if item.media_files %}
-                            {% include "helpers/group_message_files/media_preview.html" with media_files=item.media_files message=item.message %}
-                            {% include "helpers/group_message_files/media_modal.html" with media_files=item.media_files message=item.message %}
-                        {% endif %}
 
+                        {% include "helpers/groups/dd_group_message.html" with message=item.message %}
+                    </div>
+
+                    {% if item.media_files or item.attachments %}
+                    <div class="media-grid d-flex flex-nowrap gap-2 overflow-auto mb-2">
+                        {% if item.media_files %}
+                            {% include "helpers/group_message_files/media_preview.html" %}
+                        {% endif %}
                         {% if item.attachments %}
-                            {% include "helpers/group_message_files/attachments.html" with attachments=item.attachments message=item.message %}
+                            {% include "helpers/group_message_files/attachments.html" %}
                         {% endif %}
                     </div>
-                    
-                    <p class="mb-1 mt-3 message-content">{{ item.message.content }}</p>     
-                    <hr>
-                </div>
-            {% endfor %}
+                    {% endif %}
 
-            {% if not messages %}
-                <p class="text-muted">No messages yet.</p>
+                    <p class="mb-0 message-content">{{ item.message.content }}</p>
+
+                    <hr>
+                    
+                </div>
+                {% empty %}
+                    <p class="text-muted">No messages yet.</p>
+                {% endfor %}
+            </div>
+
+            {% if user_is_admin %}
+            <div class="border-top bg-white p-3">
+                <form id="new-message-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <textarea name="content"
+                                id="message-input"
+                                class="form-control"
+                                rows="2"
+                                placeholder="Write a message..."></textarea>
+                    </div>
+                    <input type="hidden" id="edit-message-id" value="">
+                    <button class="btn btn-primary w-100" id="send-btn">Send</button>
+                    <div id="message-errors" class="text-danger mt-1"></div>
+                </form>
+            </div>
             {% endif %}
         </div>
+
     </div>
 </div>
 
