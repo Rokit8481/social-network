@@ -198,7 +198,7 @@ class GroupMessageAjaxView(AdminRequiredMixin, View):
 
             return JsonResponse({
                 'success': True,
-                'message_id': message.id,
+                'id': message.id,
                 'content': message.content,
                 'sender': message.sender.username,
                 'created_at': message.created_at.strftime('%d.%m.%Y %H:%M'),

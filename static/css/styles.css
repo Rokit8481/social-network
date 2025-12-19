@@ -327,3 +327,57 @@ input.form-control::placeholder {
     width: 250px;      
     height: 80px;
 }
+
+.group-header {
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(20,20,30,0.04);
+  padding: 16px;
+  background: linear-gradient(180deg, #ffffff, #fbfbfd);
+}
+
+.group-sidebar .card {
+  border-radius: 12px;
+}
+
+.avatar-small {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.messages {
+  background: #f6f7fb;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.message-item .card {
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 18px rgba(20,20,30,0.04);
+  overflow: hidden;
+}
+
+.message-content {
+  white-space: pre-wrap;
+}
+
+.message-item.editing .card {
+  outline: 2px solid rgba(13,110,253,0.12);
+  background: #fff;
+}
+
+.tag-list .badge {
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.message-form {
+  border-radius: 12px;
+  padding: 14px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(20,20,30,0.03);
+}
+
