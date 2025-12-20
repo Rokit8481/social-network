@@ -5,39 +5,47 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ===================== TAGS ===================== */
-
 function initTagsToggle() {
     const TAGS_TO_SHOW = 3;
-    const showBtn = document.getElementById('show-more-tags');
-    const hideBtn = document.getElementById('hide-tags');
-    const tags = Array.from(document.querySelectorAll('.tag-item'));
-    if (!showBtn || !hideBtn) return;
 
-    const isHidden = el =>
-        el.style.display === 'none' || getComputedStyle(el).display === 'none';
+    document.querySelectorAll('.tags-container').forEach(container => {
+        const tags = Array.from(container.querySelectorAll('.tag-item'));
+        const showBtn = container.querySelector('.show-more-tags');
+        const hideBtn = container.querySelector('.hide-tags');
 
-    const updateButtons = () => {
-        const hiddenCount = tags.filter(isHidden).length;
-        const extraVisible = tags.slice(TAGS_TO_SHOW).some(t => !isHidden(t));
+        if (!showBtn || !hideBtn || tags.length <= TAGS_TO_SHOW) return;
 
-        showBtn.style.display = hiddenCount > 0 ? 'inline-block' : 'none';
-        hideBtn.style.display = extraVisible ? 'inline-block' : 'none';
-    };
+        let visibleCount = TAGS_TO_SHOW;
 
-    updateButtons();
-
-    showBtn.addEventListener('click', () => {
-        tags.filter(isHidden).slice(0, 3).forEach(tag => {
-            tag.style.display = 'inline-block';
+        tags.forEach((tag, i) => {
+            tag.style.display = i < TAGS_TO_SHOW ? 'inline-block' : 'none';
         });
-        updateButtons();
-    });
 
-    hideBtn.addEventListener('click', () => {
-        tags.slice(TAGS_TO_SHOW).forEach(tag => {
-            tag.style.display = 'none';
+        showBtn.addEventListener('click', () => {
+            visibleCount += TAGS_TO_SHOW;
+
+            tags.forEach((tag, i) => {
+                if (i < visibleCount) {
+                    tag.style.display = 'inline-block';
+                }
+            });
+            hideBtn.style.display = 'inline-block';
+
+            if (visibleCount >= tags.length) {
+                showBtn.style.display = 'none';
+            }
         });
-        updateButtons();
+
+        hideBtn.addEventListener('click', () => {
+            visibleCount = TAGS_TO_SHOW;
+
+            tags.forEach((tag, i) => {
+                tag.style.display = i < TAGS_TO_SHOW ? 'inline-block' : 'none';
+            });
+
+            hideBtn.style.display = 'none';
+            showBtn.style.display = 'inline-block';
+        });
     });
 }
 
@@ -188,6 +196,8 @@ function addMessageToDOM(data) {
     const msgDiv = clone.querySelector(".message-item");
 
     msgDiv.dataset.id = data.id;
+    const avatar = clone.querySelector(".msg-avatar");
+    avatar.src = data.sender_avatar_url; 
     clone.querySelector(".msg-sender").textContent = data.sender;
     clone.querySelector(".msg-created").textContent = data.created_at;
     clone.querySelector(".message-content").textContent = data.content;

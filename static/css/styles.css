@@ -238,12 +238,14 @@ input.form-control::placeholder {
     font-size: 18px;
     display: block;
 }
+
 .avatar-small {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    margin-right: 10px;
     object-fit: cover;
+    display: block;
+    background: none !important;
 }
 
 .select2-container {
@@ -328,23 +330,9 @@ input.form-control::placeholder {
     height: 80px;
 }
 
-.group-header {
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(20,20,30,0.04);
-  padding: 16px;
-  background: linear-gradient(180deg, #ffffff, #fbfbfd);
-}
 
 .group-sidebar .card {
   border-radius: 12px;
-}
-
-.avatar-small {
-  width: 36px;
-  height: 36px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-right: 10px;
 }
 
 .messages {
@@ -357,7 +345,7 @@ input.form-control::placeholder {
   border-radius: 12px;
   margin-bottom: 12px;
   box-shadow: 0 6px 18px rgba(20,20,30,0.04);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .message-content {
@@ -369,7 +357,7 @@ input.form-control::placeholder {
   background: #fff;
 }
 
-.tag-list .badge {
+.tags-container .badge {
   font-weight: 500;
   margin-bottom: 6px;
 }
@@ -377,7 +365,14 @@ input.form-control::placeholder {
 .message-form {
   border-radius: 12px;
   padding: 14px;
-  background: #fff;
+  background: rgb(45 48 50);
   box-shadow: 0 4px 12px rgba(20,20,30,0.03);
 }
 
+.bg-gray {
+    background-color: rgb(45 48 50);
+}
+
+.dropdown {
+    position: relative;
+}
