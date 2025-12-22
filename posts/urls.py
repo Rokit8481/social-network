@@ -2,7 +2,7 @@ from django.urls import path
 from posts.views import PostsListView, TogglePostLikeAPI, \
                         PostDetailView, ToggleCommentLikeAPI, \
                         PostEditView, PostDeleteView, \
-                        CommentDeleteView, CommentEditView, CreatePostView
+                        CommentDeleteView, CommentEditView, CreatePostView, PostsInfiniteAPI
 
 urlpatterns = [
     path('', PostsListView.as_view(), name='posts-list'),
@@ -14,4 +14,5 @@ urlpatterns = [
     path("post/<int:post_pk>/delete", PostDeleteView.as_view(), name="post_delete"),
     path("post/<int:post_pk>/comment/<int:comment_pk>/delete", CommentDeleteView.as_view(), name="comment_delete"),
     path("comment/<int:comment_pk>/edit/", CommentEditView.as_view(), name="comment_edit"),
+    path("infinite/", PostsInfiniteAPI.as_view(), name="posts-infinite"),
 ]

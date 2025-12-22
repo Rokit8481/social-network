@@ -8,13 +8,14 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
+from django.template.loader import render_to_string
 import json
 
 User = get_user_model()
 
 class PostsListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        posts = Post.objects.all().order_by('-created_at').annotate(likes_count=Count('likes'))
+        posts = Post.objects.annotate(likes_count=Count("likes")).order_by("-id")[:5]
 
         form = PostForm()
         return render(request, 'posts/posts_list.html', {
@@ -206,4 +207,33 @@ class CommentEditView(LoginRequiredMixin, View):
                 "created_at": comment.created_at.strftime("%d-%m-%Y %H:%M"),
                 "updated_at": comment.updated_at.strftime("%d-%m-%Y %H:%M"),
             }
+        })
+    
+class PostsInfiniteAPI(LoginRequiredMixin, View):
+    def get(self, request):
+        last_id = request.GET.get("last_id")
+
+        qs = Post.objects \
+            .select_related("author") \
+            .prefetch_related("files", "people_tags") \
+            .annotate(likes_count=Count("likes")) \
+            .order_by("-id")
+
+        if last_id:
+            qs = qs.filter(id__lt=last_id)
+
+        posts = list(qs[:5])
+
+        print("LAST ID:", last_id)
+        print("POSTS:", [p.id for p in posts])
+
+        html = render_to_string(
+            "helpers/partials/posts_list.html",
+            {"posts": posts},
+            request=request
+        )
+
+        return JsonResponse({
+            "html": html,
+            "has_more": len(posts) == 5
         })
