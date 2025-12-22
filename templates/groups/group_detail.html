@@ -45,8 +45,11 @@
                     <img src="{{ item.message.sender.avatar.url }}" alt="" class="avatar-small">
                   {% endif %}
                   <div class="ms-2">
-                    <div class="fw-semibold">{{ item.message.sender.username }}</div>
-                    <div class="text-muted small">{{ item.message.created_at|date:"d.m.Y H:i" }}</div>
+                    <div class="fw-semibold">
+                      <a href="{% url 'user_detail' item.message.sender.slug %}" class="text-decoration-none text-light">
+                        {{ item.message.sender.username }}
+                      </a></div>
+                    <div class="text-light small">{{ item.message.created_at|date:"d.m.Y H:i" }}</div>
                   </div>
                 </div>
                 <div class="ms-2">
@@ -169,7 +172,7 @@
               <img class="avatar-small msg-avatar" alt="" src="">
               <div class="ms-2">
                 <div class="fw-semibold msg-sender"></div>
-                <div class="text-muted small msg-created"></div>
+                <div class="text-light small msg-created"></div>
               </div>
             </div>
             {% include "helpers/groups/dd_group_message.html" %}

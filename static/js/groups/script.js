@@ -61,7 +61,6 @@ function initMessageForm() {
     const sendBtn = document.getElementById("send-btn");
     const cancelBtn = document.getElementById("cancel-edit-btn");
     const errorsDiv = document.getElementById("message-errors");
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
     // === Функція скидання режиму редагування ===
     const resetEditMode = () => {
@@ -84,7 +83,7 @@ function initMessageForm() {
         fetch(url, {
             method: "POST",
             headers: {
-                "X-CSRFToken": csrfToken,
+                "X-CSRFToken": CSRF_TOKEN,
                 "X-Requested-With": "XMLHttpRequest",
                 "Content-Type": "application/x-www-form-urlencoded"
             },
@@ -148,7 +147,7 @@ function initMessageActions() {
         fetch(url, {
             method: "POST",
             headers: {
-                "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+                "X-CSRFToken": CSRF_TOKEN,
                 "X-Requested-With": "XMLHttpRequest"
             }
         })

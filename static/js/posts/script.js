@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
     document.querySelectorAll(".like-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             const postId = btn.dataset.postId;
@@ -10,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fetch(`/posts/api/post/like/${postId}/`, {
                 method: "POST",
                 headers: {
-                    "X-CSRFToken": csrfToken,
+                    "X-CSRFToken": CSRF_TOKEN,
                     "X-Requested-With": "XMLHttpRequest"
                 }
             })
@@ -29,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fetch(`/posts/api/comment/like/${commentId}/`, {
                 method: "POST",
                 headers: {
-                    "X-CSRFToken": csrfToken,
+                    "X-CSRFToken": CSRF_TOKEN,
                     "X-Requested-With": "XMLHttpRequest"
                 }
             })
@@ -95,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const res = await fetch(`/posts/comment/${editingCommentId}/edit/`, {
             method: "POST",
             headers: {
-                "X-CSRFToken": csrfToken,
+                "X-CSRFToken": CSRF_TOKEN,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ content: newContent })

@@ -23,65 +23,17 @@
             placeholder="Search groups..."
         >
     </form>
+    <div id="group-container">
+        {% include "helpers/partials/groups_list.html" %}
+    </div>
 
-    {% if groups %}
-        <div class="row">
-            {% for group in groups %}
-                <div class="col-md-4 mb-4">
-                    <div class="card p-3 shadow-sm">
-                        <h4>{{ group.title }}</h4>
-                        <p class="text-muted small">{{ group.members.count }} members</p>
-                        <p>{{ group.description|default:"No description"|truncatechars:100 }}</p>
-
-                        <div class="mb-2">
-                            {% with tags=group.tags.all %}
-                                {% for tag in tags|slice:":3" %}
-                                    <a href="?{% for t in selected_tags %}q={{ t }}&{% endfor %}q={{ tag.name }}"
-                                    class="badge bg-secondary me-1 text-decoration-none text-light">
-                                        #{{ tag.name }}
-                                    </a>
-                                {% endfor %}
-
-                                {% if tags|length > 3 %}
-                                    <span class="badge bg-secondary text-light">
-                                        +{{ tags|length|add:"-3" }}
-                                    </span>
-                                {% endif %}
-                            {% endwith %}
-                        </div>
-                        {% if group.user_is_member %}
-                            <a href="{% url 'group_detail' group.slug %}" class="btn btn-primary btn-sm">View group</a>
-                        {% else %}
-                            <form action="{% url 'join_group' group.slug %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-primary btn-sm">Join group</button>
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No groups found.</p>
-    {% endif %}
+    <div id="loader" class="text-center my-4 d-none">
+        <div class="spinner-border"></div>
+    </div>
+    <div id="end-of-groups" class="text-center my-4 d-none">
+        <p class="text-light">No more groups to load.</p>
+    </div>
 </div>
 
-<script>
-const form = document.getElementById('tags-form');
-form.addEventListener('submit', function(e){
-    const inputTag = form.querySelector('input[name="tag"]');
-    const tagValue = inputTag.value.trim();
-    if (!tagValue) return;
-
-    const selectedTagElements = document.querySelectorAll('#selected-tags .selected-tag');
-    selectedTagElements.forEach(el => {
-        const value = el.textContent.replace('×','').trim().substring(1);
-        const hidden = document.createElement('input');
-        hidden.type = 'hidden';
-        hidden.name = 'tag';
-        hidden.value = value;
-        form.appendChild(hidden);
-    });
-});
-</script>
+<script src="{% static 'js/groups/infinite_scroll.js' %}"></script>
 {% endblock %}

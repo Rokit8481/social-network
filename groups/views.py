@@ -5,7 +5,8 @@ from django.urls import reverse_lazy
 from groups.models import Group, GroupMessage, GroupMessageFile, Tag
 from groups.forms import EditGroupForm, GroupMessageForm, CreateGroupForm
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Count, Q
+from django.template.loader import render_to_string
 from django.http import JsonResponse
 
 User = get_user_model()
@@ -28,20 +29,25 @@ class GroupsListView(LoginRequiredMixin, View):
     template_name = "groups/groups_list.html"
 
     def get(self, request):
-        groups = Group.objects.prefetch_related('tags').order_by("title")
-
         query = request.GET.get("q", "").strip()
+
+        groups_qs = (
+            Group.objects
+            .prefetch_related('tags')
+            .order_by("-id")
+        )
 
         if query:
             keywords = query.split()
-
             q_object = Q()
             for word in keywords:
                 q_object |= Q(title__icontains=word)
                 q_object |= Q(description__icontains=word)
                 q_object |= Q(tags__name__icontains=word)
 
-            groups = groups.filter(q_object).distinct()
+            groups_qs = groups_qs.filter(q_object).distinct()
+            
+        groups = groups_qs[:9]
 
         for group in groups:
             group.user_is_member = group.is_member(request.user)
@@ -205,3 +211,45 @@ class GroupMessageAjaxView(AdminRequiredMixin, View):
                 'created_at': message.created_at.strftime('%d.%m.%Y %H:%M'),
             })
         return JsonResponse({'success': False, 'errors': form.errors})
+    
+class GroupsInfiniteAPI(LoginRequiredMixin, View):
+    def get(self, request):
+        last_id = request.GET.get("last_id")
+        query = request.GET.get("q", "").strip()
+
+        qs = (
+            Group.objects
+            .select_related("creator")
+            .prefetch_related("tags")
+            .annotate(messages_count=Count("messages"))
+            .order_by("-id")
+        )
+
+        if query:
+            keywords = query.split()
+            q_object = Q()
+            for word in keywords:
+                q_object |= Q(title__icontains=word)
+                q_object |= Q(description__icontains=word)
+                q_object |= Q(tags__name__icontains=word)
+
+            qs = qs.filter(q_object).distinct()
+
+        if last_id:
+            qs = qs.filter(id__lt=last_id)
+
+        groups = list(qs[:9])
+
+        for group in groups:
+                group.user_is_member = group.is_member(request.user)
+
+        html = render_to_string(
+            "helpers/partials/groups_list.html",
+            {"groups": groups},
+            request=request
+        )
+
+        return JsonResponse({
+            "html": html,
+            "has_more": len(groups) == 9
+        })

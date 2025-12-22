@@ -224,9 +224,6 @@ class PostsInfiniteAPI(LoginRequiredMixin, View):
 
         posts = list(qs[:5])
 
-        print("LAST ID:", last_id)
-        print("POSTS:", [p.id for p in posts])
-
         html = render_to_string(
             "helpers/partials/posts_list.html",
             {"posts": posts},

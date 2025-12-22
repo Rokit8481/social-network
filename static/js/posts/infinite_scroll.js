@@ -42,7 +42,6 @@ function loadMorePosts() {
 }
 
 function initLikeButtons() {
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
     document.querySelectorAll(".like-btn").forEach(btn => {
         if (btn.dataset.bound) return;
@@ -55,7 +54,7 @@ function initLikeButtons() {
             fetch(`/posts/api/post/like/${postId}/`, {
                 method: "POST",
                 headers: {
-                    "X-CSRFToken": csrfToken,
+                    "X-CSRFToken": CSRF_TOKEN,
                     "X-Requested-With": "XMLHttpRequest"
                 }
             })

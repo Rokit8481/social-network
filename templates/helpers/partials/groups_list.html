@@ -1,20 +1,10 @@
-{% if user_groups %}
+{% if groups %}
     <div class="row">
-        {% for group in user_groups %}
-            <div class="col-md-4 mb-3">
-                <div class="card p-3 shadow-sm" style="border-radius: 16px;">
-                    <h5 class="mb-2">
-                        <a href="{% url 'group_detail' group.slug %}" class="text-decoration-none text-dark">
-                            {{ group.title }}
-                        </a>
-                    </h5>
-                    <p class="text-muted mb-1">{{ group.description|truncatechars:100 }}</p>
-                    <small class="text-muted">Members: {{ group.members.count }}</small>
-                </div>
-            </div>
+        {% for group in groups %}
+            {% include "helpers/partials/group_item.html" with group=group %}
         {% endfor %}
     </div>
 {% else %}
-    <p class="text-muted">This user is not a member of any groups yet.</p>
+    <p class="text-light">This user is not a member of any groups yet.</p>
 {% endif %}
 
