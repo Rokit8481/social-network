@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
-from posts.choices.files import FILE_TYPE_MAP
+from accounts.choices.files import FILE_TYPE_MAP
 import os
 
 User = get_user_model()

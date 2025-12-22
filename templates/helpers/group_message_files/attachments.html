@@ -1,0 +1,7 @@
+{% if attachments %}
+<div class="attachments-grid d-flex flex-nowrap gap-2 mt-3 overflow-auto">
+    {% for file in attachments %}
+        {% include "helpers/attachments/"|add:file.file_type|add:".html" %}
+    {% endfor %}
+</div>
+{% endif %}

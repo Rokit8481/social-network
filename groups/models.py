@@ -1,7 +1,9 @@
+import os
 from django.db import models
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
-from django.utils.text import slugify
+from slugify import slugify
+from accounts.choices.files import FILE_TYPE_MAP
 import shortuuid
 import uuid
 
@@ -19,8 +21,7 @@ class Tag(BaseModel):
         ordering = ['name']
         
     def save(self, *args, **kwargs):
-        formatted = slugify(self.name).replace('-', '_')
-        formatted = '_'.join(filter(None, formatted.split('_')))
+        formatted = slugify(self.name, separator="_", lowercase=False)
         self.name = formatted
         super().save(*args, **kwargs)
 
@@ -44,6 +45,12 @@ class Group(BaseModel):
     def __str__(self):
         return self.title
     
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.creator:
+            self.admins.add(self.creator)
+            self.members.add(self.creator)  
     def add_creator(self, user):
         self.members.add(user)
         self.admins.add(user)
@@ -62,7 +69,7 @@ class Group(BaseModel):
     def is_creator(self, user):
         return self.creator == user
     def is_admin(self, user):
-        return self.admins.filter(id=user.id).exists()
+        return user == self.creator or self.admins.filter(id=user.id).exists()
     def is_member(self, user):
         return self.members.filter(id=user.id).exists()
     
@@ -84,10 +91,31 @@ class GroupMessageFile(BaseModel):
     message = models.ForeignKey(GroupMessage, on_delete=models.CASCADE, related_name='files', null=False)
     file = models.FileField(upload_to='group_messages/', verbose_name='Message File', null=False, blank=False)
 
+    def __str__(self):
+        return f"File for {self.message.slug}"
+    
+    @property
+    def file_type(self):
+        if not self.file:
+            return "other"
+
+        ext = os.path.splitext(self.file.name)[1].lower()
+
+        for file_type, extensions in FILE_TYPE_MAP.items():
+            if ext in extensions:
+                return file_type
+
+        return "other"
+    
+    @property
+    def is_media(self):
+        return self.file_type in {"image", "video"}
+
+    @property
+    def is_attachment(self):
+        return not self.is_media
+        
     class Meta:
         verbose_name = 'Group Message File'
         verbose_name_plural = 'Group Message Files'
         ordering = ['created_at']
-
-    def __str__(self):
-        return f'File for message {self.message.slug}'

@@ -1,6 +1,6 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save, m2m_changed
-from messenger.models import Chat, Message, Reaction
+from django.db.models.signals import post_save
+from messenger.models import Message, Reaction
 from django.contrib.auth import get_user_model
 from notifications.models import Notification
 

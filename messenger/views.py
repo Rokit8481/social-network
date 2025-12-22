@@ -3,10 +3,10 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .models import Chat, Message, Reaction
-from .forms import MessageForm, GroupForm, ChatForm
+from messenger.models import Chat, Message, Reaction
+from messenger.forms import MessageForm, GroupForm, ChatForm
 from django.db.models import Count
-from .choices.emoji import EMOJI_CHOICES
+from accounts.choices.emoji import EMOJI_CHOICES
 from django.contrib.auth import get_user_model
 from django.conf import settings
 import json

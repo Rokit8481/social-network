@@ -65,6 +65,13 @@
                                 <div class="d-flex gap-2 overflow-auto py-2">
 
                                     {% for file in post.files.all %}
+                                    <div class="position-relative file-item" data-file-id="{{ file.id }}">
+                                        
+                                        <button type="button"
+                                            class="btn btn-sm btn-danger position-absolute top-0 end-0 remove-current-file"
+                                            style="z-index:10; border-radius:50%;">
+                                            ✕
+                                        </button>
 
                                         {% if file.file_type == "image" %}
                                             <img src="{{ file.file.url }}"
@@ -90,7 +97,7 @@
                                                 </div>
                                             </a>
                                         {% endif %}
-
+                                    </div>
                                     {% endfor %}
 
                                 </div>
