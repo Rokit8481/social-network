@@ -44,53 +44,129 @@
     </div>
 
     <div class="col-md-9">
-      <h3 class="text-light">
-          {{ chat.title }}
-        {% if chat.id %}
-          <a href="{% url 'chat_edit' chat.id %}" class="btn btn-sm btn-outline-secondary ms-2">Edit</a>
-          <a href="#" class="btn btn-sm btn-outline-danger ms-2" id="chat-delete-btn">Delete</a>
+      {% if chat.id %}
+        <div class="d-flex align-items-center justify-content-between p-2 rounded bg-dark shadow-sm">
+
+          <div class="d-flex align-items-center gap-2">
+
+            {% if chat.is_group %}
+              {% with first_user=chat.users.first %}
+              <a href="{% url 'user_detail' first_user.slug %}" class="text-decoration-none">
+                <img src="{{ first_user.avatar.url }}"
+                    class="avatar-small rounded-circle">
+              </a>
+              {% endwith %}
+            {% else %}
+              {% for u in chat.users.all %}
+                {% if u != request.user %}
+                  <a href="{% url 'user_detail' u.slug %}">
+                    <img src="{{ u.avatar.url }}"
+                        class="avatar-small rounded-circle">
+                  </a>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+
+            <div class="d-flex flex-column">
+              <strong class="text-light">{{ chat.title }}</strong>
+              {% if chat.is_group %}
+                <small class="text-muted">
+                  {{ chat.users.count }} members
+                </small>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            {% if chat.is_group %}
+              <button class="btn btn-sm btn-outline-info"
+                      data-bs-toggle="modal"
+                      data-bs-target="#groupInfoModal">
+                ℹ️
+              </button>
+            {% endif %}
+
+            <a href="{% url 'chat_edit' chat.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+            <a href="#" class="btn btn-sm btn-outline-danger" id="chat-delete-btn">Delete</a>
+          </div>
+        </div>
         {% endif %}
-      </h3>
 
       {% if chat.id %}
-        <div id="chat-box" class="p-4 mb-3 rounded shadow-sm"
-          style="height:600px; overflow-y:auto; border:1px solid #444;
-          {% if chat.background %}
-            background: url('{{ chat.background.url }}') no-repeat center center;
-            background-size: cover;
-          {% else %}
-            background: #1f1f2e;
-          {% endif %}">
+        <div id="chat-box"
+              class="chat-box p-4 mb-3 rounded shadow-sm
+                      {% if chat.background %}chat-box--bg{% else %}chat-box--default{% endif %}"
+              {% if chat.background %}
+                data-bg-url="{{ chat.background.url }}"
+              {% endif %}
+          >
           {% for message in messages %}
-            <div class="d-flex {% if message.user == request.user %}justify-content-end{% else %}justify-content-start{% endif %} mb-2">
-              <div class="p-2 border rounded message-content {% if message.user == request.user %}bg-primary text-white{% else %}bg-light{% endif %}"
-                  style="max-width: 80%; width: fit-content; word-wrap: break-word;"
-                  data-message-id="{{ message.id }}">
-                <div class="text-muted" style="font-size: 0.7em;">{{ message.created_at|date:"H:i, d M Y" }}</div>
-                <strong>{{ message.user.username }}:</strong>
-                <span class="message-text"> {{ message.text|linebreaksbr }} </span>
-                <div class="mt-1 message-reactions">
+            <div class="d-flex message-row
+              {% if message.user == request.user %}
+                justify-content-end
+              {% else %}
+                justify-content-start
+              {% endif %}
+              mb-3">
+
+            {% if message.user != request.user %}
+            <a href="{% url 'user_detail' message.user.slug %}" class="text-decoration-none">
+              <img src="{{ message.user.avatar.url }}"
+                  class="avatar-small message-avatar">
+            </a>
+            {% endif %}
+
+            <div class="message-content
+                {% if message.user == request.user %}
+                  message-own
+                {% else %}
+                  message-other
+                {% endif %}"
+                data-message-id="{{ message.id }}">
+
+              <div>
+                <a href="{% url 'user_detail' message.user.slug %}" class="text-decoration-none message-username">
+                {{ message.user.username }}
+                </a>
+              </div>
+
+              <div class="message-text">
+                {{ message.text|linebreaksbr }}
+              </div>
+
+              <div class="message-time">
+                {{ message.created_at|date:"H:i" }}
+              </div>
+
+                <div class="message-reactions mt-1">
                   <div class="reactions-list d-inline-block">
                     {% for reaction in message.reaction_counts %}
-                      <button class="reaction-btn mb-2 mt-2 me-2 p-2 border rounded
-                        {% if message.user_reacted_emoji == reaction.emoji %}
-                          active-reaction-btn
-                        {% else %}
-                          reaction-inactive-btn
-                        {% endif %}"
-                        data-emoji="{{ reaction.emoji }}">
+                      <button class="reaction-btn
+                          {% if message.user_reacted_emoji == reaction.emoji %}
+                            active-reaction-btn
+                          {% else %}
+                            reaction-inactive-btn
+                          {% endif %}"
+                          data-emoji="{{ reaction.emoji }}">
                         {{ reaction.emoji }} <small>×{{ reaction.count }}</small>
                       </button>
                     {% endfor %}
                   </div>
+
                   <div class="emoji-picker d-none">
                     {% for emoji, label in emoji_choices %}
                       <span class="emoji-choice" data-emoji="{{ emoji }}">{{ emoji }}</span>
                     {% endfor %}
+
+                    <hr>
+
                     {% if message.user == request.user %}
-                      <div class="justify-content-between align-content-between d-flex mt-2">
-                        <a href='#' class="btn btn-sm btn-outline-danger ms-2 message-delete-btn fs-6" data-message-id="{{ message.id }}">Видалити</a>
-                        <a href='{% url "message_edit" message.pk %}' class="btn btn-sm btn-outline-warning ms-2 message-update-btn fs-6" data-message-id="{{ message.id }}">Редагувати</a>
+                      <div class="message-actions mt-2">
+                        <a href="#" class="btn btn-sm btn-outline-danger message-delete-btn"
+                          data-message-id="{{ message.id }}">Видалити</a>
+                        <a href="{% url 'message_edit' message.pk %}"
+                          class="btn btn-sm btn-outline-warning message-update-btn"
+                          data-message-id="{{ message.id }}">Редагувати</a>
                       </div>
                     {% endif %}
                   </div>
@@ -107,9 +183,9 @@
         </form>
 
       {% else %}
-        <div id="chat-box" class="p-4 mb-3 rounded shadow-sm justify-content-center align-items-center d-flex"
-          style="height:600px; overflow-y:auto; border:1px solid #444; background:#1e1e2a;">
-          <p class="card text-center border-2 p-2 m-2 fs-4 bg-dark text-light">
+        <div id="chat-box"
+            class="chat-box chat-box--empty d-flex justify-content-center align-items-center">
+          <p class="card text-center p-2 fs-4 bg-dark text-light">
             Choose chat or user to start messaging.
           </p>
         </div>
@@ -117,6 +193,8 @@
     </div>
   </div>
 </div>
+
+{% include "helpers/messenger/modal_info.html" %}
 <script>
   document.getElementById('btn-users').addEventListener('click', function() {
     document.getElementById('user-list').classList.remove('d-none');
@@ -139,14 +217,15 @@
   const form = document.querySelector('#message-form');
   const textInput = form.querySelector('input[name="text"]');
   const currentUser = "{{ request.user.username }}";
+  const isOwn = {{ request.user.id }} === currentUser;
   
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const socket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${chatId}/`);
   
   function createReactionButton(emoji, count) {
     const btn = document.createElement('button');
-    btn.classList.add('reaction-btn', 'mb-2', 'mt-2', 'me-2', 'p-2', 'border', 'rounded');
-    btn.classList.add('reaction-new-btn');
+    btn.classList.add('reaction-btn');
+    btn.classList.add(isOwn ? 'reaction-inactive-btn' : 'active-reaction-btn');
     btn.dataset.emoji = emoji;
     btn.innerHTML = `${emoji} <small>×${count}</small>`;
   
@@ -168,29 +247,34 @@
     if (data.type === 'chat_message') {
       const isOwn = data.user === currentUser;
       const messageHTML = `
-        <div class="d-flex justify-content-${isOwn ? 'end' : 'start'} mb-2">
-          <div class="p-2 border rounded message-content ${isOwn ? 'bg-primary text-white' : 'bg-light'}"
-               data-message-id="${data.id}"
-               style="max-width:80%; width:fit-content; word-wrap:break-word;">
-            <div class="text-muted" style="font-size:0.7em;">${data.time}</div>
-            <strong>${data.user}:</strong> 
-            <span class="message-text">${data.text}</span>
-            <div class="mt-1 message-reactions">
+        <div class="d-flex message-row ${isOwn ? 'justify-content-end' : 'justify-content-start'} mb-3">
+          ${!isOwn ? `<img src="${data.avatar}" class="avatar-small message-avatar">` : ''}
+          <div class="message-content ${isOwn ? 'message-own' : 'message-other'}"
+               data-message-id="${data.id}">
+            <div>
+              <a href="/users/${data.user.slug}/" class="text-decoration-none message-username">
+              ${data.user}
+              </a>
+            </div>
+            <div class="message-text">
+              ${data.text}
+            </div>
+            <div class="message-time">
+              ${data.time}
+            </div>
+            <div class="message-reactions mt-1">
               <div class="reactions-list d-inline-block"></div>
-              <div class="emoji-picker d-none" 
-                   style="position:absolute; background:#fff; border:1px solid #ccc; padding:5px; border-radius:5px; z-index:1000; display:flex; flex-wrap:wrap; gap:3px; max-width:335px;">
+              <div class="emoji-picker d-none">
                 {% for emoji, label in emoji_choices %}
-                  <span class="emoji-choice" data-emoji="{{ emoji }}" 
-                        style="cursor:pointer; font-size:1.2em;">{{ emoji }}</span>
+                  <span class="emoji-choice" data-emoji="{{ emoji }}">{{ emoji }}</span>
                 {% endfor %}
-                {% if message.user == request.user %}
-                  <div class="justify-content-between align-content-between d-flex mt-2">
-                    <div style="width:100%; height:1px; border-bottom:1px solid #ccc; margin:5px 0;"></div>
-                      <a href='#' class="btn btn-sm btn-outline-danger ms-2 message-delete-btn fs-6" data-message-id="${data.id}" style="cursor:pointer;">Delete</a>
-                    <div style="width:100%; height:1px; border-bottom:1px solid #ccc; margin:5px 0;"></div>
-                      <a href='{% url "message_edit" message.pk %}' class="btn btn-sm btn-outline-warning ms-2 message-update-btn fs-6" data-message-id="${data.id}" style="cursor:pointer;">Edit</a>
+                <hr>
+                ${isOwn ? `
+                  <div class="message-actions mt-2">
+                    <a href="#" class="btn btn-sm btn-outline-danger message-delete-btn" data-message-id="${data.id}">Delete</a>
+                    <a href="#" class="btn btn-sm btn-outline-warning message-update-btn" data-message-id="${data.id}">Edit</a>
                   </div>
-                {% endif %}
+                ` : ''}
               </div>
             </div>
           </div>
@@ -340,8 +424,9 @@
         document.querySelectorAll('.emoji-picker').forEach(p => p.classList.add('d-none'));
         const picker = msg.querySelector('.emoji-picker');
         if (!picker) return;
-        picker.style.top = (e.clientY + window.scrollY) + 'px';
-        picker.style.left = (e.clientX + window.scrollX) + 'px';
+        picker.style.position = 'fixed'; 
+        picker.style.top = e.clientY + 'px';
+        picker.style.left = e.clientX + 'px';
         picker.classList.remove('d-none');
       };
     });
@@ -370,6 +455,11 @@
       document.querySelectorAll('.emoji-picker').forEach(p => p.classList.add('d-none'));
     }
   });
+
+  const chatBoxBg = document.querySelector('.chat-box--bg');
+  if (chatBoxBg) {
+    chatBoxBg.style.backgroundImage = `url(${chatBoxBg.dataset.bgUrl})`;
+  }
   
   attachRightClickEvents();
   attachEmojiClickEvents();
