@@ -34,8 +34,22 @@
                     <li>
                         <a class="nav-link" href="{% url "groups_list" %}"><i class="bi bi-collection fs-6" aria-label="Пабліки"></i></a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'notifications:notifications_list' %}"><i class="bi bi-bell fs-6"></i></a>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" href="#" id="notificationsToggle">
+                            <i class="bi bi-bell fs-6"></i>
+                            <span id="notifications-badge"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                0
+                            </span>
+                        </a>
+
+                        <div id="notifications-dropdown"
+                            class="shadow rounded bg-gray d-none">
+                            <div class="p-2 border-bottom fw-bold small">
+                                Notifications
+                            </div>
+                            <div id="notifications-container"></div>
+                        </div>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>

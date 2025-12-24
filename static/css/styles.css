@@ -245,3 +245,62 @@ input.form-control::placeholder {
     margin-right: 10px;
     object-fit: cover;
 }
+
+#notifications-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+
+    background-color: #2c2c2c; /* темний фон */
+    border: 1px solid #444;    /* темна рамка */
+    border-radius: 8px;
+    color: #e0e0e0;            /* світлий текст */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.notification-item {
+    padding: 10px 12px;
+    margin: 0;
+    border-bottom: 1px solid #444;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    transition: background 0.2s;
+}
+
+.notification-time{
+    font-size: 12px;
+    justify-content: flex-end;
+    align-items: end;
+}
+
+.notification-item:hover {
+    background-color: #3a3a3a;
+}
+
+.notification-item.text-muted {
+    color: #888;
+}
+
+.mark-read-btn {
+    background: transparent;
+    border: 1px solid #198754;
+    color: #198754;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.mark-read-btn:hover {
+    background: #198754;
+    color: #fff;
+}

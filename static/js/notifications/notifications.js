@@ -1,4 +1,3 @@
-
 (() => {
     'use strict';
 
@@ -9,6 +8,70 @@
 
     let socket = null;
     let reconnectTimeout = null;
+    let loadedOld = false;
+
+    function getContainer() {
+        return document.getElementById('notifications-container');
+    }
+
+    async function loadOldNotifications() {
+        if (loadedOld) return;
+
+        const res = await fetch('/notifications/api/');
+        const data = await res.json();
+
+        const container = getContainer();
+        container.innerHTML = '';
+
+        data.forEach(n => renderNotification(n, true));
+        loadedOld = true;
+    }
+
+    function renderNotification(notification, fromHistory = false) {
+        const container = getContainer();
+        const badge = document.getElementById('notifications-badge');
+
+        const el = document.createElement('div');
+        el.className = `
+            d-flex justify-content-between align-items-start
+            px-3 py-2 border-bottom notification-item
+        `;
+
+        el.innerHTML = `
+            <div class="me-2 flex-grow-1">
+                <div class="small">${notification.message}</div>
+                <div class="text-light notification-time">${notification.created || 'just now'}</div>
+            </div>
+
+            ${notification.is_read ? '' : `
+                <button class="mark-read-btn" title="Позначити прочитаним">✓</button>
+            `}
+        `;
+
+        if (!notification.is_read) {
+            const btn = el.querySelector('.mark-read-btn');
+
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                await fetch(`/notifications/api/${notification.id}/read/`);
+
+                el.classList.add('bg-dark');
+                btn.remove();
+            });
+        }
+
+        if (fromHistory) {
+            container.appendChild(el);
+        } else {
+            container.prepend(el);
+
+            badge.classList.remove('d-none');
+            badge.textContent = parseInt(badge.textContent || 0) + 1;
+        }
+    }
+
 
     function connect() {
         socket = new WebSocket(WS_URL);
@@ -21,18 +84,16 @@
             try {
                 const data = JSON.parse(e.data);
                 renderNotification(data);
-            } catch (err) {
-                console.error('[Notifications] invalid JSON', err);
+            } catch {
+                console.error('[Notifications] invalid JSON');
             }
         };
 
         socket.onclose = () => {
-            console.warn('[Notifications] disconnected, reconnecting...');
             reconnect();
         };
 
-        socket.onerror = (err) => {
-            console.error('[Notifications] socket error', err);
+        socket.onerror = () => {
             socket.close();
         };
     }
@@ -45,41 +106,30 @@
         }, 3000);
     }
 
-    function renderNotification(notification) {
-        const container = getContainer();
+    document.addEventListener('DOMContentLoaded', () => {
+        connect();
 
-        const el = document.createElement('div');
-        el.className = 'alert alert-info alert-dismissible fade show shadow-sm mb-2';
-        el.setAttribute('role', 'alert');
-        el.innerHTML = `
-            <div class="small">${notification.message}</div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
+        const toggle = document.getElementById('notificationsToggle');
+        const dropdown = document.getElementById('notifications-dropdown');
+        const badge = document.getElementById('notifications-badge');
 
-        container.appendChild(el);
+        toggle.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            dropdown.classList.toggle('d-none');
 
-        setTimeout(() => {
-            el.classList.remove('show');
-            el.remove();
-        }, 5000);
-    }
+            if (!loadedOld) {
+                await loadOldNotifications();
+            }
 
-    function getContainer() {
-        let container = document.getElementById('notifications-container');
-        if (container) return container;
+            badge.textContent = 0;
+            badge.classList.add('d-none');
+        });
 
-        container = document.createElement('div');
-        container.id = 'notifications-container';
-        container.style.cssText = `
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 9999;
-            width: 320px;
-        `;
-        document.body.appendChild(container);
-        return container;
-    }
-
-    document.addEventListener('DOMContentLoaded', connect);
+        document.addEventListener('click', (e) => {
+            if (!toggle.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('d-none');
+            }
+        });
+    });
 })();
