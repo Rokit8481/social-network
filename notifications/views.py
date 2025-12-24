@@ -30,4 +30,4 @@ class NotificationMarkReadView(LoginRequiredMixin, View):
             notif.is_read = True
             notif.save()
 
-        return redirect("notifications:list")
+        return redirect("notifications:notifications_list")

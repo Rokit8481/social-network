@@ -8,18 +8,18 @@ User = get_user_model()
 class Notification(BaseModel):
     class EventType(models.TextChoices):
         # MESSENGER 2/2
-        NEW_MESSENGER_MESSAGE = "new_messenger_message", "New messenger message" # ❌
-        MESSAGE_REACTION = "message_reaction", "Message reaction" # ❌
+        NEW_MESSENGER_MESSAGE = "new_messenger_message", "New messenger message" # ✔️
+        MESSAGE_REACTION = "message_reaction", "Message reaction" # ✔️
 
         # POSTS 5/5
         NEW_POST = "new_post", "New post" # ✔️
         POST_LIKE = "post_like", "Post like" # ✔️
         NEW_COMMENT = "new_comment", "New comment" # ✔️
-        COMMENT_LIKE = "comment_like", "Comment like" # ❌
-        TAGGED_IN_POST = "tagged_in_post", " Tagged in post" # ❌ 
+        COMMENT_LIKE = "comment_like", "Comment like" # ✔️
+        TAGGED_IN_POST = "tagged_in_post", " Tagged in post" # ✔️ 
 
         # ACCOUNTS 1/1
-        NEW_FOLLOWER = "new_follower", "New follower" # ❌
+        NEW_FOLLOWER = "new_follower", "New follower" # ✔️
 
         # GROUPS 2/2 
         NEW_GROUP_MESSAGE = "new_group_messsage", " New group message" # ✔️
