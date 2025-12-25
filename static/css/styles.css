@@ -84,8 +84,9 @@ body {
 }
 
 .message-avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
+  margin: 8px 8px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -446,9 +447,6 @@ input.form-control::placeholder {
     background: #198754;
     color: #fff;
 }
-    display: block;
-    background: none !important;
-}
 
 .select2-container {
     width: 100% !important;
@@ -533,28 +531,28 @@ input.form-control::placeholder {
 }
 
 
-.group-sidebar .card {
+.group-sidebar .group-card {
   border-radius: 12px;
 }
 
-.messages {
+.group-messages {
   background: #f6f7fb;
   border-radius: 12px;
   padding: 18px;
 }
 
-.message-item .card {
+.group-message-item .group-card {
   border-radius: 12px;
   margin-bottom: 12px;
   box-shadow: 0 6px 18px rgba(20,20,30,0.04);
   overflow: visible;
 }
 
-.message-content {
+.group-message-content {
   white-space: pre-wrap;
 }
 
-.message-item.editing .card {
+.group-message-item.editing .group-card {
   outline: 2px solid rgba(13,110,253,0.12);
   background: #fff;
 }
@@ -564,7 +562,7 @@ input.form-control::placeholder {
   margin-bottom: 6px;
 }
 
-.message-form {
+.group-message-form {
   border-radius: 12px;
   padding: 14px;
   background: rgb(45 48 50);

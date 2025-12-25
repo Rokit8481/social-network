@@ -135,7 +135,7 @@
             {% if message.user != request.user %}
             <a href="{% url 'user_detail' message.user.slug %}" class="text-decoration-none">
               <img src="{{ message.user.avatar.url }}"
-                  class="avatar-small message-avatar">
+                  class="message-avatar">
             </a>
             {% endif %}
 
