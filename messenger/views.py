@@ -3,11 +3,12 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .models import Chat, Message, Reaction
-from .forms import MessageForm, GroupForm, ChatForm
+from messenger.models import Chat, Message, Reaction
+from messenger.forms import MessageForm, GroupForm, ChatForm
 from django.db.models import Count
-from .choices.emoji import EMOJI_CHOICES
+from messenger.choices.emoji import EMOJI_CHOICES
 from django.contrib.auth import get_user_model
+from accounts.models import Follow
 from django.conf import settings
 import json
 
@@ -75,7 +76,8 @@ class MessageEditView(LoginRequiredMixin, View):
             "message": {
                 "id": message.id,
                 "text": message.text,
-                "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "created_at": message.created_at.strftime("%H:%M %d/%m/%Y"),
+                "updated_at": message.updated_at.strftime("%H:%M %d/%m/%Y"),
             }
         })
 
@@ -104,7 +106,8 @@ class MessageUpdateView(LoginRequiredMixin, View):
             "message": {
                 "id": message.id,
                 "text": message.text,
-                "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "created_at": message.created_at.strftime("%H:%M %d/%m/%Y"),
+                "updated_at": message.updated_at.strftime("%H:%M %d/%m/%Y"),
             }
         })
 
@@ -167,14 +170,23 @@ class ChatView(LoginRequiredMixin, View):
                 chat.save()
                 
             for msg in messages:
-                msg.reaction_counts = (
-                    msg.reactions.values("emoji")
-                    .annotate(count=Count("emoji"))
-                    .order_by()
-                )
+                reactions_by_emoji = {}
+                for reaction in msg.reactions.select_related('user'):
+                    if reaction.emoji not in reactions_by_emoji:
+                        reactions_by_emoji[reaction.emoji] = {'count': 0, 'users': []}
+                    reactions_by_emoji[reaction.emoji]['count'] += 1
+                    reactions_by_emoji[reaction.emoji]['users'].append(reaction.user)
+                msg.reactions_by_emoji = reactions_by_emoji
                 msg.user_reacted_emoji = user_reaction_map.get(msg.id) 
 
         default_background = Chat._meta.get_field('background').default
+
+        user_followers = User.objects.filter(
+            id__in=Follow.objects.filter(
+                following=request.user
+            ).values_list('follower_id', flat=True)
+        )
+
                 
         context = {
             "chat": chat,
@@ -183,6 +195,7 @@ class ChatView(LoginRequiredMixin, View):
             "chats": Chat.objects.filter(users=request.user),
             "form": MessageForm(),
             "emoji_choices": EMOJI_CHOICES,
+            "user_followers": user_followers,
             "default_background": settings.MEDIA_URL + default_background,
         }
 
@@ -205,7 +218,8 @@ class SendMessageView(LoginRequiredMixin, View):
                 "id": message.id, 
                 "user": message.user.username,
                 "text": message.text,
-                "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "created_at": message.created_at.strftime("%H:%M %d/%m/%Y"),
+                "updated_at": message.updated_at.strftime("%H:%M %d/%m/%Y"),
             })
         return JsonResponse({'errors': form.errors}, status=400)
 

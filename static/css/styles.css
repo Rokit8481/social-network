@@ -15,6 +15,13 @@ body {
     color: #e5e5e5;
 }
 
+.list-group {
+    background-color: #1f1f2e;
+    border: 1px solid #333;
+    max-height: 660px;
+    overflow-y: auto
+}
+
 .list-group-item {
     background-color: #2b2b3b;
     color: #e0e0e0;
@@ -84,10 +91,11 @@ body {
 }
 
 .message-content {
-  min-height: 42px;
+  min-height: 32px;
+  min-width: 20%;
   max-width: 70%;
   position: relative;
-  padding: 8px 32px 18px 12px;
+  padding: 6px 28px 10px 10px;
   border-radius: 12px;
 }
 
@@ -98,7 +106,7 @@ body {
 }
 
 .message-text {
-  white-space: wrap;
+  overflow-wrap: break-word;
 }
 
 .message-time {
@@ -129,27 +137,31 @@ body {
 }
 
 .reaction-btn {
-  margin: 6px 6px 0 0;
-  padding: 6px 10px;
-  border-radius: 16px;
-  border: 1px solid #444;
-  transition: 0.2s;
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  margin-right: 5px;
+  border-radius: 10px;
+}
+
+.reaction-btn img:first-child {
+  margin-left: 0;
 }
 
 .active-reaction-btn {
-    background: linear-gradient(45deg, #f59e0b, #d97706);
+    background: linear-gradient(45deg, #4f94f6, #3b9efb);
     color: #fff;
     border-radius: 16px;
-    box-shadow: 0 0 8px #f59e0b;
 }
 
 .reaction-inactive-btn {
-    background: linear-gradient(45deg, #6d28d9, #8b5cf6);
+    background: linear-gradient(45deg, #5a5a5a, #7e7e7e);
     border-radius: 16px;
     color: #fff;
 }
-
 
 .emoji-picker {
   position: absolute;
@@ -311,4 +323,69 @@ input.form-control::placeholder {
     border-radius: 50%;
     margin-right: 10px;
     object-fit: cover;
+}
+
+
+.reaction-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-left: -8px;
+}
+
+.reaction-count {
+  margin-left: 2px;
+  font-weight: bold;
+  color: #555;
+}
+
+.reaction-tooltip {
+    position: absolute; /* змінюємо з fixed на absolute, тоді скрол працює в межах body */
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    max-height: 150px;   /* висота меню */
+    overflow-y: auto;    /* скрол */
+    width: 160px;        /* ширина меню */
+    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+
+.reaction-user {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.reaction-user img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.avatar-tiny {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.edited-time {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: 11px;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.emoji-picker-header {
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255,255,255,.15);
+  margin-bottom: 6px;
 }
