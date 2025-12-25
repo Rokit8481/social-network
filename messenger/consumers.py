@@ -2,6 +2,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from asgiref.sync import sync_to_async
 from django.db.models import Count
+from django.conf import settings
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -35,7 +36,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'id': message.id,
                 'user': user.username,
                 'text': message.text,
-                'time': message.created_at.strftime("%H:%M, %d %b %Y"),
+                'created_time': message.created_at.strftime("%H:%M %d/%m/%Y"),
+                'updated_time': message.updated_at.strftime("%H:%M %d/%m/%Y"),
                 'is_own': False,
             }
 
@@ -71,16 +73,39 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 action = 'added'
 
-            counts = await sync_to_async(lambda: list(
-                message.reactions.values('emoji').annotate(count=Count('emoji'))
-            ))()
+            def avatar_url(avatar):
+                if avatar:
+                    return settings.MEDIA_URL + avatar
+                return settings.MEDIA_URL + 'default/default_avatar.png'
+
+            counts = await sync_to_async(lambda: [
+                {
+                    'emoji': item['emoji'],
+                    'count': item['count'],
+                    'users': [
+                        {
+                            'username': u['user__username'],
+                            'avatar': avatar_url(u['user__avatar'])
+                        }
+                        for u in message.reactions
+                            .filter(emoji=item['emoji'])
+                            .select_related('user')[:3]
+                            .values('user__username', 'user__avatar')
+                    ]
+                }
+                for item in message.reactions
+                    .values('emoji')
+                    .annotate(count=Count('emoji'))
+            ])()
+
 
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'reaction_update',
                 'message_id': message_id,
                 'emoji': emoji,
                 'action': action,
-                'counts': counts
+                'counts': counts,
+                'user_reacted_emojis': await sync_to_async(lambda: list(Reaction.objects.filter(message=message, user=user).values_list('emoji', flat=True)))()
             })
 
         elif data['type'] == 'delete_message':
@@ -123,7 +148,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'id': message.id,
                 'user': user.username,
                 'text': message.text,
-                'time': message.created_at.strftime("%H:%M, %d %b %Y"),
+                'created_time': message.created_at.strftime("%H:%M %d/%m/%Y"),
+                'updated_time': message.updated_at.strftime("%H:%M %d/%m/%Y"),
                 'is_own': False,
             })
 

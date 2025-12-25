@@ -15,6 +15,13 @@ body {
     color: #e5e5e5;
 }
 
+.list-group {
+    background-color: #1f1f2e;
+    border: 1px solid #333;
+    max-height: 660px;
+    overflow-y: auto
+}
+
 .list-group-item {
     background-color: #2b2b3b;
     color: #e0e0e0;
@@ -49,59 +56,125 @@ body {
     color: white;
 }
 
-#chat-box {
-    background-color: #20202c;
-    color: #e5e5e5;
+.chat-box {
+  height: 600px;
+  overflow-y: auto;
+  border: 1px solid #444;
+  color: #e5e5e5;
 }
 
-.message-content.bg-light {
-    background-color: #2d2d3b !important;
-    color: #f0f0f0 !important;
-    border: 1px solid #444;
+.chat-box--default {
+  background: #1f1f2e;
 }
 
-.message-content.bg-primary {
-    background: linear-gradient(45deg, #2563eb, #1d4ed8) !important;
+.chat-box--bg {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.message-username {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-bottom: 2px;
+}
+
+.message-row {
+  align-items: flex-end;
+}
+
+.message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.message-content {
+  min-height: 32px;
+  min-width: 20%;
+  max-width: 70%;
+  position: relative;
+  padding: 6px 28px 10px 10px;
+  border-radius: 12px;
+}
+
+.message-username {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.message-text {
+  overflow-wrap: break-word;
+}
+
+.message-time {
+  position: absolute;
+  bottom: 4px;
+  right: 8px;
+  font-size: 0.65rem;
+  color: #9ca3af;
+}
+
+.message-own {
+  background: linear-gradient(45deg, #2563eb, #1d4ed8);
+  color: #fff;
+}
+
+.message-other {
+  background-color: #2d2d3b;
+  color: #f0f0f0;
+}
+
+.message-time {
+  font-size: 0.7em;
+  color: #aaa;
 }
 
 .message-content.editing {
     box-shadow: 0 0 12px 2px orange;
 }
 
-/* реакції */
 .reaction-btn {
-    transition: 0.2s;
-    color: #fff;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  margin-right: 5px;
+  border-radius: 10px;
+}
+
+.reaction-btn img:first-child {
+  margin-left: 0;
 }
 
 .active-reaction-btn {
-    background: linear-gradient(45deg, #f59e0b, #d97706);
+    background: linear-gradient(45deg, #4f94f6, #3b9efb);
     color: #fff;
-    box-shadow: 0 0 8px #f59e0b;
+    border-radius: 16px;
 }
 
 .reaction-inactive-btn {
-    background: linear-gradient(45deg, #6d28d9, #8b5cf6);
-    color: #fff;
-}
-
-.reaction-new-btn {
-    background: linear-gradient(45deg, #06b6d4, #0891b2);
+    background: linear-gradient(45deg, #5a5a5a, #7e7e7e);
+    border-radius: 16px;
     color: #fff;
 }
 
 .emoji-picker {
-    position: absolute;
-    background: #2a2a3a;
-    border: 1px solid #444;
-    padding: 8px;
-    border-radius: 10px;
-    z-index: 1000;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    max-width: 340px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  position: absolute;
+  background: #2a2a3a;
+  border: 1px solid #444;
+  padding: 8px;
+  border-radius: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-width: 340px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.6);
 }
 
 .emoji-choice {
@@ -112,6 +185,12 @@ body {
 
 .emoji-choice:hover {
     transform: scale(1.3);
+}
+
+.message-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 input.form-control, select.form-select {
@@ -246,6 +325,69 @@ input.form-control::placeholder {
     object-fit: cover;
 }
 
+.reaction-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-left: -8px;
+}
+
+.reaction-count {
+  margin-left: 2px;
+  font-weight: bold;
+  color: #555;
+}
+
+.reaction-tooltip {
+    position: absolute; /* змінюємо з fixed на absolute, тоді скрол працює в межах body */
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    max-height: 150px;   /* висота меню */
+    overflow-y: auto;    /* скрол */
+    width: 160px;        /* ширина меню */
+    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+
+.reaction-user {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.reaction-user img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.avatar-tiny {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.edited-time {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: 11px;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.emoji-picker-header {
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255,255,255,.15);
+  margin-bottom: 6px;
+}
 #notifications-dropdown {
     position: absolute;
     top: 45px;
