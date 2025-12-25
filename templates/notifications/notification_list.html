@@ -1,35 +1,21 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Notifications{% endblock title %}
 
 {% block content %}
 <h2>Your Notifications</h2>
 
-<ul style="list-style: none; padding: 0;">
+<ul class="notifications-container" style="list-style: none; padding: 0;">
     {% for notif in notifications %}
     <li style="padding: 10px; margin-bottom: 10px; border-radius: 6px; 
                {% if not notif.is_read %} background: #49c5ffff; {% else %} background: #4b2525ff; {% endif %}">
-
-        <strong>{{ notif.get_event_type_display }} </strong><br>
-
-        From: <strong>{{ notif.from_user.username }}</strong><br>
-
-        Target type: {{ notif.target_type }}<br>
-
-        Target ID: {{ notif.target_id }}<br>
-
-        Status:
-        {% if notif.is_read %}
-            <span style="color: green;">Read</span>
-        {% else %}
-            <span style="color: red;">Unread</span>
-        {% endif %}
-        <br>
-
-        <small>{{ notif.created_at }}</small>
+        {{ notif.get_message }}
     </li>
     {% empty %}
         <li>No notifications yet.</li>
     {% endfor %}
 </ul>
+
+<script src="{% static 'js/notifications/notifications.js' %}"></script>
 {% endblock content %}

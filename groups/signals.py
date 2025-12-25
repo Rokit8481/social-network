@@ -3,6 +3,7 @@ from django.db.models.signals import post_save, m2m_changed
 from groups.models import Group, GroupMessage
 from django.contrib.auth import get_user_model
 from notifications.models import Notification
+from notifications.signals import notify_user
 
 User = get_user_model()
 
@@ -19,7 +20,7 @@ def create_new_group_message_notification(sender, instance, created, **kwargs):
         if member.pk == sender.pk:
             continue
 
-        Notification.create_notification(
+        notify_user(
             to_user=member,
             from_user=sender,
             event_type=Notification.EventType.NEW_GROUP_MESSAGE,
@@ -50,7 +51,7 @@ def create_join_group_notification(sender, instance, pk_set, action, **kwargs):
             ).exists()
 
             if not already:
-                Notification.create_notification(
+                notify_user(
                     to_user=admin,
                     from_user=new_user,
                     event_type=Notification.EventType.JOIN_GROUP,
