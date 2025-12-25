@@ -44,3 +44,18 @@ document.addEventListener("DOMContentLoaded", () => {
         input.files = dt.files;
     });
 });
+document.querySelectorAll(".remove-current-file").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const container = btn.closest(".file-item");
+        const fileId = container.dataset.fileId;
+
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "delete_files";
+        input.value = fileId;
+
+        document.querySelector("form").appendChild(input);
+
+        container.remove();
+    });
+});

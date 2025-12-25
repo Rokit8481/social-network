@@ -28,7 +28,6 @@ class EditGroupForm(forms.ModelForm):
                     "style": "width: 100%;"
                 }),
             'admins': forms.SelectMultiple(attrs={'class': 'form-control'}),
-            'members': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -37,15 +36,13 @@ class EditGroupForm(forms.ModelForm):
         if user:
             if self.instance.pk: 
                 self.fields['admins'].queryset = self.fields['admins'].queryset.exclude(id=user.id) | self.instance.admins.filter(id=user.id)
-                self.fields['members'].queryset = self.fields['members'].queryset.exclude(id=user.id) | self.instance.members.filter(id=user.id)
             else:
                 self.fields['admins'].queryset = self.fields['admins'].queryset.exclude(id=user.id)
-                self.fields['members'].queryset = self.fields['members'].queryset.exclude(id=user.id)
 
 class GroupMessageForm(forms.ModelForm):
     class Meta:
         model = GroupMessage
         fields = ['content']
         widgets = {
-            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),
         }
