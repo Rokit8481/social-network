@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("select2/", include("django_select2.urls")),
     path('', include('accounts.urls')),
     path('groups/', include('groups.urls')),
     path('messenger/', include('messenger.urls')),
