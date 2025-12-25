@@ -2,6 +2,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from accounts.models import Follow
 from notifications.models import Notification
+from notifications.signals import notify_user
 
 
 @receiver(post_save, sender=Follow)
@@ -24,7 +25,7 @@ def create_follow_notification(sender, instance, created, **kwargs):
     ).exists()
 
     if not already:
-        Notification.create_notification(
+        notify_user(
             to_user=following,
             from_user=follower,
             event_type=Notification.EventType.NEW_FOLLOWER,

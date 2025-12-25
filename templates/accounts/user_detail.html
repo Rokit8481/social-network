@@ -111,17 +111,17 @@
     <ul class="nav nav-tabs" id="profileTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts-tab-pane" type="button" role="tab">
-                Posts
+                My Posts
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups-tab-pane" type="button" role="tab">
-                Groups
+                My Groups
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="liked-tab" data-bs-toggle="tab" data-bs-target="#liked-tab-pane" type="button" role="tab">
-                Liked
+                My Liked Posts
             </button>
         </li>
     </ul>
@@ -129,17 +129,17 @@
         <div class="tab-content mt-3" id="profileTabsContent">
 
         <div class="tab-pane fade show active" id="posts-tab-pane" role="tabpanel">
-            {% include "accounts/partials/posts_list.html" with posts=posts %}
+            {% include "helpers/partials/posts_list.html" with posts=posts %}
         </div>
 
         <div class="tab-pane fade" id="groups-tab-pane" role="tabpanel">
-            {% include "accounts/partials/groups_list.html" with groups=user_groups %}
+            {% include "helpers/partials/groups_list.html" with groups=user_groups %}
         </div>
 
         <div class="tab-pane fade" id="liked-tab-pane" role="tabpanel">
             {% if posts_user_liked %}
                 {% for post in posts_user_liked %}
-                    {% include "accounts/partials/post_item.html" with post=post %}
+                    {% include "helpers/partials/post_item.html" with post=post %}
                 {% endfor %}
             {% else %}
                 <p class="text-muted">This user hasn't liked any posts yet.</p>
@@ -149,5 +149,6 @@
     </div>
 </div>
 
+<script src="{% static 'js/posts/script.js' %}"></script>
 
 {% endblock %}
