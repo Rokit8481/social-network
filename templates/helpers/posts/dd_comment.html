@@ -1,0 +1,38 @@
+<div class="dropdown">
+<button class="btn btn-sm btn-outline-secondary"
+        data-bs-toggle="dropdown"
+        style="border-radius: 10px;">
+    ⋮
+</button>
+
+<ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+    <li>
+    <a class="dropdown-item d-flex align-items-center gap-2 comment-update-btn"
+        href="#"
+        data-message-id="{{ comment.id }}">
+        ✏️ <span>Edit</span>
+    </a>
+    </li>
+
+    <li>
+    <button class="dropdown-item d-flex align-items-center gap-2"
+            data-copy-comment="{{ comment.id }}">
+        📋 <span>Copy</span>
+    </button>
+    </li>
+
+    <li><hr class="dropdown-divider"></li>
+
+    <li>
+    <form method="POST"
+            action="{% url 'comment_delete' post.pk comment.pk %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="dropdown-item d-flex align-items-center gap-2 text-danger"
+                onclick="return confirm('Delete this comment?')">
+        🗑️ <span>Delete</span>
+        </button>
+    </form>
+    </li>
+</ul>
+</div>

@@ -3,6 +3,7 @@
 {% block title %}Edit Group: {{ group.title }}{% endblock title %}
 
 {% block content %}
+{{ form.media }} 
 <div class="container mt-4">
 	<h2>Edit Group: {{ group.title }}</h2>
 	<form method="post">
@@ -31,12 +32,6 @@
 			{{ form.admins.label_tag }}
 			{{ form.admins }}
 			<div class="text-danger">{{ form.admins.errors }}</div>
-		</div>
-
-		<div class="mb-3">
-			{{ form.members.label_tag }}
-			{{ form.members }}
-			<div class="text-danger">{{ form.members.errors }}</div>
 		</div>
 
 		<button type="submit" class="btn btn-primary">Save Changes</button>

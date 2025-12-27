@@ -1,0 +1,30 @@
+{% if user_is_admin %}
+<div class="dropdown">
+    <button class="btn btn-sm btn-outline-secondary"
+            data-bs-toggle="dropdown"
+            style="border-radius: 10px;">
+        ⋮
+    </button>
+
+    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+        <li>
+            <button class="dropdown-item edit-message-btn"
+                    data-message-id="{{ message.id }}">
+                ✏️ <span>Edit</span>
+            </button>
+        </li>
+        <li>
+            <button class="dropdown-item d-flex align-items-center gap-2"
+                    data-copy-message="{{ message.id }}">
+                📋 <span>Copy</span>
+            </button>
+        </li>
+        <li>
+            <button class="dropdown-item delete-message-btn text-danger"
+                    data-message-id="{{ message.id }}">
+                🗑️ <span>Delete</span>
+            </button>
+        </li>
+    </ul>
+</div>
+{% endif %}

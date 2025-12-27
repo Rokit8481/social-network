@@ -1,0 +1,23 @@
+<div class="media-grid">
+    {% for file in media_files|slice:":3" %}
+        <div class="media-item"
+             data-bs-toggle="modal"
+             data-bs-target="#mediaModal{{ post.id }}"
+             data-index="{{ forloop.counter0 }}">
+
+            {% if file.file_type == "image" %}
+                <img src="{{ file.file.url }}">
+            {% elif file.file_type == "video" %}
+                <video muted>
+                    <source src="{{ file.file.url }}">
+                </video>
+            {% endif %}
+
+            {% if forloop.last and media_files|length > 3 %}
+                <div class="media-overlay">
+                    +{{ media_files|length|add:"-3" }}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
