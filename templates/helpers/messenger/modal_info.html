@@ -1,0 +1,26 @@
+{% if chat.is_group %}
+<div class="modal fade" id="groupInfoModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light">
+
+      <div class="modal-header">
+        <h5 class="modal-title">{{ chat.title }}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        {% for user in chat.users.all %}
+          <a href="{% url 'user_detail' user.slug %}"
+             class="d-flex align-items-center gap-2 text-decoration-none text-light mb-2">
+            <img src="{{ user.avatar.url }}"
+                 class="rounded-circle"
+                 width="40" height="40">
+            <span>{{ user.username }}</span>
+          </a>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endif %}
