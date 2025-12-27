@@ -1,6 +1,9 @@
 (() => {
     'use strict';
 
+    const IS_PAGE = document.body.dataset.notificationsPage === 'true';
+    console.log('Notifications page mode:', IS_PAGE);
+
     const WS_URL = (() => {
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
         return `${protocol}://${window.location.host}/ws/notifications/`;
@@ -11,91 +14,137 @@
     let loadedOld = false;
 
     function getContainer() {
-        return document.getElementById('notifications-container');
+        const container = IS_PAGE 
+            ? document.querySelector('.notifications-container') 
+            : document.getElementById('notifications-container');
+        if (!container) console.warn('Notifications container not found!');
+        return container;
+    }
+
+    function toggleMarkAllReadButton() {
+        const container = getContainer();
+        if (!container) return;
+
+        const hasUnread = container.querySelector('.unread') !== null;
+        const buttons = document.querySelectorAll('.mark-all-read-btn');
+        buttons.forEach(btn => {
+            if (hasUnread) {
+                btn.classList.remove('d-none');
+            } else {
+                btn.classList.add('d-none');
+            }
+        });
     }
 
     async function loadOldNotifications() {
         if (loadedOld) return;
+        try {
+            const res = await fetch('/notifications/api/');
+            if (!res.ok) throw new Error('Failed to fetch notifications');
+            const data = await res.json();
 
-        const res = await fetch('/notifications/api/');
-        const data = await res.json();
+            const container = getContainer();
+            if (!container) return;
 
-        const container = getContainer();
-        container.innerHTML = '';
+            container.innerHTML = '';
+            data.forEach(n => renderNotification(n, true));
+            loadedOld = true;
 
-        data.forEach(n => renderNotification(n, true));
-        loadedOld = true;
+            toggleMarkAllReadButton();
+        } catch (err) {
+            console.error('Error loading old notifications:', err);
+        }
+    }
+
+    async function loadUnreadCount() {
+        if (IS_PAGE) return;
+        try {
+            const res = await fetch('/notifications/api/unread_count/');
+            if (!res.ok) throw new Error('Failed to fetch unread count');
+            const data = await res.json();
+
+            const badge = document.getElementById('notifications-badge');
+            if (!badge) return;
+
+            if (data.count > 0) {
+                badge.textContent = data.count;
+                badge.classList.remove('d-none');
+            } else {
+                badge.classList.add('d-none');
+            }
+        } catch (err) {
+            console.error('Error loading unread count:', err);
+        }
+    }
+
+    function updateBadge(count) {
+        if (IS_PAGE) return;
+        const badge = document.getElementById('notifications-badge');
+        if (!badge) return;
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('d-none');
+        } else {
+            badge.classList.add('d-none');
+        }
     }
 
     function renderNotification(notification, fromHistory = false) {
         const container = getContainer();
-        const badge = document.getElementById('notifications-badge');
+        if (!container) return;
 
-        const el = document.createElement('div');
-        el.className = `
-            d-flex justify-content-between align-items-start
-            px-3 py-2 border-bottom notification-item
-        `;
+        const li = document.createElement(IS_PAGE ? 'li' : 'div');
+        li.className = IS_PAGE 
+            ? `notification-site-item ${notification.is_read ? '' : 'unread'}`
+            : `notification-item ${notification.is_read ? '' : 'unread'}`;
 
-        el.innerHTML = `
-            <div class="me-2 flex-grow-1">
-                <div class="small">${notification.message}</div>
-                <div class="text-light notification-time">${notification.created || 'just now'}</div>
+        li.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1 me-2">
+                    <div class="small">${notification.message}</div>
+                    <div class="text-light notification-time">${notification.created || 'just now'}</div>
+                </div>
+                ${notification.is_read ? '' : `<button class="mark-read-btn" title="Mark read">✓</button>`}
             </div>
-
-            ${notification.is_read ? '' : `
-                <button class="mark-read-btn" title="Позначити прочитаним">✓</button>
-            `}
         `;
 
         if (!notification.is_read) {
-            const btn = el.querySelector('.mark-read-btn');
-
-            btn.addEventListener('click', async (e) => {
+            const btn = li.querySelector('.mark-read-btn');
+            btn?.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 e.preventDefault();
-
                 await fetch(`/notifications/api/${notification.id}/read/`);
-
-                el.classList.add('bg-dark');
+                li.classList.remove('unread');
                 btn.remove();
+                if (!IS_PAGE) await loadUnreadCount();
+                toggleMarkAllReadButton(); // оновлюємо кнопку
             });
         }
 
         if (fromHistory) {
-            container.appendChild(el);
+            container.appendChild(li);
         } else {
-            container.prepend(el);
-
-            badge.classList.remove('d-none');
-            badge.textContent = parseInt(badge.textContent || 0) + 1;
+            container.prepend(li);
         }
+
+        toggleMarkAllReadButton();
     }
 
-
     function connect() {
-        socket = new WebSocket(WS_URL);
+        try {
+            socket = new WebSocket(WS_URL);
 
-        socket.onopen = () => {
-            console.log('[Notifications] connected');
-        };
-
-        socket.onmessage = (e) => {
-            try {
+            socket.onopen = () => console.log('[Notifications] connected');
+            socket.onmessage = (e) => {
                 const data = JSON.parse(e.data);
-                renderNotification(data);
-            } catch {
-                console.error('[Notifications] invalid JSON');
-            }
-        };
-
-        socket.onclose = () => {
-            reconnect();
-        };
-
-        socket.onerror = () => {
-            socket.close();
-        };
+                renderNotification(data.notification);
+                updateBadge(data.unread_count);
+            };
+            socket.onclose = () => reconnect();
+            socket.onerror = () => socket.close();
+        } catch (err) {
+            console.error('WebSocket connection failed:', err);
+        }
     }
 
     function reconnect() {
@@ -106,30 +155,52 @@
         }, 3000);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         connect();
 
         const toggle = document.getElementById('notificationsToggle');
         const dropdown = document.getElementById('notifications-dropdown');
-        const badge = document.getElementById('notifications-badge');
 
-        toggle.addEventListener('click', async (e) => {
-            e.stopPropagation();
+        if (IS_PAGE) {
+            toggle?.classList.add('d-none');
+            dropdown?.classList.add('d-none');
+            await loadOldNotifications();
+        } else {
+            await loadUnreadCount();
+
+            toggle?.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                dropdown?.classList.toggle('d-none');
+                if (!loadedOld) await loadOldNotifications();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!toggle?.contains(e.target) && !dropdown?.contains(e.target)) {
+                    dropdown?.classList.add('d-none');
+                }
+            });
+        }
+    });
+
+    document.addEventListener('click', async (e) => {
+        if (e.target.matches('.mark-all-read-btn')) {
             e.preventDefault();
-            dropdown.classList.toggle('d-none');
+            try {
+                const res = await fetch('/notifications/api/mark_all_read/');
+                if (!res.ok) throw new Error('Failed to mark all read');
+                
+                document.querySelectorAll('.unread').forEach(el => {
+                    el.classList.remove('unread');
+                    const btn = el.querySelector('.mark-read-btn');
+                    btn?.remove();
+                });
 
-            if (!loadedOld) {
-                await loadOldNotifications();
+                toggleMarkAllReadButton(); 
+                if (!IS_PAGE) await loadUnreadCount(); 
+            } catch (err) {
+                console.error('Error marking all read:', err);
             }
-
-            badge.textContent = 0;
-            badge.classList.add('d-none');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!toggle.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.add('d-none');
-            }
-        });
+        }
     });
 })();
