@@ -1,5 +1,5 @@
 from django.db import models
-from .choices.emoji import EMOJI_CHOICES
+from accounts.choices.emoji import EMOJI_CHOICES
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
 
