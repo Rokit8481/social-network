@@ -3,6 +3,7 @@ from django.db.models.signals import post_save, m2m_changed
 from posts.models import Post, PostLike, Comment, CommentLike
 from django.contrib.auth import get_user_model
 from notifications.models import Notification
+from notifications.signals import notify_user
 
 User = get_user_model()
 
@@ -26,7 +27,7 @@ def create_new_post_notification(sender, instance, created, **kwargs):
         ).exists()
 
         if not already:
-            Notification.create_notification(
+            notify_user(
                 to_user=follower,
                 from_user=post_author,
                 event_type=Notification.EventType.NEW_POST,
@@ -56,7 +57,7 @@ def create_new_comment_notification(sender, instance, created, **kwargs):
     ).exists()
 
     if not already:
-        Notification.create_notification(
+        notify_user(
             to_user=post_author,
             from_user=comment_author,
             event_type=Notification.EventType.NEW_COMMENT,
@@ -85,7 +86,7 @@ def create_new_post_like_notification(sender, instance, created, **kwargs):
     ).exists()
 
     if not already:
-        Notification.create_notification(
+        notify_user(
             to_user=post_author,
             from_user=like_author,
             event_type=Notification.EventType.POST_LIKE,
@@ -115,7 +116,7 @@ def create_new_comment_like_notification(sender, instance, created, **kwargs):
     ).exists()
 
     if not already:
-        Notification.create_notification(
+        notify_user(
             to_user=comment_author,
             from_user=like_author,
             event_type=Notification.EventType.COMMENT_LIKE,
@@ -125,7 +126,7 @@ def create_new_comment_like_notification(sender, instance, created, **kwargs):
 
 
 @receiver(m2m_changed, sender=Post.people_tags.through)
-def create_join_group_notification(sender, instance, pk_set, action, **kwargs):
+def create_tagged_in_post_notification(sender, instance, pk_set, action, **kwargs):
     if action != "post_add" or not pk_set:
         return
     
@@ -146,7 +147,7 @@ def create_join_group_notification(sender, instance, pk_set, action, **kwargs):
             ).exists()
 
             if not already:
-                Notification.create_notification(
+                notify_user(
                     to_user=tagged_user,
                     from_user=author,
                     event_type=Notification.EventType.TAGGED_IN_POST,

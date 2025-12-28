@@ -1,0 +1,10 @@
+{% if groups %}
+    <div class="row">
+        {% for group in groups %}
+            {% include "helpers/partials/group_item.html" with group=group %}
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-light">There are no groups to load.</p>
+{% endif %}
+

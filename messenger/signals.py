@@ -1,9 +1,9 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save, m2m_changed
-from messenger.models import Chat, Message, Reaction
+from django.db.models.signals import post_save
+from messenger.models import Message, Reaction
 from django.contrib.auth import get_user_model
 from notifications.models import Notification
-
+from notifications.signals import notify_user
 
 User = get_user_model()
 
@@ -27,7 +27,7 @@ def new_messanger_message_notifications(sender, instance, created, **kwargs):
         ).exists()
 
         if not already:
-            Notification.create_notification(
+            notify_user(
                 to_user=user,
                 from_user=message_user,
                 event_type=Notification.EventType.NEW_MESSENGER_MESSAGE,
@@ -56,7 +56,7 @@ def new_message_notification_notifications(sender, instance, created, **kwargs):
     ).exists()
 
     if not already:
-        Notification.create_notification(
+        notify_user(
             to_user=message_user,
             from_user=reaction_user,
             event_type=Notification.EventType.MESSAGE_REACTION,

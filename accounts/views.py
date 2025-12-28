@@ -113,7 +113,9 @@ class UserDetailView(LoginRequiredMixin, View):
         ).exists()
 
         user_groups = Group.objects.filter(members=user_detail)
-
+        for group in user_groups:
+            group.user_is_member = group.is_member(request.user)
+        
         posts_user_liked = Post.objects.filter(
             id__in=PostLike.objects.filter(user=user_detail).values_list('post_id', flat=True)
         ).order_by('-created_at')

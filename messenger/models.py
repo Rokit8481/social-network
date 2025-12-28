@@ -1,5 +1,5 @@
 from django.db import models
-from .choices.emoji import EMOJI_CHOICES
+from accounts.choices.emoji import EMOJI_CHOICES
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
 
@@ -39,6 +39,11 @@ class Message(BaseModel):
 
     def __str__(self):
         return f"{self.user}: {self.text[:30] if self.text else '[файл]'}"
+    
+    def was_edited(self):
+        if (self.updated_at - self.created_at).total_seconds() > 1:
+            return True
+        return False
 
     class Meta: 
         ordering = ["created_at"]

@@ -22,7 +22,7 @@
         <tr>
             <td>
                 {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" width="50" class="rounded-circle">
+                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" width="50" class="avatar-small">
                 {% else %}
                     <span class="text-muted">—</span>
                 {% endif %}
