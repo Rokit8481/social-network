@@ -28,58 +28,31 @@
           </div>
         </div>
       </div>
-
-      <div class="group-messages flex-grow-1 overflow-auto p-3 mb-3 bg-gray rounded-3"
-           style="height:60vh;"
-           data-create-url="{% url 'group_message_ajax' group.slug %}"
-           data-edit-url="{% url 'edit_group_message_ajax' group.slug 0 %}"
-           data-delete-url="{% url 'delete_group_message_ajax' group.slug 0 %}">
-
-        {% for item in messages_with_files %}
-        <div class="group-message-item mb-2" data-id="{{ item.message.id }}">
-          <div class="card p-2 bg-dark text-light border-0 shadow-sm rounded-3">
-            <div class="card-body p-2">
-              <div class="d-flex align-items-start justify-content-between mb-2">
-                <div class="d-flex align-items-center">
-                  {% if item.message.sender.avatar %}
-                    <img src="{{ item.message.sender.avatar.url }}" alt="" class="avatar-small">
-                  {% endif %}
-                  <div class="ms-2">
-                    <div class="fw-semibold">
-                      <a href="{% url 'user_detail' item.message.sender.slug %}" class="text-decoration-none text-light">
-                        {{ item.message.sender.username }}
-                      </a></div>
-                    <div class="text-light small">{{ item.message.created_at|date:"d.m.Y H:i" }}</div>
-                  </div>
-                </div>
-                <div class="ms-2">
-                  {% include "helpers/groups/dd_group_message.html" with message=item.message %}
-                </div>
-              </div>
-
-              {% if item.media_files or item.attachments %}
-              <div class="media-grid d-flex flex-nowrap gap-2 overflow-auto mb-2">
-                {% if item.media_files %}
-                  {% include "helpers/group_message_files/media_preview.html" %}
-                {% endif %}
-                {% if item.attachments %}
-                  {% include "helpers/group_message_files/attachments.html" %}
-                {% endif %}
-              </div>
-              {% endif %}
-
-              <div class="group-message-content p-2 rounded text-light">{{ item.message.content }}</div>
+      <div class="group-messages overflow-auto bg-gray rounded-3 p-3"
+          style="height:60vh;"
+          id="group-messages-container"
+          data-group-slug="{{ group.slug }}"
+          data-create-url="{% url 'group_message_ajax' group.slug %}"
+          data-edit-url="{% url 'edit_group_message_ajax' group.slug 0 %}"
+          data-delete-url="{% url 'delete_group_message_ajax' group.slug 0 %}">
+          {% if group_messages %}
+            <div id="messages-list">
+              {% include "helpers/partials/group_messages_list.html" with group_messages=group_messages %}
             </div>
+          {% else %}
+              <p class="text-light">No group messages yet.</p>
+          {% endif %}
+          <div id="loader" class="text-center my-4 d-none">
+              <div class="spinner-border"></div>
           </div>
-        </div>
-        {% empty %}
-          <p class="text-muted">No messages yet.</p>
-        {% endfor %}
+          <div id="end-of-group-messages" class="text-center my-4 d-none">
+              <p class="text-light">No more group messages to load.</p>
+          </div>
       </div>
 
       {% if user_is_admin %}
       <div class="group-message-form mt-3">
-        <form id="new-message-form" enctype="multipart/form-data" class="row gx-2 align-items-end">
+        <form id="new-message-form" method="post" enctype="multipart/form-data" class="row gx-2 align-items-end">
           {% csrf_token %}
           <div class="col-12 mb-2">
             <label for="message-input" class="form-label visually-hidden">Message</label>
@@ -88,8 +61,8 @@
           </div>
 
           <div class="d-flex gap-2 mb-2"> 
-            <button class="btn btn-primary flex-grow-1 mt-2" id="send-btn">Send</button> 
-            <button class="btn btn-secondary flex-grow-1 mt-2 d-none" id="cancel-edit-btn"> Cancel </button> 
+            <button type="submit" class="btn btn-primary flex-grow-1 mt-2" id="send-btn">Send</button> 
+            <button type="button" class="btn btn-secondary flex-grow-1 mt-2 d-none" id="cancel-edit-btn"> Cancel </button> 
           </div>
 
           <div class="col-12">
@@ -184,4 +157,5 @@
 </template>
 
 <script src="{% static 'js/groups/script.js' %}"></script>
+<script src="{% static 'js/groups/messages_infinite_scroll.js' %}"></script>
 {% endblock %}
