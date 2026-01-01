@@ -1,6 +1,8 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
+from notifications.models import Notification
+from channels.db import database_sync_to_async
 
 class NotificationConsumer(AsyncWebsocketConsumer):
 
@@ -35,9 +37,22 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         notification = await Notification.objects.aget(pk=notification_id)
         message = await notification.async_get_message()
 
+        unread_count = await self.get_unread_count()
+
         await self.send(text_data=json.dumps({
-            "id": notification.id,
-            "message": message,
-            "event_type": notification.event_type,
-            "created_at": notification.created_at.strftime("%Y-%m-%d %H:%M"),
+            "notification": {
+                "id": notification.id,
+                "message": message,
+                "event_type": notification.event_type,
+                "created": notification.created_at.strftime("%H:%M %d/%m/%Y"),
+                "is_read": False,
+            },
+            "unread_count": unread_count
         }))
+
+    @database_sync_to_async
+    def get_unread_count(self):
+        return Notification.objects.filter(
+            to_user=self.user,
+            is_read=False
+        ).count()

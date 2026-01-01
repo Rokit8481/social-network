@@ -4,18 +4,12 @@
 {% block title %}Notifications{% endblock title %}
 
 {% block content %}
-<h2>Your Notifications</h2>
+<div class="d-flex align-items-center mb-2 gap-2">
+    <h2>Your Notifications</h2>
+    <button class="mark-all-read-btn" title="Mark all read">✓</button>
+</div>
 
-<ul class="notifications-container" style="list-style: none; padding: 0;">
-    {% for notif in notifications %}
-    <li style="padding: 10px; margin-bottom: 10px; border-radius: 6px; 
-               {% if not notif.is_read %} background: #49c5ffff; {% else %} background: #4b2525ff; {% endif %}">
-        {{ notif.get_message }}
-    </li>
-    {% empty %}
-        <li>No notifications yet.</li>
-    {% endfor %}
-</ul>
+<ul class="notifications-container list-unstyled"></ul>
 
 <script src="{% static 'js/notifications/notifications.js' %}"></script>
 {% endblock content %}

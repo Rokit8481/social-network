@@ -27,7 +27,6 @@ class NotificationMarkReadAPIView(LoginRequiredMixin, View):
 
         return JsonResponse({"status": "ok"})
 
-
 class NotificationAPIView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         notifications = Notification.objects.filter(
@@ -45,3 +44,20 @@ class NotificationAPIView(LoginRequiredMixin, View):
         ]
 
         return JsonResponse(data, safe=False)
+    
+class UnreadCountAPI(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        count = Notification.objects.filter(
+            to_user=request.user,
+            is_read=False
+        ).count()
+        return JsonResponse({"count": count})
+    
+class MarkAllReadAPI(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        Notification.objects.filter(
+            to_user=request.user,
+            is_read=False
+        ).update(is_read=True)
+
+        return JsonResponse({"status": "ok"})
