@@ -53,7 +53,7 @@ function initTagsToggle() {
 
 function initMessageForm() {
     const form = document.getElementById('new-message-form');
-    const container = document.querySelector('.messages');
+    const container = document.querySelector('.group-messages');
     if (!form || !container) return;
 
     const textarea = document.getElementById("message-input");
@@ -62,7 +62,6 @@ function initMessageForm() {
     const cancelBtn = document.getElementById("cancel-edit-btn");
     const errorsDiv = document.getElementById("message-errors");
 
-    // === Функція скидання режиму редагування ===
     const resetEditMode = () => {
         editInput.value = "";
         textarea.value = "";
@@ -70,7 +69,6 @@ function initMessageForm() {
         cancelBtn.classList.add("d-none");
     };
 
-    // === Submit (створення/редагування) ===
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         const content = textarea.value.trim();
@@ -85,11 +83,13 @@ function initMessageForm() {
             headers: {
                 "X-CSRFToken": CSRF_TOKEN,
                 "X-Requested-With": "XMLHttpRequest",
-                "Content-Type": "application/x-www-form-urlencoded"
             },
             body: new URLSearchParams({ content })
         })
-        .then(r => r.json())
+        .then(r => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+        })
         .then(data => {
             if (!data.success) {
                 errorsDiv.textContent = JSON.stringify(data.errors || data);
@@ -97,8 +97,10 @@ function initMessageForm() {
             }
 
             if (editId) {
-                const msgDiv = document.querySelector(`.message-item[data-id="${editId}"]`);
-                if (msgDiv) msgDiv.querySelector(".message-content").textContent = data.content;
+                const msgDiv = document.querySelector(`.group-message-item[data-id="${editId}"]`);
+                if (msgDiv) {
+                    msgDiv.querySelector(".group-message-content").textContent = data.content;
+                }
             } else {
                 addMessageToDOM(data);
             }
@@ -106,19 +108,20 @@ function initMessageForm() {
             resetEditMode();
             errorsDiv.textContent = "";
         })
-        .catch(() => {
+        .catch((err) => {
+            console.error("Network error:", err);
             errorsDiv.textContent = "Network error";
         });
     });
 
-    // === Cancel редагування ===
-    cancelBtn.addEventListener("click", resetEditMode);
+    cancelBtn.addEventListener("click", () => {
+        resetEditMode();
+    });
 }
 
 /* ===================== MESSAGE ACTIONS ===================== */
-
 function initMessageActions() {
-    const container = document.querySelector('.messages');
+    const container = document.querySelector('.group-messages');
     if (!container) return;
 
     const DELETE_URL_TEMPLATE = container.dataset.deleteUrl;
@@ -128,7 +131,7 @@ function initMessageActions() {
     const cancelBtn = document.getElementById("cancel-edit-btn");
 
     const handleEditMessage = (msgDiv) => {
-        const text = msgDiv.querySelector('.message-content')?.textContent.trim() || "";
+        const text = msgDiv.querySelector('.group-message-content')?.textContent.trim() || "";
         const msgId = msgDiv.dataset.id;
 
         textarea.value = text;
@@ -160,12 +163,12 @@ function initMessageActions() {
     };
 
     const handleCopyMessage = (msgDiv) => {
-        const text = msgDiv.querySelector('.message-content')?.innerText.trim();
+        const text = msgDiv.querySelector('.group-message-content')?.innerText.trim();
         if (text) navigator.clipboard?.writeText(text);
     };
 
     container.addEventListener("click", (e) => {
-        const msgDiv = e.target.closest(".message-item");
+        const msgDiv = e.target.closest(".group-message-item");
         if (!msgDiv) return;
 
         const msgId = msgDiv.dataset.id;
@@ -175,7 +178,6 @@ function initMessageActions() {
         else if (e.target.closest("[data-copy-message]")) handleCopyMessage(msgDiv);
     });
 
-    // === media thumbnails → carousel ===
     document.querySelectorAll(".media-item-small").forEach(item => {
         item.addEventListener("click", () => {
             const carousel = document.querySelector(item.dataset.bsTarget + " .carousel");
@@ -185,21 +187,20 @@ function initMessageActions() {
 }
 
 /* ===================== ADD MESSAGE TO DOM ===================== */
-
 function addMessageToDOM(data) {
-    const container = document.querySelector(".messages");
+    const container = document.querySelector(".group-messages");
     const template = document.getElementById("message-template");
     if (!template) return;
 
     const clone = template.content.cloneNode(true);
-    const msgDiv = clone.querySelector(".message-item");
+    const msgDiv = clone.querySelector(".group-message-item");
 
     msgDiv.dataset.id = data.id;
     const avatar = clone.querySelector(".msg-avatar");
     avatar.src = data.sender_avatar_url; 
     clone.querySelector(".msg-sender").textContent = data.sender;
     clone.querySelector(".msg-created").textContent = data.created_at;
-    clone.querySelector(".message-content").textContent = data.content;
+    clone.querySelector(".group-message-content").textContent = data.content;
 
     container.insertBefore(clone, container.firstChild);
     container.scrollTop = 0;

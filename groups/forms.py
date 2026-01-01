@@ -1,5 +1,5 @@
 from django import forms
-from groups.models import Group, Tag, GroupMessage, GroupMessageFile
+from groups.models import Group, GroupMessage
 from groups.widgets import TagSelect2Widget
 
 class CreateGroupForm(forms.ModelForm):

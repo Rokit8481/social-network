@@ -1,8 +1,8 @@
-from django.views.generic import View, DetailView, ListView
+from django.views.generic import View
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from groups.models import Group, GroupMessage, GroupMessageFile, Tag
+from groups.models import Group, GroupMessage, Tag
 from groups.forms import EditGroupForm, GroupMessageForm, CreateGroupForm
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
@@ -63,25 +63,15 @@ class GroupDetailView(MemberRequiredMixin, View):
         group = get_object_or_404(Group, slug=slug)
         user_is_admin = group.is_admin(request.user)
         user_is_member = group.is_member(request.user)
-        messages = group.messages.prefetch_related('files').order_by('-created_at')
+        group_messages = (group.messages.order_by('-id')[:10])
         tags = group.tags.all()
-        messages_with_files = []
-        for msg in messages:
-            media_files = [f for f in msg.files.all() if f.is_media]
-            attachments = [f for f in msg.files.all() if f.is_attachment]
-            messages_with_files.append({
-                'message': msg,
-                'media_files': media_files,
-                'attachments': attachments,
-            })
 
         context = {
             'group': group,
-            'messages': messages,
+            'group_messages': group_messages,
             'user_is_admin': user_is_admin,
             'user_is_member': user_is_member,
             'tags': tags,
-            'messages_with_files': messages_with_files,
         }
         return render(request, 'groups/group_detail.html', context)
 
@@ -162,15 +152,9 @@ class EditGroupMessageAjaxView(AdminRequiredMixin, View):
     def post(self, request, slug, message_id, *args, **kwargs):
         group = get_object_or_404(Group, slug=slug)
         message = get_object_or_404(GroupMessage, id=message_id, group=group)
-        form = self.form_class(request.POST, request.FILES, instance=message)
+        form = self.form_class(request.POST, instance=message)
         if form.is_valid():
             message = form.save()
-
-            delete_ids = request.POST.getlist("delete_files")
-            message.files.filter(id__in=delete_ids).delete()
-
-            for f in request.FILES.getlist("files"):
-                GroupMessageFile.objects.create(message=message, file=f)
 
             return JsonResponse({
                 'success': True,
@@ -192,15 +176,12 @@ class GroupMessageAjaxView(AdminRequiredMixin, View):
 
     def post(self, request, slug, *args, **kwargs):
         group = get_object_or_404(Group, slug=slug)
-        form = self.form_class(request.POST, request.FILES)
+        form = self.form_class(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
             message.group = group
             message.sender = request.user
             message.save()
-
-            for f in request.FILES.getlist("files"):
-                GroupMessageFile.objects.create(message=message, file=f)
 
             return JsonResponse({
                 'success': True,
@@ -252,4 +233,34 @@ class GroupsInfiniteAPI(LoginRequiredMixin, View):
         return JsonResponse({
             "html": html,
             "has_more": len(groups) == 9
+        })
+    
+
+class GroupMessagesInfiniteAPI(MemberRequiredMixin, View):
+    def get(self, request, slug):
+        group = get_object_or_404(Group, slug=slug)
+        last_id = request.GET.get("last_id")
+
+        qs = (
+            GroupMessage.objects
+            .filter(group=group)
+            .select_related("sender")
+            .order_by('-id')
+        )
+
+        if last_id:
+            qs = qs.filter(id__lt=last_id)
+
+        group_messages = list(qs[:10])
+
+
+        html = render_to_string(
+            "helpers/partials/group_messages_list.html",
+            {"group_messages": group_messages},
+            request=request
+        )
+
+        return JsonResponse({
+            "html": html,
+            "has_more": len(group_messages) == 10
         })

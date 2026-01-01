@@ -1,0 +1,25 @@
+<div class="group-message-item mb-2" data-post-id="{{ message.id }}">
+    <div class="card p-2 bg-dark text-light border-0 shadow-sm rounded-3">
+        <div class="card-body p-2">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+                <div class="d-flex align-items-center">
+                    {% if message.sender.avatar %}
+                    <img src="{{ message.sender.avatar.url }}" alt="" class="avatar-small">
+                    {% endif %}
+                    <div class="ms-2">
+                    <div class="fw-semibold">
+                        <a href="{% url 'user_detail' message.sender.slug %}" class="text-decoration-none text-light">
+                        {{ message.sender.username }}
+                        </a></div>
+                    <div class="text-light small">{{ message.created_at|date:"d.m.Y H:i" }}</div>
+                    </div>
+                </div>
+                <div class="ms-2">
+                    {% include "helpers/groups/dd_group_message.html" with message=message %}
+                </div>
+            </div>
+
+            <div class="group-message-content p-2 rounded text-light">{{ message.content }}</div>
+        </div>
+    </div>
+</div>
