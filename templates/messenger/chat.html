@@ -259,7 +259,6 @@
   const form = document.querySelector('#message-form');
   const textInput = form.querySelector('input[name="text"]');
   const currentUser = "{{ request.user.username }}";
-  const isOwn = {{ request.user.id }} === currentUser;
   
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const socket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${chatId}/`);
@@ -361,7 +360,7 @@
           <div class="message-content ${isOwn ? 'message-own' : 'message-other'}"
                data-message-id="${data.id}">
             <div>
-              <a href="/users/${data.user.slug}/" class="text-decoration-none message-username">
+              <a href="/users/${data.user_slug}/" class="text-decoration-none message-username">
               ${data.user}
               </a>
             </div>

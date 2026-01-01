@@ -31,14 +31,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 chat=chat, user=user, text=text
             )
 
+            def get_avatar_url(user):
+                if user.avatar:
+                    return settings.MEDIA_URL + user.avatar.name
+                return settings.MEDIA_URL + 'default/default_avatar.png'
+
+
             event = {
                 'type': 'chat_message',
                 'id': message.id,
                 'user': user.username,
+                'user_slug': user.slug,
+                'avatar': get_avatar_url(user),
                 'text': message.text,
                 'created_time': message.created_at.strftime("%H:%M %d/%m/%Y"),
                 'updated_time': message.updated_at.strftime("%H:%M %d/%m/%Y"),
-                'is_own': False,
             }
 
             await self.channel_layer.group_send(self.room_group_name, event)
