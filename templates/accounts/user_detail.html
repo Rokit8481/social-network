@@ -21,11 +21,11 @@
             <div class="profile-stats">
                 <div>
                     <span>{{ followers_count }}</span>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#followersModal">Followers</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#followersModal" class="text-decoration-none text-light">Followers</a>
                 </div>
                 <div>
                     <span>{{ following_count }}</span>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#followingModal">Following</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#followingModal" class="text-decoration-none text-light">Following</a>
                 </div>
 
             </div>
@@ -110,18 +110,18 @@
 
     <ul class="nav nav-tabs" id="profileTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts-tab-pane" type="button" role="tab">
-                My Posts
+            <button class="nav-link active text-decoration-none text-secondary" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts-tab-pane" type="button" role="tab">
+                <i class="bi bi-journal-text fs-6 text-gray"></i>
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups-tab-pane" type="button" role="tab">
-                My Groups
+            <button class="nav-link text-decoration-none text-secondary" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups-tab-pane" type="button" role="tab">
+                <i class="bi bi-collection fs-6 text-gray" aria-label="Пабліки"></i>
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="liked-tab" data-bs-toggle="tab" data-bs-target="#liked-tab-pane" type="button" role="tab">
-                My Liked Posts
+            <button class="nav-link text-decoration-none text-danger" id="liked-tab" data-bs-toggle="tab" data-bs-target="#liked-tab-pane" type="button" role="tab">
+                <i class="bi bi-suit-heart-fill"></i>
             </button>
         </li>
     </ul>
@@ -142,7 +142,7 @@
                     {% include "helpers/partials/post_item.html" with post=post %}
                 {% endfor %}
             {% else %}
-                <p class="text-muted">This user hasn't liked any posts yet.</p>
+                <p class="text-light">This user hasn't liked any posts yet.</p>
             {% endif %}
         </div>
 

@@ -13,7 +13,7 @@ class BaseModel(models.Model):
 class UserProfile(AbstractUser):
     bio = models.CharField(max_length=100, blank=True, null=True, verbose_name='Bio', default='Bio is not set.')
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Avatar', default='default/default_avatar.png')
-    mobile = PhoneNumberField(unique=True, blank=True, null=True, verbose_name='Mobile Number', default='No mobile number.')
+    mobile = PhoneNumberField(blank=True, null=True, verbose_name='Mobile Number', default='No mobile number.')
     slug = AutoSlugField(populate_from='username', unique=True, verbose_name='Slug')
     birthday = models.DateField(blank=True, null=True, verbose_name='Birthday')
 
