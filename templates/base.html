@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/general/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/general/notifications/styles.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body {% if request.resolver_match.url_name == 'notifications_list' %}data-notifications-page="true"{% endif %}>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -94,7 +96,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// глобальна змінна для всього JS
 const CSRF_TOKEN = getCookie("csrftoken");
 </script>
 </body>

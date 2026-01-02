@@ -1,0 +1,47 @@
+
+.group-sidebar .group-card {
+  border-radius: 12px;
+}
+
+.group-messages {
+  background: #f6f7fb;
+  border-radius: 12px;
+  padding: 18px;
+  height:60vh
+}
+
+.group-message-item .group-card {
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 18px rgba(20,20,30,0.04);
+  overflow: visible;
+}
+
+.group-message-content {
+  white-space: pre-wrap;
+}
+
+.group-message-item.editing .group-card {
+  outline: 2px solid rgba(13,110,253,0.12);
+  background: #fff;
+}
+
+.tags-container .badge {
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.group-message-form {
+  border-radius: 12px;
+  padding: 14px;
+  background: rgb(45 48 50);
+  box-shadow: 0 4px 12px rgba(20,20,30,0.03);
+}
+
+.bg-gray {
+    background-color: rgb(45 48 50);
+}
+
+.dropdown {
+    position: relative;
+}

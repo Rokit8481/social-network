@@ -1,7 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %} Messenger {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messenger/styles.css' %}">
+{% endblock %}
 {% block content %}
 <div class="container mt-4">
 

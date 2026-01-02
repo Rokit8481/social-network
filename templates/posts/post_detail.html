@@ -1,8 +1,10 @@
 {% extends "base.html" %}
-
-{% block title %}{{ post.title }}{% endblock %}
 {% load static %}
 
+{% block title %}{{ post.title }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/posts/styles.css' %}">
+{% endblock %}
 {% block content %}
 
 <div class="container mt-4">
