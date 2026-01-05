@@ -8,7 +8,7 @@ from accounts.models import Follow
 from posts.models import Post, PostLike
 from django.contrib import messages
 from accounts.forms import CustomUserCreationForm, CustomAuthenticationForm, UserEditForm
-from groups.models import Group
+from boards.models import Board
 from django.contrib.auth import get_user_model, update_session_auth_hash
 
 User = get_user_model()
@@ -112,9 +112,9 @@ class UserDetailView(LoginRequiredMixin, View):
             following=user_detail
         ).exists()
 
-        user_groups = Group.objects.filter(members=user_detail)
-        for group in user_groups:
-            group.user_is_member = group.is_member(request.user)
+        user_boards = Board.objects.filter(members=user_detail)
+        for board in user_boards:
+            board.user_is_member = board.is_member(request.user)
         
         posts_user_liked = Post.objects.filter(
             id__in=PostLike.objects.filter(user=user_detail).values_list('post_id', flat=True)
@@ -127,7 +127,7 @@ class UserDetailView(LoginRequiredMixin, View):
             "followers": followers,
             "following": following,
             "posts_user_liked": posts_user_liked,
-            "user_groups": user_groups,
+            "user_boards": user_boards,
             "followers_count": followers_count,
             "following_count": following_count,
             "is_following": is_following,

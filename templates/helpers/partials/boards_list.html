@@ -1,0 +1,10 @@
+{% if boards %}
+    <div class="row">
+        {% for board in boards %}
+            {% include "helpers/partials/board_item.html" with board=board %}
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-light">There are no boards to load.</p>
+{% endif %}
+

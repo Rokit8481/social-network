@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Create Group{% endblock title %}
+{% block title %}Create Board{% endblock title %}
 
 {% block content %}
 {{ form.media }} 
 <div class="container mt-4">
-	<h2>Create Group</h2>
+	<h2>Create Board</h2>
 	<form method="post">
 		{% csrf_token %}
 		{{ form.non_field_errors }}
@@ -28,8 +28,8 @@
 			<div class="text-danger">{{ form.tags.errors }}</div>
 		</div>
 
-		<button type="submit" class="btn btn-primary">Create Group</button>
-		<a href="{% url 'groups_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+		<button type="submit" class="btn btn-primary">Create Board</button>
+		<a href="{% url 'boards_list' %}" class="btn btn-secondary ms-2">Cancel</a>
 	{{ form.media.js }}
 	</form>
 </div>

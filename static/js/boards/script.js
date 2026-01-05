@@ -53,7 +53,7 @@ function initTagsToggle() {
 
 function initMessageForm() {
     const form = document.getElementById('new-message-form');
-    const container = document.querySelector('.group-messages');
+    const container = document.querySelector('.board-messages');
     if (!form || !container) return;
 
     const textarea = document.getElementById("message-input");
@@ -97,9 +97,9 @@ function initMessageForm() {
             }
 
             if (editId) {
-                const msgDiv = document.querySelector(`.group-message-item[data-id="${editId}"]`);
+                const msgDiv = document.querySelector(`.board-message-item[data-id="${editId}"]`);
                 if (msgDiv) {
-                    msgDiv.querySelector(".group-message-content").textContent = data.content;
+                    msgDiv.querySelector(".board-message-content").textContent = data.content;
                 }
             } else {
                 addMessageToDOM(data);
@@ -121,7 +121,7 @@ function initMessageForm() {
 
 /* ===================== MESSAGE ACTIONS ===================== */
 function initMessageActions() {
-    const container = document.querySelector('.group-messages');
+    const container = document.querySelector('.board-messages');
     if (!container) return;
 
     const DELETE_URL_TEMPLATE = container.dataset.deleteUrl;
@@ -131,7 +131,7 @@ function initMessageActions() {
     const cancelBtn = document.getElementById("cancel-edit-btn");
 
     const handleEditMessage = (msgDiv) => {
-        const text = msgDiv.querySelector('.group-message-content')?.textContent.trim() || "";
+        const text = msgDiv.querySelector('.board-message-content')?.textContent.trim() || "";
         const msgId = msgDiv.dataset.id;
 
         textarea.value = text;
@@ -163,12 +163,12 @@ function initMessageActions() {
     };
 
     const handleCopyMessage = (msgDiv) => {
-        const text = msgDiv.querySelector('.group-message-content')?.innerText.trim();
+        const text = msgDiv.querySelector('.board-message-content')?.innerText.trim();
         if (text) navigator.clipboard?.writeText(text);
     };
 
     container.addEventListener("click", (e) => {
-        const msgDiv = e.target.closest(".group-message-item");
+        const msgDiv = e.target.closest(".board-message-item");
         if (!msgDiv) return;
 
         const msgId = msgDiv.dataset.id;
@@ -188,20 +188,22 @@ function initMessageActions() {
 
 /* ===================== ADD MESSAGE TO DOM ===================== */
 function addMessageToDOM(data) {
-    const container = document.querySelector(".group-messages");
+    const container = document.querySelector(".board-messages");
     const template = document.getElementById("message-template");
+    const endText = document.querySelector(".end-text")
     if (!template) return;
 
     const clone = template.content.cloneNode(true);
-    const msgDiv = clone.querySelector(".group-message-item");
+    const msgDiv = clone.querySelector(".board-message-item");
 
     msgDiv.dataset.id = data.id;
     const avatar = clone.querySelector(".msg-avatar");
     avatar.src = data.sender_avatar_url; 
     clone.querySelector(".msg-sender").textContent = data.sender;
     clone.querySelector(".msg-created").textContent = data.created_at;
-    clone.querySelector(".group-message-content").textContent = data.content;
+    clone.querySelector(".board-message-content").textContent = data.content;
 
     container.insertBefore(clone, container.firstChild);
+    endText.classList.add("d-none")
     container.scrollTop = 0;
 }

@@ -3,7 +3,6 @@ import subprocess
 import shutil
 import sys
 import os
-import signal
 
 def stop_uvicorn():
     print("Stopping uvicorn...")

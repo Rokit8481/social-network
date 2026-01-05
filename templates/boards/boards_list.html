@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Boards{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/boards/styles.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+
+    <h1 class="mb-4">Boards</h1>
+
+    <div class="mb-4">
+        <a href="{% url 'create_boards_board' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Create board
+        </a>
+    </div>  
+    
+    <form method="GET" class="mb-4">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            class="form-control"
+            placeholder="Search boards..."
+        >
+    </form>
+    <div id="board-container">
+        {% include "helpers/partials/boards_list.html" %}
+    </div>
+
+    <div id="loader" class="text-center my-4 d-none">
+        <div class="spinner-border"></div>
+    </div>
+    <div id="end-of-boards" class="text-center my-4 d-none">
+        <p class="text-light">No more boards to load.</p>
+    </div>
+</div>
+
+<script src="{% static 'js/boards/infinite_scroll.js' %}"></script>
+{% endblock %}

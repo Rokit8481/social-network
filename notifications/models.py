@@ -21,9 +21,9 @@ class Notification(BaseModel):
         # ACCOUNTS 1/1
         NEW_FOLLOWER = "new_follower", "New follower" # ✔️
 
-        # GROUPS 2/2 
-        NEW_GROUP_MESSAGE = "new_group_messsage", " New group message" # ✔️
-        JOIN_GROUP = "join_group", "Join group" # ✔️
+        # BOARDS 2/2 
+        NEW_BOARD_MESSAGE = "new_board_messsage", " New board message" # ✔️
+        JOIN_BOARD = "join_board", "Join board" # ✔️
 
 
     class TargetType(models.TextChoices):
@@ -32,7 +32,7 @@ class Notification(BaseModel):
         COMMENT = "comment", "Comment"
         REACTION = "reaction", "Reaction"
         MESSAGE = "message", "Message"
-        GROUP = "group", "Group"
+        BOARD = "board", "Board"
 
     
     TYPE_MAP = {
@@ -41,7 +41,7 @@ class Notification(BaseModel):
         "Comment": TargetType.COMMENT,
         "Reaction": TargetType.REACTION,
         "Message": TargetType.MESSAGE,
-        "Group": TargetType.GROUP,
+        "Board": TargetType.BOARD,
     }
 
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications', verbose_name="Recipient")
@@ -66,19 +66,19 @@ class Notification(BaseModel):
         return notification
         
     def get_message(self):
-        if self.event_type == self.EventType.NEW_GROUP_MESSAGE:
-            from groups.models import Group
-            group = Group.objects.filter(pk=self.target_id).first()
-            if group:
-                return f"In group '{group.title}' there is a new message"
-            return "New message in a group"
+        if self.event_type == self.EventType.NEW_BOARD_MESSAGE:
+            from boards.models import Board
+            board = Board.objects.filter(pk=self.target_id).first()
+            if board:
+                return f"In board '{board.title}' there is a new message"
+            return "New message in a board"
 
-        elif self.event_type == self.EventType.JOIN_GROUP:
-            from groups.models import Group
-            group = Group.objects.filter(pk=self.target_id).first()
-            if group:
-                return f"{self.from_user.username} joined group, where you are admin, '{group.title}'"
-            return f"{self.from_user.username} joined a group"
+        elif self.event_type == self.EventType.JOIN_BOARD:
+            from boards.models import Board
+            board = Board.objects.filter(pk=self.target_id).first()
+            if board:
+                return f"{self.from_user.username} joined board, where you are admin, '{board.title}'"
+            return f"{self.from_user.username} joined a board"
 
         elif self.event_type == self.EventType.NEW_POST:
             from posts.models import Post
@@ -125,10 +125,10 @@ class Notification(BaseModel):
             if message:
                 chat = message.chat
                 author = message.user
-                if chat.is_group == True:
-                    return f"You have a new message in group '{chat.title}' by {author.username}"
+                if chat.is_board == True:
+                    return f"You have a new message in board '{chat.title}' by {author.username}"
                 return f"You have a new message from '{author.username}'"
-            return f"You have a new message in chat/group"
+            return f"You have a new message in chat/board"
         elif self.event_type == self.EventType.MESSAGE_REACTION:
             from messenger.models import Reaction
             reaction = Reaction.objects.filter(pk=self.target_id).first()
@@ -136,8 +136,8 @@ class Notification(BaseModel):
                 message = reaction.message
                 chat = message.chat
                 author = reaction.user
-                if chat.is_group == True:
-                    return f"{author.username} put a {reaction.emoji} on your message '{message.text[:15]}...' in group '{chat.title}'"
+                if chat.is_board == True:
+                    return f"{author.username} put a {reaction.emoji} on your message '{message.text[:15]}...' in board '{chat.title}'"
                 return f"{author.username} put a {reaction.emoji} on your message '{message.text[:15]}...' in your chat"
             return "You have a new reaction on your message"
         

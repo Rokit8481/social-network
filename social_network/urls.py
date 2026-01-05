@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("select2/", include("django_select2.urls")),
     path('', include('accounts.urls')),
-    path('groups/', include('groups.urls')),
+    path('boards/', include('boards.urls')),
     path('messenger/', include('messenger.urls')),
     path('notifications/', include('notifications.urls')),
     path('posts/', include('posts.urls')),

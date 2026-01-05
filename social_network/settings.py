@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'channels',
     'phonenumber_field',
     'accounts.apps.AccountsConfig',
-    'groups.apps.GroupsConfig',
+    'boards.apps.BoardsConfig',
     'messenger.apps.MessengerConfig',
     'notifications.apps.NotificationsConfig',
     'posts.apps.PostsConfig',

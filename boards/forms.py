@@ -1,10 +1,10 @@
 from django import forms
-from groups.models import Group, GroupMessage
-from groups.widgets import TagSelect2Widget
+from boards.models import Board, BoardMessage
+from boards.widgets import TagSelect2Widget
 
-class CreateGroupForm(forms.ModelForm):
+class CreateBoardForm(forms.ModelForm):
     class Meta:
-        model = Group
+        model = Board
         fields = ["title", "description", "tags"]
         
         widgets = {
@@ -15,9 +15,9 @@ class CreateGroupForm(forms.ModelForm):
             ),
         }
 
-class EditGroupForm(forms.ModelForm):
+class EditBoardForm(forms.ModelForm):
     class Meta:
-        model = Group
+        model = Board
         fields = ['title', 'description', 'tags', 'admins', 'members']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -39,9 +39,9 @@ class EditGroupForm(forms.ModelForm):
             else:
                 self.fields['admins'].queryset = self.fields['admins'].queryset.exclude(id=user.id)
 
-class GroupMessageForm(forms.ModelForm):
+class CreateBoardMessageForm(forms.ModelForm):
     class Meta:
-        model = GroupMessage
+        model = BoardMessage
         fields = ['content']
         widgets = {
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),

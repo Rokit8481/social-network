@@ -1,27 +1,27 @@
 
-.group-sidebar .group-card {
+.board-sidebar .board-card {
   border-radius: 12px;
 }
 
-.group-messages {
+.board-messages {
   background: #f6f7fb;
   border-radius: 12px;
   padding: 18px;
   height:60vh
 }
 
-.group-message-item .group-card {
+.board-message-item .board-card {
   border-radius: 12px;
   margin-bottom: 12px;
   box-shadow: 0 6px 18px rgba(20,20,30,0.04);
   overflow: visible;
 }
 
-.group-message-content {
+.board-message-content {
   white-space: pre-wrap;
 }
 
-.group-message-item.editing .group-card {
+.board-message-item.editing .board-card {
   outline: 2px solid rgba(13,110,253,0.12);
   background: #fff;
 }
@@ -31,7 +31,7 @@
   margin-bottom: 6px;
 }
 
-.group-message-form {
+.board-message-form {
   border-radius: 12px;
   padding: 14px;
   background: rgb(45 48 50);

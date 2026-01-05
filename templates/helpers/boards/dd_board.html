@@ -8,23 +8,23 @@
         <li>
         {% if user_is_admin %}
         <a class="dropdown-item d-flex align-items-center gap-2"
-            href="{% url 'edit_group' group.slug %}">
-            ✏️ <span>Edit Group</span>
+            href="{% url 'edit_board' board.slug %}">
+            ✏️ <span>Edit Board</span>
         </a>
         {% endif %}
         </li>
 
         <li>
         {% if user_is_member %}
-        <form action="{% url 'leave_group' group.slug %}" method="post" style="margin:0">
+        <form action="{% url 'leave_board' board.slug %}" method="post" style="margin:0">
             {% csrf_token %}
             <button type="submit"
                     class="dropdown-item d-flex align-items-center gap-2 text-danger"
                     {% if user_is_admin %}
-                        onclick="return confirm('Leave and delete group?')"
+                        onclick="return confirm('Leave and delete board?')"
                     {% else %}
-                        onclick="return confirm('Leave group?')"{% endif %}>
-            🗑️ <span>Leave Group</span>
+                        onclick="return confirm('Leave board?')"{% endif %}>
+            🗑️ <span>Leave Board</span>
             </button>
         </form>
         {% endif %}

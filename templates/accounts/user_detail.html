@@ -115,7 +115,7 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link text-decoration-none text-secondary" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups-tab-pane" type="button" role="tab">
+            <button class="nav-link text-decoration-none text-secondary" id="boards-tab" data-bs-toggle="tab" data-bs-target="#boards-tab-pane" type="button" role="tab">
                 <i class="bi bi-collection fs-6 text-gray" aria-label="Пабліки"></i>
             </button>
         </li>
@@ -132,8 +132,8 @@
             {% include "helpers/partials/posts_list.html" with posts=posts %}
         </div>
 
-        <div class="tab-pane fade" id="groups-tab-pane" role="tabpanel">
-            {% include "helpers/partials/groups_list.html" with groups=user_groups %}
+        <div class="tab-pane fade" id="boards-tab-pane" role="tabpanel">
+            {% include "helpers/partials/boards_list.html" with boards=user_boards %}
         </div>
 
         <div class="tab-pane fade" id="liked-tab-pane" role="tabpanel">

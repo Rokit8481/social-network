@@ -13,22 +13,22 @@ function loadMorePosts() {
     loading = true;
     document.getElementById("loader").classList.remove("d-none");
 
-    const groups = document.querySelectorAll(".group-item");
-    if (!groups.length) {
+    const boards = document.querySelectorAll(".board-item");
+    if (!boards.length) {
         loading = false;
         return;
     }
 
-    const lastId = groups[groups.length - 1].dataset.groupId;
+    const lastId = boards[boards.length - 1].dataset.boardId;
 
     const params = new URLSearchParams(window.location.search);
     params.set("last_id", lastId);
 
-    fetch(`/groups/infinite/?${params.toString()}`)
+    fetch(`/boards/infinite/?${params.toString()}`)
         .then(r => r.json())
         .then(data => {
             document
-                .getElementById("group-container")
+                .getElementById("board-container")
                 .insertAdjacentHTML("beforeend", data.html);
 
             hasMore = data.has_more;
@@ -37,7 +37,7 @@ function loadMorePosts() {
             document.getElementById("loader").classList.add("d-none");
 
             if (!hasMore) {
-                document.getElementById("end-of-groups").classList.remove("d-none");
+                document.getElementById("end-of-boards").classList.remove("d-none");
             }
         });
 }

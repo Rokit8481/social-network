@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Group: {{ group.title }}{% endblock title %}
+{% block title %}Edit Board: {{ board.title }}{% endblock title %}
 
 {% block content %}
 {{ form.media }} 
 <div class="container mt-4">
-	<h2>Edit Group: {{ group.title }}</h2>
+	<h2>Edit Board: {{ board.title }}</h2>
 	<form method="post">
 		{% csrf_token %}
 		{{ form.non_field_errors }}
@@ -35,7 +35,7 @@
 		</div>
 
 		<button type="submit" class="btn btn-primary">Save Changes</button>
-		<a href="{% url 'group_detail' slug=group.slug %}" class="btn btn-secondary ms-2">Back</a>
+		<a href="{% url 'board_detail' slug=board.slug %}" class="btn btn-secondary ms-2">Back</a>
 	</form>
 </div>
 
