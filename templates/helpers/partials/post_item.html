@@ -15,7 +15,7 @@
     </div>
     <div class="card-body">
         <h4 class="fw-bold mb-2">
-            <a href="{% url 'post-detail' post_pk=post.pk %}" class="text-decoration-none text-dark">
+            <a href="{% url 'post_detail' post_pk=post.pk %}" class="text-decoration-none text-dark">
                 {{ post.title }}
             </a>
         </h4>
@@ -39,7 +39,7 @@
                                 <source src="{{ file.file.url }}">
                             </video>
                         {% else %}
-                            <a href="{% url 'post-detail' post_pk=post.pk %}" class="d-block text-primary small">
+                            <a href="{% url 'post_detail' post_pk=post.pk %}" class="d-block text-primary small">
                                 📄 {{ file.file.name|truncatechars:15 }}
                             </a>
                         {% endif %}

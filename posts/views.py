@@ -41,7 +41,7 @@ class CreatePostView(LoginRequiredMixin, View):
             
             for f in request.FILES.getlist('files'):
                 File.objects.create(post=post, file=f)
-            return redirect('posts-list')
+            return redirect('posts_list')
         
         return render(request, self.template_name, {'form': form})
 
@@ -116,7 +116,7 @@ class PostDetailView(LoginRequiredMixin, View):
             new_comment.user = request.user
             new_comment.post = post
             new_comment.save()
-            return redirect('post-detail', post_pk=post.pk)
+            return redirect('post_detail', post_pk=post.pk)
 
         comments = post.comments.all()
         liked_by_user = PostLike.objects.filter(post=post, user=request.user).exists()
@@ -135,8 +135,7 @@ class PostEditView(LoginRequiredMixin, View):
     model = Post
     template_name = "posts/post_edit.html"
     form_class = PostForm
-    success_url = reverse_lazy("posts-list")
-
+    
     def get(self, request, post_pk, *args, **kwargs):
         post = get_object_or_404(self.model, pk=post_pk)
 
@@ -160,7 +159,7 @@ class PostEditView(LoginRequiredMixin, View):
             for f in request.FILES.getlist("files"):
                 File.objects.create(post=post, file=f)
             
-            return redirect(self.success_url)
+            return redirect('post_detail', post_pk=post_pk)
         return render(request, self.template_name, {"form": form, "post": post})
 
 class PostDeleteView(LoginRequiredMixin, View):
@@ -171,7 +170,7 @@ class PostDeleteView(LoginRequiredMixin, View):
             raise PermissionDenied
         
         post.delete()
-        return redirect('posts-list')
+        return redirect('posts_list')
     
 class CommentDeleteView(LoginRequiredMixin, View):
     def post(self, request, comment_pk, post_pk):
@@ -181,7 +180,7 @@ class CommentDeleteView(LoginRequiredMixin, View):
             raise PermissionDenied
 
         comment.delete()
-        return redirect('post-detail', post_pk=post_pk)
+        return redirect('post_detail', post_pk=post_pk)
 
 
 class CommentEditView(LoginRequiredMixin, View):

@@ -7,10 +7,10 @@ from boards.views import BoardsListView, BoardDetailView,\
 
 urlpatterns = [
     path('', BoardsListView.as_view(), name='boards_list'),
+    path("infinite/", BoardsInfiniteAPI.as_view(), name="boards_infinite"),
     path("create/", CreateBoardView.as_view(), name="create_boards_board"),
-    path("infinite/", BoardsInfiniteAPI.as_view(), name="boards_infinite"), ###
     path("<slug:slug>/", BoardDetailView.as_view(), name="board_detail"),
-    path("<slug:slug>/infinite/", BoardMessagesInfiniteAPI.as_view(), name="boards_messages_infinite"), ###
+    path("<slug:slug>/infinite/", BoardMessagesInfiniteAPI.as_view(), name="boards_messages_infinite"),
     path("<slug:slug>/edit/", EditBoardView.as_view(), name="edit_board"),
     path("<slug:slug>/join/", JoinBoardView.as_view(), name="join_board"),
     path("<slug:slug>/leave/", LeaveBoardView.as_view(), name="leave_board"),
