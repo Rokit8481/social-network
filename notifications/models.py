@@ -8,22 +8,22 @@ User = get_user_model()
 class Notification(BaseModel):
     class EventType(models.TextChoices):
         # MESSENGER 2/2
-        NEW_MESSENGER_MESSAGE = "new_messenger_message", "New messenger message" # ✔️
-        MESSAGE_REACTION = "message_reaction", "Message reaction" # ✔️
+        NEW_MESSENGER_MESSAGE = "new_messenger_message", "New messenger message" 
+        MESSAGE_REACTION = "message_reaction", "Message reaction" 
 
         # POSTS 5/5
-        NEW_POST = "new_post", "New post" # ✔️
-        POST_LIKE = "post_like", "Post like" # ✔️
-        NEW_COMMENT = "new_comment", "New comment" # ✔️
-        COMMENT_LIKE = "comment_like", "Comment like" # ✔️
-        TAGGED_IN_POST = "tagged_in_post", " Tagged in post" # ✔️ 
+        NEW_POST = "new_post", "New post" 
+        POST_LIKE = "post_like", "Post like" 
+        NEW_COMMENT = "new_comment", "New comment" 
+        COMMENT_LIKE = "comment_like", "Comment like" 
+        TAGGED_IN_POST = "tagged_in_post", " Tagged in post"  
 
         # ACCOUNTS 1/1
-        NEW_FOLLOWER = "new_follower", "New follower" # ✔️
+        NEW_FOLLOWER = "new_follower", "New follower" 
 
         # BOARDS 2/2 
-        NEW_BOARD_MESSAGE = "new_board_messsage", " New board message" # ✔️
-        JOIN_BOARD = "join_board", "Join board" # ✔️
+        NEW_BOARD_MESSAGE = "new_board_messsage", " New board message" 
+        JOIN_BOARD = "join_board", "Join board" 
 
 
     class TargetType(models.TextChoices):
@@ -125,10 +125,10 @@ class Notification(BaseModel):
             if message:
                 chat = message.chat
                 author = message.user
-                if chat.is_board == True:
-                    return f"You have a new message in board '{chat.title}' by {author.username}"
+                if chat.is_group == True:
+                    return f"You have a new message in group '{chat.title}' by {author.username}"
                 return f"You have a new message from '{author.username}'"
-            return f"You have a new message in chat/board"
+            return f"You have a new message in chat/group"
         elif self.event_type == self.EventType.MESSAGE_REACTION:
             from messenger.models import Reaction
             reaction = Reaction.objects.filter(pk=self.target_id).first()
@@ -136,8 +136,8 @@ class Notification(BaseModel):
                 message = reaction.message
                 chat = message.chat
                 author = reaction.user
-                if chat.is_board == True:
-                    return f"{author.username} put a {reaction.emoji} on your message '{message.text[:15]}...' in board '{chat.title}'"
+                if chat.is_group == True:
+                    return f"{author.username} put a {reaction.emoji} on your message '{message.text[:15]}...' in group '{chat.title}'"
                 return f"{author.username} put a {reaction.emoji} on your message '{message.text[:15]}...' in your chat"
             return "You have a new reaction on your message"
         

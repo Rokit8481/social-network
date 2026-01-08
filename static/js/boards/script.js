@@ -204,6 +204,6 @@ function addMessageToDOM(data) {
     clone.querySelector(".board-message-content").textContent = data.content;
 
     container.insertBefore(clone, container.firstChild);
-    endText.classList.add("d-none")
+    endText?.classList.add("d-none")
     container.scrollTop = 0;
 }

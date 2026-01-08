@@ -33,7 +33,7 @@ function loadMoreMessages() {
         return;
     }
 
-    const lastId = messages[messages.length - 1].dataset.postId;
+    const lastId = messages[messages.length - 1].dataset.id;
 
     fetch(`/boards/${boardSlug}/infinite/?last_id=${lastId}`)
         .then(res => res.json())

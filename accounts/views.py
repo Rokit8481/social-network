@@ -7,6 +7,7 @@ from django.contrib.auth import logout
 from accounts.models import Follow
 from posts.models import Post, PostLike
 from django.contrib import messages
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from accounts.forms import CustomUserCreationForm, CustomAuthenticationForm, UserEditForm
 from boards.models import Board
 from django.contrib.auth import get_user_model, update_session_auth_hash
@@ -104,34 +105,62 @@ class UserDetailView(LoginRequiredMixin, View):
 
         followers = user_detail.followers.all()
         following = user_detail.following.all()
-        followers_count = user_detail.followers.count()
-        following_count = user_detail.following.count()
 
         is_following = Follow.objects.filter(
             follower=request.user,
             following=user_detail
         ).exists()
 
-        user_boards = Board.objects.filter(members=user_detail)
-        for board in user_boards:
+        posts_qs = Post.objects.filter(author=user_detail).order_by('-created_at')
+        posts_paginator = Paginator(posts_qs, 3) 
+        posts_page = request.GET.get('posts_page')
+        try:
+            posts = posts_paginator.page(posts_page)
+        except PageNotAnInteger:
+            posts = posts_paginator.page(1)
+        except EmptyPage:
+            posts = posts_paginator.page(posts_paginator.num_pages)
+
+        boards_qs = Board.objects.filter(members=user_detail)
+        for board in boards_qs:
             board.user_is_member = board.is_member(request.user)
+        boards_paginator = Paginator(boards_qs, 6)
+        boards_page = request.GET.get('boards_page')
+        try:
+            user_boards = boards_paginator.page(boards_page)
+        except PageNotAnInteger:
+            user_boards = boards_paginator.page(1)
+        except EmptyPage:
+            user_boards = boards_paginator.page(boards_paginator.num_pages)
         
-        posts_user_liked = Post.objects.filter(
-            id__in=PostLike.objects.filter(user=user_detail).values_list('post_id', flat=True)
+        liked_qs = Post.objects.filter(
+        id__in=PostLike.objects.filter(user=user_detail)
+            .values_list('post_id', flat=True)
         ).order_by('-created_at')
 
-        posts = Post.objects.filter(author=user_detail).order_by("-created_at")
+        liked_paginator = Paginator(liked_qs, 3)
+        liked_page = request.GET.get('liked_page')
+
+        try:
+            posts_user_liked = liked_paginator.page(liked_page)
+        except PageNotAnInteger:
+            posts_user_liked = liked_paginator.page(1)
+        except EmptyPage:
+            posts_user_liked = liked_paginator.page(liked_paginator.num_pages)
 
         context = {
             "user_detail": user_detail,
             "followers": followers,
             "following": following,
-            "posts_user_liked": posts_user_liked,
-            "user_boards": user_boards,
-            "followers_count": followers_count,
-            "following_count": following_count,
+            "followers_count": followers.count(),
+            "following_count": following.count(),
             "is_following": is_following,
             "posts": posts,
+            "posts_paginator": posts_paginator,
+            "user_boards": user_boards,
+            "boards_paginator": boards_paginator,
+            "posts_user_liked": posts_user_liked,
+            "liked_paginator": liked_paginator,
         }
 
         return render(request, self.template_name, context)
