@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll(".like-btn").forEach(btn => {
         btn.addEventListener("click", () => {
+            console.log(`Button was clickes (script.js)`)
             const postId = btn.dataset.postId;
             const likesCountSpan = btn.querySelector(".likes-count");
 
@@ -15,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 likesCountSpan.textContent = data.likes_count;
+                console.log(`Likes count reset to ${likesCountSpan.textContent}`)
             });
         });
     });
