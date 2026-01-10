@@ -41,7 +41,7 @@ class CreatePostView(LoginRequiredMixin, View):
             
             for f in request.FILES.getlist('files'):
                 File.objects.create(post=post, file=f)
-            return redirect('posts_list')
+            return redirect('post_detail', post_pk=post.pk)
         
         return render(request, self.template_name, {'form': form})
 

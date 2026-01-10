@@ -111,6 +111,7 @@ class UserDetailView(LoginRequiredMixin, View):
             following=user_detail
         ).exists()
 
+        #POSTS
         posts_qs = Post.objects.filter(author=user_detail).order_by('-created_at')
         posts_paginator = Paginator(posts_qs, 3) 
         posts_page = request.GET.get('posts_page')
@@ -121,6 +122,7 @@ class UserDetailView(LoginRequiredMixin, View):
         except EmptyPage:
             posts = posts_paginator.page(posts_paginator.num_pages)
 
+        #BOARDS
         boards_qs = Board.objects.filter(members=user_detail)
         for board in boards_qs:
             board.user_is_member = board.is_member(request.user)
@@ -133,14 +135,13 @@ class UserDetailView(LoginRequiredMixin, View):
         except EmptyPage:
             user_boards = boards_paginator.page(boards_paginator.num_pages)
         
+        #LIKED_POSTS
         liked_qs = Post.objects.filter(
         id__in=PostLike.objects.filter(user=user_detail)
             .values_list('post_id', flat=True)
         ).order_by('-created_at')
-
         liked_paginator = Paginator(liked_qs, 3)
         liked_page = request.GET.get('liked_page')
-
         try:
             posts_user_liked = liked_paginator.page(liked_page)
         except PageNotAnInteger:
