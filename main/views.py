@@ -16,12 +16,38 @@ User = get_user_model()
 class MainPageView(LoginRequiredMixin, View):
     template_name = "main/main_page.html"
     def get(self, request, *args, **kwargs):
-        #0. HELPERS
+        #1. CURRENT USER
         user = request.user
-        follows = Follow.objects.filter(follower=user)
-        users_i_follow = follows.values_list('following', flat=True)
+
+        users_i_follow = Follow.objects.filter(
+            follower=request.user
+        ).values_list('following', flat=True)
+
+        second_level_ids  = Follow.objects.filter(follower__in=users_i_follow
+        ).exclude(following=request.user
+        ).exclude(following__in=users_i_follow
+        ).values_list('following', flat=True).distinct()
+
+        #2. POSSIBLE FRIENDS
+        possible_friends = User.objects.filter(
+            id__in=second_level_ids
+        )
+
+        #2.1. ALREADY FOLLOWING
+        already_following = set(
+            Follow.objects.filter(
+                follower=request.user,
+                following__in=possible_friends
+            ).values_list('following_id', flat=True)
+        )
+
+        for possible_friend in possible_friends:
+            possible_friend.is_following = possible_friend.id in already_following
+        
+        #3.TABS
         tab = request.GET.get("tab", "feed")
 
+        #4. POSTS
         if tab == "recommendations":
             posts = Post.objects.filter(
                 author__in=users_i_follow
@@ -29,25 +55,20 @@ class MainPageView(LoginRequiredMixin, View):
         else:
             posts = Post.objects.all().order_by("-id")
 
-
-        #2. POSTS BY USERS I FOLLOW
-        posts_by_followings = Post.objects.filter(author__in=users_i_follow).order_by("-id")[:5]
-
-        #3. ALL BOARDS
+        #5. TOP 5 BOARDS
         boards = Board.objects.annotate(
             members_count=Count("members")
         ).order_by("-members_count")[:5]
-
-        #4. BOARDS BY USERS I FOLLOW
-        boards_by_followings = Board.objects.filter(creator__in=users_i_follow).order_by("members")
+        for board in boards:
+            board.user_is_member = board.is_member(request.user)
+            board.boards_position = True
 
         return render(request, self.template_name, {
             "user": user,
             "active_tab": tab,
             "posts": posts[:5],
-            "posts_by_followings": posts_by_followings,
-            "boards": boards,
-            "boards_by_followings": boards_by_followings,
+            "top_boards": boards,
+            "possible_friends": possible_friends[:15],
         })
     
     def post(self, request):
