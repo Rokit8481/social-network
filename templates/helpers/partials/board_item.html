@@ -1,12 +1,34 @@
-<div class="{% if board.boards_mini %}col-md-12 mb-4 board-item{% else %}col-md-4 mb-4 board-item{% endif %}" data-board-id="{{ board.id }}">
+{% if board.boards_mini %}
+<div class="col-12 mb-1 board-item" data-board-id="{{ board.id }}">
+    <div class="card px-2 py-2 shadow-sm d-flex flex-row align-items-center justify-content-between">
+        <div class="me-2">
+            <div class="fw-semibold small">{{ board.title }}</div>
+            <div class="text-muted" style="font-size: 12px;">
+                {{ board.members.count }} members
+            </div>
+        </div>
+        {% if board.user_is_member %}
+            <a href="{% url 'board_detail' board.slug %}"
+               class="btn btn-primary btn-sm px-2 py-0">
+                →
+            </a>
+        {% else %}
+            <form action="{% url 'join_board' board.slug %}" method="post">
+                {% csrf_token %}
+                <button type="submit"
+                        class="btn btn-outline-primary btn-sm px-2 py-0">
+                    +
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="col-md-4 mb-4 board-item" data-board-id="{{ board.id }}">
     <div class="card p-3 shadow-sm">
         <h4>{{ board.title }}</h4>
         <p class="text-muted small">{{ board.members.count }} members</p>
-        {% if board.boards_mini %}
-            <p>{{ board.description|default:"No description"|truncatechars:20 }}</p>
-        {% else %}
-            <p>{{ board.description|default:"No description"|truncatechars:100 }}</p>
-        {% endif %}
+        <p>{{ board.description|default:"No description"|truncatechars:100 }}</p>
 
 
         <div class="mb-2">
@@ -35,3 +57,4 @@
         {% endif %}
     </div>
 </div>
+{% endif %}

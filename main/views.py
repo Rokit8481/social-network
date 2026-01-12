@@ -17,14 +17,14 @@ class MainPageView(LoginRequiredMixin, View):
     template_name = "main/main_page.html"
     def get(self, request, *args, **kwargs):
         #1. CURRENT USER
-        user = request.user
+        current_user = request.user
 
         users_i_follow = Follow.objects.filter(
-            follower=request.user
+            follower=current_user
         ).values_list('following', flat=True)
 
         second_level_ids  = Follow.objects.filter(follower__in=users_i_follow
-        ).exclude(following=request.user
+        ).exclude(following=current_user
         ).exclude(following__in=users_i_follow
         ).values_list('following', flat=True).distinct()
 
@@ -36,7 +36,7 @@ class MainPageView(LoginRequiredMixin, View):
         #2.1. ALREADY FOLLOWING
         already_following = set(
             Follow.objects.filter(
-                follower=request.user,
+                follower=current_user,
                 following__in=possible_friends
             ).values_list('following_id', flat=True)
         )
@@ -60,7 +60,7 @@ class MainPageView(LoginRequiredMixin, View):
             members_count=Count("members")
         ).order_by("-members_count")[:5]
         for board in boards:
-            board.user_is_member = board.is_member(request.user)
+            board.user_is_member = board.is_member(current_user)
             board.boards_mini = True
 
         #6. TOP 10 TAGS
@@ -73,14 +73,34 @@ class MainPageView(LoginRequiredMixin, View):
             if tag.boards_count >= 100:
                 tag.boards_count = "+99"
             
+        #7. STATS
+        boards_count = Board.objects.filter(creator=current_user).count()
+        board_messages_count = BoardMessage.objects.filter(sender=current_user).count()
+        posts_count = Post.objects.filter(author=current_user).count()
+        posts_likes_count = PostLike.objects.filter(user=current_user).count()
+        comments_count = Comment.objects.filter(user=current_user).count()
+        comments_likes_count = CommentLike.objects.filter(user=current_user).count()
+        chats_count = Chat.objects.filter(users=current_user, is_group=False).count()
+        messenger_messages_count = Message.objects.filter(user=current_user).count()
+        stats = {
+            "boards_count": boards_count,
+            "board_messages_count": board_messages_count,
+            "posts_count": posts_count,
+            "posts_likes_count": posts_likes_count,
+            "comments_count": comments_count,
+            "comments_likes_count": comments_likes_count,
+            "chats_count": chats_count,
+            "messenger_messages_count": messenger_messages_count,
+        }
 
         return render(request, self.template_name, {
-            "user": user,
+            "user": current_user,
             "active_tab": tab,
             "posts": posts[:5],
             "top_boards": boards,
             "top_tags": tags,
             "possible_friends": possible_friends[:15],
+            "stats": stats,
         })
     
     def post(self, request):

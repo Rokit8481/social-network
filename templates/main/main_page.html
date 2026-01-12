@@ -4,9 +4,47 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-
         <!-- LEFT COLUMN -->
         <div class="col-lg-3 d-none d-lg-block">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3 text-center">Your stats</h5>
+                    <ul class="list-group list-group-flush small">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Boards created</span>
+                            <strong>{{ stats.boards_count }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Board messages</span>
+                            <strong>{{ stats.board_messages_count }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Posts</span>
+                            <strong>{{ stats.posts_count }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Post likes given</span>
+                            <strong>{{ stats.posts_likes_count }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Comments</span>
+                            <strong>{{ stats.comments_count }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Comment likes given</span>
+                            <strong>{{ stats.comments_likes_count }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Private chats</span>
+                            <strong>{{ stats.chats_count }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Messages sent</span>
+                            <strong>{{ stats.messenger_messages_count }}</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
             {% if possible_friends %}
                 <div class="card mb-4">
                     <div class="card-body">
@@ -14,7 +52,7 @@
                         {% for possible_friend in possible_friends %}
                             <div class="d-flex justify-content-between">
                                 <a href="{% url 'user_detail' possible_friend.slug %}"
-                                class="d-flex align-items-center mb-3 text-decoration-none text-dark gap-2">
+                                class="d-flex align-items-center mb-1 text-decoration-none text-dark gap-2">
                                     <img src="{{ possible_friend.avatar.url }}" class="avatar-small">
                                     <span>{{ possible_friend.username|truncatechars:11 }}</span>
                                 </a>
@@ -31,21 +69,6 @@
                                 {% endif %}
                             </div>
                         {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-            {% if top_tags %}
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title d-flex justify-content-center mt-3">Top 10 Boards Tags</h5>
-                        <ol>
-                        {% for tag in top_tags %}
-                            <li><a href="{% url 'boards_list' %}?q={{ tag.name }}"
-                            class="badge bg-secondary text-light me-1 mb-1 tag-item text-decoration-none">
-                                #{{ tag.name }}
-                            </a> in {{ tag.boards_count }} groups</li>
-                        {% endfor %}
-                        </ol>
                     </div>
                 </div>
             {% endif %}
@@ -87,7 +110,7 @@
         <!-- RIGHT COLUMN -->
         <div class="col-lg-3 d-none d-lg-block">
             {% if top_boards  %}
-                <div class="card">
+                <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title d-flex justify-content-center mb-2">Top 5 Boards</h5>
                         {% include "helpers/partials/boards_list.html" with boards=top_boards %}
@@ -97,8 +120,22 @@
                     </div>
                 </div>
             {% endif %}
+            {% if top_tags %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title d-flex justify-content-center mt-1">Top 10 Boards Tags</h5>
+                        <ol>
+                        {% for tag in top_tags %}
+                            <li><a href="{% url 'boards_list' %}?q={{ tag.name }}"
+                            class="badge bg-secondary text-light me-1 mb-1 tag-item text-decoration-none">
+                                #{{ tag.name }}
+                            </a> in {{ tag.boards_count }} groups</li>
+                        {% endfor %}
+                        </ol>
+                    </div>
+                </div>
+            {% endif %}
         </div>
-
     </div>
 </div>
 <script src="{% static 'js/posts/script.js' %}"></script>
