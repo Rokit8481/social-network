@@ -61,13 +61,25 @@ class MainPageView(LoginRequiredMixin, View):
         ).order_by("-members_count")[:5]
         for board in boards:
             board.user_is_member = board.is_member(request.user)
-            board.boards_position = True
+            board.boards_mini = True
+
+        #6. TOP 10 TAGS
+        tags = (
+            Tag.objects
+            .annotate(boards_count=Count('boards'))
+            .order_by('-boards_count')
+        )[:10]
+        for tag in tags:
+            if tag.boards_count >= 100:
+                tag.boards_count = "+99"
+            
 
         return render(request, self.template_name, {
             "user": user,
             "active_tab": tab,
             "posts": posts[:5],
             "top_boards": boards,
+            "top_tags": tags,
             "possible_friends": possible_friends[:15],
         })
     

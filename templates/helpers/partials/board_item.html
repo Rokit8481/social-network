@@ -1,8 +1,13 @@
-<div class="{% if board.boards_position %}col-md-12 mb-4 board-item{% else %}col-md-4 mb-4 board-item{% endif %}" data-board-id="{{ board.id }}">
+<div class="{% if board.boards_mini %}col-md-12 mb-4 board-item{% else %}col-md-4 mb-4 board-item{% endif %}" data-board-id="{{ board.id }}">
     <div class="card p-3 shadow-sm">
         <h4>{{ board.title }}</h4>
         <p class="text-muted small">{{ board.members.count }} members</p>
-        <p>{{ board.description|default:"No description"|truncatechars:100 }}</p>
+        {% if board.boards_mini %}
+            <p>{{ board.description|default:"No description"|truncatechars:20 }}</p>
+        {% else %}
+            <p>{{ board.description|default:"No description"|truncatechars:100 }}</p>
+        {% endif %}
+
 
         <div class="mb-2">
             {% with tags=board.tags.all %}
