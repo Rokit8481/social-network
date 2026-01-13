@@ -1,26 +1,47 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 {% block title %}Log in{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <h2 class="mb-3">Log in</h2>
-        <form method="post">
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="form-card">
+        <h3 class="text-center mb-4 card-title">
+            <i class="bi bi-box-arrow-in-right"></i> Log in
+        </h3>
+
+        <form method="post" novalidate>
             {% csrf_token %}
-            {{ form.non_field_errors }}
+
             <div class="mb-3">
                 {{ form.username.label_tag }}
                 {{ form.username }}
-                {{ form.username.errors }}
+                <div class="text-danger">{{ form.username.errors }}</div>
             </div>
+
             <div class="mb-3">
                 {{ form.password.label_tag }}
                 {{ form.password }}
-                {{ form.password.errors }}
+                <div class="text-danger">{{ form.password.errors }}</div>
             </div>
-            <button type="submit" class="btn btn-primary">Sumbit</button>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">
+                    <i class="bi bi-box-arrow-in-right"></i> Log in
+                </button>
+                <a href="{% url 'register_step1' %}" class="btn btn-secondary flex-grow-1">
+                    Register
+                </a>
+            </div>
         </form>
-        <p class="mt-2">No account? <a href="{% url 'register' %}">Sing in</a></p>
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

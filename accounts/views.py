@@ -1,16 +1,17 @@
-from django.views.generic import View, ListView, CreateView
+from django.views.generic import View, ListView, FormView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from accounts.models import Follow
 from posts.models import Post, PostLike
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from accounts.forms import CustomUserCreationForm, CustomAuthenticationForm, UserEditForm
+from accounts.forms import RegistrationStep1Form, RegistrationStep2Form, CustomAuthenticationForm, UserEditForm
 from boards.models import Board
 from django.contrib.auth import get_user_model, update_session_auth_hash
+from django.contrib.messages import get_messages
 
 User = get_user_model()
 
@@ -26,11 +27,59 @@ class CustomLogoutView(View):
         logout(request)
         return redirect(self.next_page)
 
-class RegisterView(CreateView):
-    model = User
-    template_name = 'accounts/register.html'
-    form_class = CustomUserCreationForm
-    success_url = reverse_lazy('users_list')
+class RegisterStep1View(FormView):
+    template_name = 'accounts/register_step1.html'
+    form_class = RegistrationStep1Form
+    success_url = reverse_lazy('register_step2')
+
+    def form_valid(self, form):
+        self.request.session['registration_data'] = form.cleaned_data
+        return super().form_valid(form)
+
+
+class RegisterStep2View(FormView):
+    template_name = 'accounts/register_step2.html'
+    form_class = RegistrationStep2Form
+    success_url = reverse_lazy('login')
+
+    def dispatch(self, request, *args, **kwargs):
+        if 'registration_data' not in request.session:
+            return redirect('register_step1')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        action = self.request.POST.get('action')
+        data = self.request.session.get('registration_data')
+
+        if action == 'later':
+            user = User.objects.create_user(
+                username=data['username'],
+                email=data['email'],
+                password=data['password1']
+            )
+
+            self.request.session.pop('registration_data', None)
+            login(self.request, user)
+
+            messages.info(self.request, "Your account has been created. You can complete your profile later.")
+            return redirect('user_detail', slug=user.slug) 
+
+        user = User.objects.create_user(
+            username=data['username'],
+            email=data['email'],
+            password=data['password1']
+        )
+        user.first_name = form.cleaned_data.get('first_name')
+        user.last_name = form.cleaned_data.get('last_name')
+        user.bio = form.cleaned_data.get('bio')
+        user.avatar = form.cleaned_data.get('avatar')
+        user.mobile = form.cleaned_data.get('mobile')
+        user.birthday = form.cleaned_data.get('birthday')
+        user.save()
+
+        self.request.session.pop('registration_data', None)
+        login(self.request, user)
+        return super().form_valid(form)
 
 class UsersListView(LoginRequiredMixin, ListView):
     model = User
@@ -70,6 +119,10 @@ class ChangePasswordView(LoginRequiredMixin, View):
     def post(self, request, slug, *args, **kwargs):
         if request.user.slug != slug:
             return redirect('user_detail', slug=request.user.slug)
+        
+        storage = get_messages(request)
+        for _ in storage:
+            pass
 
         user = request.user
 
