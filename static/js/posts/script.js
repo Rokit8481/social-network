@@ -64,18 +64,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function addEditButtons() {
         if (document.getElementById("save-edit-btn")) return;
-
+        
+        const editActionsContainer = document.querySelector(".edit-actions")
+        const commentSubmit = document.querySelector(".comment-sumbmit")
         const saveBtn = document.createElement("button");
         saveBtn.id = "save-edit-btn";
-        saveBtn.className = "btn btn-success w-100 mb-2";
+        saveBtn.className = "btn btn-success flex-grow-1";
         saveBtn.textContent = "💾 Save";
 
         const cancelBtn = document.createElement("button");
         cancelBtn.id = "cancel-edit-btn";
-        cancelBtn.className = "btn btn-secondary w-100";
+        cancelBtn.className = "btn btn-secondary flex-grow-1";
         cancelBtn.textContent = "✖ Cancel";
 
-        commentForm.append(saveBtn, cancelBtn);
+        commentSubmit.classList.add("d-none")
+        editActionsContainer.append(saveBtn, cancelBtn);
 
         saveBtn.addEventListener("click", saveEdit);
         cancelBtn.addEventListener("click", cancelEdit);
@@ -115,12 +118,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function finishEditing() {
+        const commentSubmit = document.querySelector(".comment-sumbmit")
         editingCommentId = null;
         textarea.value = "";
         submitBtn.style.display = "block";
 
         document.getElementById("save-edit-btn")?.remove();
         document.getElementById("cancel-edit-btn")?.remove();
+        commentSubmit.classList.remove("d-none")
     }
 
     document.querySelectorAll(".media-item").forEach(item => {
