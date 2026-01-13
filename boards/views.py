@@ -116,6 +116,10 @@ class EditBoardView(AdminRequiredMixin, View):
             board.save()
             form.save_m2m()
 
+            for admin in board.admins.all():
+                if admin not in board.members.all():
+                    board.members.add(admin)
+
             if request.user not in board.members.all():
                 board.members.add(request.user)
             if request.user not in board.admins.all():

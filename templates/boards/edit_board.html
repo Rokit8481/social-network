@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Board: {{ board.title }}{% endblock title %}
+{% block title %} Edit Board: {{ board.title }} {% endblock %}
 
 {% block content %}
 {{ form.media }} 
-<div class="container mt-4">
-	<h2>Edit Board: {{ board.title }}</h2>
-	<form method="post">
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+  <div class="form-card">
+    <h3 class="text-center mb-4 card-title">
+      <i class="bi bi-pencil-square"></i> Edit Board: "{{ board.title }}"
+    </h3>
+
+    <form method="post">
 		{% csrf_token %}
-		{{ form.non_field_errors }}
 
 		<div class="mb-3">
 			{{ form.title.label_tag }}
@@ -33,11 +36,35 @@
 			{{ form.admins }}
 			<div class="text-danger">{{ form.admins.errors }}</div>
 		</div>
-
-		<button type="submit" class="btn btn-primary">Save Changes</button>
-		<a href="{% url 'board_detail' slug=board.slug %}" class="btn btn-secondary ms-2">Back</a>
-	</form>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success flex-grow-1">
+          <i class="bi bi-save"></i> Save changes
+        </button>
+		<a href="{% url 'board_detail' slug=board.slug %}" class="btn btn-secondary flex-grow-1">Back</a>
+      </div>
+	    {{ form.media.js }} 
+    </form>
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger mt-3">
+        <ul class="mb-0">
+          {% for field in form %}
+            {% for error in field.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
 </div>
 
+<script>
+  $(document).ready(function () {
+    $('#id_admins').select2({
+      placeholder: 'Choose admins',
+      width: '100'
+    });
+  });
+</script>
 {% endblock %}
 

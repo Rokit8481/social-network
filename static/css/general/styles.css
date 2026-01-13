@@ -15,6 +15,31 @@ body {
     width: 100% !important;
 }
 
+.select2-selection--multiple {
+    min-height: 38px;
+    max-height: calc(38px * 3);
+    overflow-y: auto;
+    padding-bottom: 5px;
+}
+
+.select2-selection__rendered {
+    display: flex !important;
+    flex-wrap: wrap !important; 
+    gap: 4px;
+    white-space: normal !important;
+}
+
+.select2-selection__choice__remove {
+    color: #111 !important;
+}
+
+.select2-selection__choice {
+    flex-shrink: 0;
+    color: #111 !important;
+    background-color: #dcdcdc !important;
+    border: 1px solid #bdbdbd;
+}
+
 .avatar-tiny {
     width: 30px;
     height: 30px;
@@ -92,25 +117,13 @@ label.form-label {
     color: #ccc;
   }
 
-input.form-control,
-select.form-select {
+.form-control {
     background-color: #2b2b3b !important;
     border: 1px solid #555 !important;
     color: #e5e5e5 !important;
 }
 
-input.form-control::placeholder {
-    color: #aaa !important;
-}
-
-
-input.form-control, select.form-select {
-    background-color: #2b2b3b !important;
-    border: 1px solid #555 !important;
-    color: #e5e5e5 !important;
-}
-
-input.form-control::placeholder {
+.form-control::placeholder {
     color: #aaa !important;
 }
 

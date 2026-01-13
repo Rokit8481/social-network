@@ -44,11 +44,11 @@ class Board(BaseModel):
         return self.title
     
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
         super().save(*args, **kwargs)
-
-        if self.creator:
+        if is_new and self.creator:
             self.admins.add(self.creator)
-            self.members.add(self.creator)  
+            self.members.add(self.creator)
     def add_creator(self, user):
         self.members.add(user)
         self.admins.add(user)
