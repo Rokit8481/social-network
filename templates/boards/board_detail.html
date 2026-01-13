@@ -23,8 +23,18 @@
           <p class="small text-light mb-1">{{ board.description|default:"No description provided." }}</p>
           <div class="justify-content-between d-flex align-items-center mb-2">
             <div class="small text-light">
-              <span class="me-3">Members: <strong>{{ board.members.count }}</strong></span>
-              <a href="#" class="text-decoration-none text-light" data-bs-toggle="modal" data-bs-target="#membersModal">View members</a>
+              <span class="me-3">
+                <a href="#" class="text-decoration-none text-light" data-bs-toggle="modal" data-bs-target="#membersModal">
+                  Members: <strong>{{ board.members.count }}</strong>
+                </a>
+              </span>
+              {% if user_is_admin %}
+              <span class="me-3">
+                <a href="#" class="text-decoration-none text-light" data-bs-toggle="modal" data-bs-target="#adminsModal">
+                  Admins: <strong>{{ board.admins.count }}</strong>
+                </a>
+              </span>
+              {% endif %}
             </div>
             <div class="text-light small">Created: {{ board.created_at|date:"d.m.Y" }}</div>
           </div>
@@ -118,19 +128,43 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-dark text-light border-0">
       <div class="modal-header border-bottom border-secondary">
-        <h5 class="modal-title">Members of {{ board.title }}: {{ board.members.count }}</h5>
+        <h5 class="modal-title">Members of "{{ board.title }}": {{ board.members.count }}</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         {% if board.members %}
             {% for member in board.members.all %}
-                <a href="{% url 'user_detail' member.slug %}" class="d-flex align-items-center mb-3 text-decoration-none text-light">
+                <a href="{% url 'user_detail' member.slug %}" class="d-flex align-items-center mb-3 text-decoration-none text-light gap-2">
                     <img src="{{ member.avatar.url }}" class="avatar-small">
                     <span> {{ member.username }}</span>
                 </a>
             {% endfor %}
         {% else %}
             <p class="text-muted">No members yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Admins modal -->
+<div class="modal fade" id="adminsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light border-0">
+      <div class="modal-header border-bottom border-secondary">
+        <h5 class="modal-title">Admins of "{{ board.title }}": {{ board.admins.count }}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        {% if board.admins %}
+            {% for admin in board.admins.all %}
+                <a href="{% url 'user_detail' admin.slug %}" class="d-flex align-items-center mb-3 text-decoration-none text-light gap-2">
+                    <img src="{{ admin.avatar.url }}" class="avatar-small">
+                    <span> {{ admin.username }}</span>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">No admins yet.</p>
         {% endif %}
       </div>
     </div>

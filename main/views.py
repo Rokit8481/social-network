@@ -67,28 +67,37 @@ class MainPageView(LoginRequiredMixin, View):
         tags = (
             Tag.objects
             .annotate(boards_count=Count('boards'))
+            .filter(boards_count__gt=0)
             .order_by('-boards_count')
         )[:10]
         for tag in tags:
             if tag.boards_count >= 100:
                 tag.boards_count = "+99"
+            else: 
+                tag.boards_count = tag.boards_count
             
         #7. STATS
-        boards_count = Board.objects.filter(creator=current_user).count()
-        board_messages_count = BoardMessage.objects.filter(sender=current_user).count()
-        posts_count = Post.objects.filter(author=current_user).count()
-        posts_likes_count = PostLike.objects.filter(user=current_user).count()
-        comments_count = Comment.objects.filter(user=current_user).count()
-        comments_likes_count = CommentLike.objects.filter(user=current_user).count()
-        chats_count = Chat.objects.filter(users=current_user, is_group=False).count()
-        messenger_messages_count = Message.objects.filter(user=current_user).count()
+        boards_count = Board.objects.filter(creator=current_user).count() # How much boards current user have
+        board_messages_count = BoardMessage.objects.filter(sender=current_user).count() # How much board messages current user posted
+        posts_count = Post.objects.filter(author=current_user).count() # How much posts current user posted
+        tagged_in_posts_count = Post.objects.filter(people_tags=current_user).count() # In how much posts current user is tagged in
+        posts_likes_given_count = PostLike.objects.filter(user=current_user).count() # How much posts likes current user gave
+        my_posts_likes_count = PostLike.objects.filter(post__author=current_user).count() # How much posts likes current user have on his posts
+        comments_count = Comment.objects.filter(user=current_user).count() # How much comments current user sented
+        comments_likes_given_count = CommentLike.objects.filter(user=current_user).count() # How much comments likes current user gave
+        my_comments_likes_count = CommentLike.objects.filter(comment__user=current_user).count()  # How much posts likes current user have on his comments
+        chats_count = Chat.objects.filter(users=current_user, is_group=False).count() # How much private chats current user have
+        messenger_messages_count = Message.objects.filter(user=current_user).count() # How much messages current user sented
         stats = {
             "boards_count": boards_count,
             "board_messages_count": board_messages_count,
             "posts_count": posts_count,
-            "posts_likes_count": posts_likes_count,
+            "tagged_in_posts_count": tagged_in_posts_count,
+            "posts_likes_given_count": posts_likes_given_count,
+            "my_posts_likes_count": my_posts_likes_count,
             "comments_count": comments_count,
-            "comments_likes_count": comments_likes_count,
+            "comments_likes_given_count": comments_likes_given_count,
+            "my_comments_likes_count": my_comments_likes_count,
             "chats_count": chats_count,
             "messenger_messages_count": messenger_messages_count,
         }

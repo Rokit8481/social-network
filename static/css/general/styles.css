@@ -160,3 +160,29 @@ input.form-control::placeholder {
 .container {
     color: #e5e5e5;
 }
+
+.sidebar-sticky {
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+
+.sidebar-sticky::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-sticky::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+}
+
+.sidebar-sticky::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-sticky {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,.25) transparent;
+}
