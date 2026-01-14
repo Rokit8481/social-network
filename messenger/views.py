@@ -111,11 +111,16 @@ class MessageUpdateView(LoginRequiredMixin, View):
             }
         })
 
-class CreateGroupView(CreateView):
+class CreateGroupView(LoginRequiredMixin, CreateView):
     model = Chat
     form_class = GroupForm
     template_name = 'messenger/create_group.html'
     success_url = reverse_lazy('messenger_main')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         form.instance.is_group = True

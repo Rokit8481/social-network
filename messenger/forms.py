@@ -1,5 +1,8 @@
 from django import forms 
-from .models import Message, Chat
+from messenger.models import Message, Chat
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class MessageForm(forms.ModelForm):
     class Meta:
@@ -30,6 +33,15 @@ class GroupForm(forms.ModelForm):
             }),
         }
         title = forms.CharField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        # Витягуємо поточного користувача
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        if user:
+            following_qs = User.objects.filter(followers__follower=user)
+            self.fields['users'].queryset = following_qs
 
 class ChatForm(forms.ModelForm):
     class Meta:
