@@ -9,7 +9,7 @@ from messenger.models import Chat, Message, Reaction
 from boards.models import Board, BoardMessage, Tag
 from notifications.models import Notification
 from django.contrib.auth import get_user_model
-from django.db.models import Count
+from django.db.models import Count, Q
 
 User = get_user_model()
 
@@ -48,12 +48,22 @@ class MainPageView(LoginRequiredMixin, View):
         tab = request.GET.get("tab", "feed")
 
         #4. POSTS
+        q = request.GET.get("q", "").strip()
         if tab == "recommendations":
             posts = Post.objects.filter(
                 author__in=users_i_follow
-            ).exclude(author=current_user).order_by("-id")
+            ).exclude(author=current_user)
         else:
-            posts = Post.objects.all().exclude(author=current_user).order_by("-id")
+            posts = Post.objects.all().exclude(author=current_user)
+
+        if q:
+            posts = posts.filter(
+                Q(author__username__icontains=q) |
+                Q(title__icontains=q) |
+                Q(content__icontains=q)
+            )
+
+        posts = posts.order_by("-id")
 
         #5. TOP 5 BOARDS
         boards = Board.objects.annotate(
@@ -104,6 +114,9 @@ class MainPageView(LoginRequiredMixin, View):
             "main_page": main_page,
         }
 
+        #8. TOP 5 POSTS
+        top_posts = Post.objects.all().order_by("viewers")[:5]
+
         return render(request, self.template_name, {
             "user": current_user,
             "active_tab": tab,
@@ -112,6 +125,7 @@ class MainPageView(LoginRequiredMixin, View):
             "top_tags": tags,
             "possible_friends": possible_friends[:15],
             "stats": stats,
+            "top_posts": top_posts,
         })
     
     def post(self, request):

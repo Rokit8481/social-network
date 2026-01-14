@@ -7,7 +7,7 @@ from posts.forms import PostForm, CommentForm
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.template.loader import render_to_string
 import json
 
@@ -212,11 +212,19 @@ class PostsInfiniteAPI(LoginRequiredMixin, View):
     def get(self, request):
         last_id = request.GET.get("last_id")
 
+        q = request.GET.get("q", "").strip()
+
         qs = Post.objects \
             .select_related("author") \
             .prefetch_related("files", "people_tags") \
             .annotate(likes_count=Count("likes")) \
             .order_by("-id")
+
+        if q:
+            qs = qs.filter(
+                Q(title__icontains=q) |
+                Q(content__icontains=q)
+            )
 
         if last_id:
             qs = qs.filter(id__lt=last_id)

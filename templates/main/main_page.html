@@ -45,20 +45,42 @@
 
         <!-- CENTER COLUMN -->
         <div class="col-lg-6 col-md-8 col-sm-12">
-            <ul class="nav nav-tabs justify-content-center mb-3">
-                <li class="nav-item">
-                    <a class="nav-link {% if active_tab == 'feed' %}active{% endif %}"
-                    href="?tab=feed">
-                        Feed
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if active_tab == 'recommendations' %}active{% endif %}"
-                    href="?tab=recommendations">
-                        Recommendations
-                    </a>
-                </li>
-            </ul>
+            {% if request.GET.q %}
+                <p class="text-light small text-center">
+                    Results for “{{ request.GET.q|truncatechars:50 }}”
+                </p>
+            {% else %}
+                <ul class="nav nav-tabs justify-content-center mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_tab == 'feed' %}active{% endif %}"
+                        href="?tab=feed">
+                            Feed
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_tab == 'recommendations' %}active{% endif %}"
+                        href="?tab=recommendations">
+                            Recommendations
+                        </a>
+                    </li>
+                </ul>
+            {% endif %}
+
+            <form method="get" class="mb-3">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        name="q"
+                        class="form-control"
+                        placeholder="Search posts..."
+                        value="{{ request.GET.q }}"
+                    >
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+
 
             <div class="d-grid mb-3">
                     <a href="{% url "post_create" %}" class="btn btn-primary" style="border-radius: 12px;"><i class="bi bi-plus-circle me-1"></i> Create Post </a>

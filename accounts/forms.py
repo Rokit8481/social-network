@@ -47,10 +47,11 @@ class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
         fields = (
-            'first_name', 'last_name', 'email', 
+            'username', 'first_name', 'last_name', 'email', 
             'bio', 'avatar', 'mobile', 'birthday'
         )
         widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),

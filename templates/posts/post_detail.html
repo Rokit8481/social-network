@@ -13,7 +13,7 @@
             <div class="card post-card shadow-sm mb-3">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
-                        <img src="{{ post.author.avatar.url }}" alt="avatar" class="rounded-circle me-3" width="48" height="48">
+                        <img src="{{ post.author.avatar.url }}" alt="avatar" class="avatar-small e me-3" width="48" height="48">
                         <div>
                             <h6 class="fw-bold mb-0">
                                 <a href="{% url 'user_detail' post.author.slug %}" class="text-decoration-none text-light">

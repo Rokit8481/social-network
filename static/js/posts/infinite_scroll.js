@@ -24,8 +24,10 @@ function loadMorePosts() {
     if (!posts.length) return;
 
     const lastId = posts[posts.length - 1].dataset.postId;
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("q") || "";
 
-    fetch(`/posts/infinite/?last_id=${lastId}`)
+    fetch(`/posts/infinite/?last_id=${lastId}&q=${encodeURIComponent(query)}`)
         .then(r => r.json())
         .then(data => {
             document
