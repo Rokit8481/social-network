@@ -16,7 +16,7 @@
 
   <div class="row">
     <div class="col-md-3">
-      <div id="user-list" class="list-group d-none">
+      <div id="user-list" class="list-group d-none mb-4">
         {% for user in user_followers %}
           <form method="post" action="{% url 'create_chat' %}">
             {% csrf_token %}
@@ -35,7 +35,7 @@
         {% endfor %}
       </div>
       
-      <div id="chat-list" class="list-group">
+      <div id="chat-list" class="list-group mb-4">
         <a href="{% url 'create_group' %}" class="mb-2 btn btn-outline-primary text-light">➕ Create chat</a>
         {% for c in chats %}
           <a href="{% url 'chat' c.id %}"
@@ -132,6 +132,17 @@
               data-current-user="{{ request.user }}"
           >
           {% for message in messages %}
+            {% ifchanged message.created_at.date %}
+              <div class="chat-date-divider my-3 text-center"
+              data-date="{{ message.created_at|date:'Y-m-d' }}">
+                <span class="px-3 py-1 rounded bg-dark text-light small">
+                  <span class="date-label"
+                        data-iso="{{ message.created_at|date:'Y-m-d' }}">
+                    {{ message.created_at|date:"j E Y" }}
+                  </span>
+                </span>
+              </div>
+            {% endifchanged %}
             <div class="d-flex message-row
               {% if message.user == request.user %}
                 justify-content-end
@@ -165,8 +176,8 @@
                 {{ message.text|linebreaksbr }}
               </div>
 
-              <div class="message-time">
-                {{ message.created_at|date:"H:i d/m/Y" }}
+              <div class="message-time text-muted small text-end">
+                {% if message.was_edited %}edited {% endif %}{{ message.created_at|date:"H:i" }}
               </div>
 
                 <div class="message-reactions mt-1">
@@ -280,6 +291,13 @@
     </div>
   </div>
 </template>
+
+<template id="date-divider-template">
+  <div class="chat-date-divider my-3 text-center" data-date="">
+    <span class="px-3 py-1 rounded bg-dark text-light small"></span>
+  </div>
+</template>
+
 
 
 {% include "helpers/messenger/modal_info.html" %}

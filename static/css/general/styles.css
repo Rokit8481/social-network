@@ -181,7 +181,6 @@ input.form-control::placeholder {
     overflow-y: auto;
 }
 
-
 .sidebar-sticky::-webkit-scrollbar {
     width: 4px;
 }

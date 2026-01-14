@@ -62,6 +62,19 @@
     overflow-y: auto
 }
 
+.list-group::-webkit-scrollbar {
+    width: 4px;
+}
+
+.list-group::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+}
+
+.list-group::-webkit-scrollbar-track {
+    background: transparent;
+}
+
 .list-group-item {
     background-color: #2b2b3b;
     color: #e0e0e0;
@@ -101,6 +114,19 @@
   overflow-y: auto;
   border: 1px solid #444;
   color: #e5e5e5;
+}
+
+.chat-box::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .chat-box--default {
@@ -232,4 +258,9 @@
   display: flex;
   justify-content: space-between;
   gap: 10px;
+}
+
+.chat-date-divider span {
+    font-size: 0.75rem;
+    opacity: 0.85;
 }

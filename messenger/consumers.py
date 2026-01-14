@@ -44,7 +44,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'user_slug': user.slug,
                 'avatar': get_avatar_url(user),
                 'text': message.text,
-                'created_time': message.created_at.strftime("%H:%M %d/%m/%Y"),
+                "created_time": message.created_at.strftime("%H:%M"),
+                "created_date": message.created_at.date().isoformat(),
                 'updated_time': message.updated_at.strftime("%H:%M %d/%m/%Y"),
             }
 

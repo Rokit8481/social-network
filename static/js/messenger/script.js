@@ -47,7 +47,6 @@ function createReactionButton(emoji, count, users, userReactedEmojis) {
 
   btn.innerHTML = html;
 
-  // Клік на реакцію
   btn.addEventListener('click', () => {
       const messageId = btn.closest('.message-content').dataset.messageId;
       socket.send(JSON.stringify({
@@ -57,16 +56,6 @@ function createReactionButton(emoji, count, users, userReactedEmojis) {
       }));
   });
 
-  const tooltip = document.createElement('div');
-  const end_text = document.createElement('div');
-
-  users.forEach(u => {
-      const div = document.createElement('div');
-      div.classList.add('reaction-user');
-      div.innerHTML = `<img src="${u.avatar}" class="avatar-small" alt="${u.username}"><span>${u.username}</span>`;
-      tooltip.appendChild(div);
-  });
-  
   if (users.length > 3) {
       const end_text = document.createElement('div');
       end_text.textContent = `+${users.length - 3} others`;
@@ -77,46 +66,10 @@ function createReactionButton(emoji, count, users, userReactedEmojis) {
           'text-light',
           'fw-bold'
       );
-      tooltip.appendChild(end_text);
   }
-  tooltip.classList.add('reaction-tooltip', 'd-none');
-  document.body.appendChild(tooltip);
-
-  btn.addEventListener('mouseenter', () => {
-      const rect = btn.getBoundingClientRect();
-      tooltip.style.position = 'fixed';
-      tooltip.style.top = `${rect.bottom + 5}px`;
-      tooltip.style.left = `${rect.left}px`;
-      tooltip.classList.remove('d-none');
-  });
-
-  // Ховати тултіп тільки при кліку поза ним і кнопкою
-  document.addEventListener('click', e => {
-      if (!tooltip.contains(e.target) && e.target !== btn) {
-          tooltip.classList.add('d-none');
-      }
-  });
-
+  
   return btn;
 }
-
-function attachReactionTooltips() {
-  document.querySelectorAll('.reaction-btn').forEach(btn => {
-    const tooltip = btn.querySelector('.reaction-tooltip');
-    if (!tooltip) return;
-
-    btn.addEventListener('mouseenter', () => {
-        const rect = btn.getBoundingClientRect();
-        tooltip.style.top = `${rect.bottom + window.scrollY}px`;
-        tooltip.style.left = `${rect.left + window.scrollX}px`;
-        tooltip.classList.remove('d-none');
-    });
-    btn.addEventListener('mouseleave', () => {
-      tooltip.classList.add('d-none');
-    });
-  });
-}
-
 
 socket.onmessage = function(e) {
   const data = JSON.parse(e.data);
@@ -139,7 +92,10 @@ socket.onmessage = function(e) {
   }
   if (data.type === 'message_deleted') {
     const msg = document.querySelector(`[data-message-id="${data.message_id}"]`);
-    if (msg) msg.remove();
+    if (!msg) return;
+
+    const row = msg.closest('.message-row');
+    if (row) row.remove();
   }
   if (data.type === 'update_message') { 
     const msgEl = document.querySelector(`[data-message-id="${data.id}"]`);
@@ -250,6 +206,36 @@ function scrollToBottom() {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+function positionPicker(picker, x, y) {
+  const padding = 8;
+
+  picker.style.visibility = 'hidden';
+  picker.classList.remove('d-none');
+  picker.style.position = 'fixed';
+
+  const rect = picker.getBoundingClientRect();
+
+  let left = x;
+  let top = y;
+
+  if (left + rect.width > window.innerWidth) {
+    left = window.innerWidth - rect.width - padding;
+  }
+  if (left < padding) {
+    left = padding;
+  }
+  if (top + rect.height > window.innerHeight) {
+    top = y - rect.height - padding;
+  }
+  if (top < padding) {
+    top = padding;
+  }
+
+  picker.style.left = `${left}px`;
+  picker.style.top = `${top}px`;
+  picker.style.visibility = 'visible';
+}
+
 function attachRightClickEvents() {
   document.querySelectorAll('.message-content').forEach(msg => {
     msg.oncontextmenu = e => {
@@ -257,10 +243,7 @@ function attachRightClickEvents() {
       document.querySelectorAll('.emoji-picker').forEach(p => p.classList.add('d-none'));
       const picker = msg.querySelector('.emoji-picker');
       if (!picker) return;
-      picker.style.position = 'fixed'; 
-      picker.style.top = e.clientY + 'px';
-      picker.style.left = e.clientX + 'px';
-      picker.classList.remove('d-none');
+      positionPicker(picker, e.clientX, e.clientY);
     };
   });
 }
@@ -294,7 +277,54 @@ if (chatBoxBg) {
   chatBoxBg.style.backgroundImage = `url(${chatBoxBg.dataset.bgUrl})`;
 }
 
+function formatHumanDate(dateISO) {
+  const date = new Date(dateISO);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  if (date.toDateString() === today.toDateString()) {
+    return "Сьогодні";
+  }
+
+  if (date.toDateString() === yesterday.toDateString()) {
+    return "Вчора";
+  }
+
+  return date.toLocaleDateString('uk-UA', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
+
+function createDateDivider(dateISO) {
+  const tpl = document.getElementById('date-divider-template');
+  if (!tpl) return document.createDocumentFragment();
+
+  const clone = tpl.content.cloneNode(true);
+  const divider = clone.querySelector('.chat-date-divider');
+  const label = clone.querySelector('span');
+
+  divider.dataset.date = dateISO;
+  label.textContent = formatHumanDate(dateISO);
+
+  return clone;
+}
+
+
+function maybeInsertDateDivider(messageDate) {
+  const dividers = chatBox.querySelectorAll('.chat-date-divider');
+  const lastDivider = dividers[dividers.length - 1];
+
+  if (!lastDivider || lastDivider.dataset.date !== messageDate) {
+    chatBox.appendChild(createDateDivider(messageDate));
+  }
+}
+
 function addMessageToDOM(data) {
+  maybeInsertDateDivider(data.created_date);
   const template = document.getElementById('message-template');
   if (!template) return;
 
@@ -345,5 +375,12 @@ function addMessageToDOM(data) {
 document.addEventListener('DOMContentLoaded', () => {
   attachEmojiClickEvents();
   attachRightClickEvents();
-  attachReactionTooltips();
+  scrollToBottom();
+  document.querySelectorAll('.chat-date-divider').forEach(divider => {
+    const date = divider.dataset.date;
+    if (!date) return;
+
+    const label = divider.querySelector('span');
+    label.textContent = formatHumanDate(date);
+  });
 });
