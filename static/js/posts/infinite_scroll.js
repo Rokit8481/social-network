@@ -42,12 +42,12 @@ function loadMorePosts() {
 }
 
 function initLikeButtons() {
-
     document.querySelectorAll(".like-btn").forEach(btn => {
         if (btn.dataset.bound) return;
         btn.dataset.bound = "1";
 
         btn.addEventListener("click", () => {
+            console.log(`Button was clickes (infinite.js)`)
             const postId = btn.dataset.postId;
             const counter = btn.querySelector(".likes-count");
 
@@ -61,6 +61,7 @@ function initLikeButtons() {
             .then(r => r.json())
             .then(data => {
                 counter.textContent = data.likes_count;
+                console.log(`Likes count reset to ${counter.textContent}`)
             });
         });
     });
