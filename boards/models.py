@@ -11,7 +11,7 @@ def generate_code():
 User = get_user_model()
 
 class Tag(BaseModel):
-    name = models.CharField(max_length=100, unique=True, verbose_name='Tag Name', null=False, blank=False)
+    name = models.CharField(max_length=40, unique=True, verbose_name='Tag Name', null=False, blank=False)
 
     class Meta:
         verbose_name = 'Tag'
@@ -27,7 +27,7 @@ class Tag(BaseModel):
         return self.name
     
 class Board(BaseModel):
-    title = models.CharField(max_length=200, verbose_name='Title', null=False, blank=False)
+    title = models.CharField(max_length=100, verbose_name='Title', null=False, blank=False)
     description = models.TextField(verbose_name='Description', null=True, blank=True)
     slug = models.SlugField(unique=True, default=shortuuid.uuid, editable=False)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_boards', null=False)

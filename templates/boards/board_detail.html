@@ -92,7 +92,7 @@
         <div class="tags-container">
           {% for tag in tags %}
               <a href="{% url 'boards_list' %}?q={{ tag.name }}"
-                class="badge bg-secondary text-light me-1 mb-1 tag-item">
+                class="badge bg-secondary text-light me-1 mb-1 tag-item text-decoration-none">
                   #{{ tag.name }}
               </a>
           {% endfor %}
@@ -128,7 +128,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-dark text-light border-0">
       <div class="modal-header border-bottom border-secondary">
-        <h5 class="modal-title">Members of "{{ board.title }}": {{ board.members.count }}</h5>
+        <h5 class="modal-title">Members of "{{ board.title|truncatechars:30 }}": {{ board.members.count }}</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
@@ -152,7 +152,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-dark text-light border-0">
       <div class="modal-header border-bottom border-secondary">
-        <h5 class="modal-title">Admins of "{{ board.title }}": {{ board.admins.count }}</h5>
+        <h5 class="modal-title">Admins of "{{ board.title|truncatechars:30 }}": {{ board.admins.count }}</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">

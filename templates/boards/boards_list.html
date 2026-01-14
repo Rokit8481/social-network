@@ -8,14 +8,15 @@
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
+    <div class="d-flex justify-content-between">
+        <h1 class="mb-4">Boards</h1>
 
-    <h1 class="mb-4">Boards</h1>
-
-    <div class="mb-4">
-        <a href="{% url 'create_boards_board' %}" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Create board
-        </a>
-    </div>  
+        <div class="mb-4">
+            <a href="{% url 'create_boards_board' %}" class="btn btn-primary px-4 py-2">
+                <i class="bi bi-plus-circle me-1 "></i> Create board
+            </a>
+        </div>  
+    </div>
     
     <form method="GET" class="mb-4">
         <input

@@ -47,7 +47,7 @@
                     </div>
 
                     {% if post.people_tags.exists %}
-                        <div class="mt-2 gap-3 d-flex flex-wrap tagged-people-container">
+                        <div class="mt-2 gap-1 d-flex flex-wrap tagged-people-container">
                             👥 Tagged:
                             {% for user in post.people_tags.all %}
                                 <a href="{% url 'user_detail' user.slug %}" class="badge tagged-people-item me-1">{{ user.username }}</a>

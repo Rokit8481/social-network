@@ -1,15 +1,16 @@
 from django.views.generic import View, ListView, FormView
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth import logout, login
 from accounts.models import Follow
-from posts.models import Post, PostLike
+from posts.models import Post, PostLike, Comment, CommentLike
+from messenger.models import Chat, Message
+from boards.models import Board, BoardMessage
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from accounts.forms import RegistrationStep1Form, RegistrationStep2Form, CustomAuthenticationForm, UserEditForm
-from boards.models import Board
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.messages import get_messages
 
@@ -81,13 +82,16 @@ class RegisterStep2View(FormView):
         login(self.request, user)
         return super().form_valid(form)
 
-class UsersListView(LoginRequiredMixin, ListView):
+class UsersListView(UserPassesTestMixin, ListView):
     model = User
     template_name = 'accounts/users_list.html'
     context_object_name = 'users'
     paginate_by = 10
     login_url = reverse_lazy('login')
     redirect_field_name = 'next'
+
+    def test_func(self):
+        return self.request.user.is_superuser
 
 class EditUserView(LoginRequiredMixin, View):
     template_name = 'accounts/edit_user.html'
@@ -202,6 +206,33 @@ class UserDetailView(LoginRequiredMixin, View):
         except EmptyPage:
             posts_user_liked = liked_paginator.page(liked_paginator.num_pages)
 
+        
+
+        boards_count = Board.objects.filter(creator=user_detail).count() # How much boards user have
+        board_messages_count = BoardMessage.objects.filter(sender=user_detail).count() # How much board messages user posted
+        posts_count = Post.objects.filter(author=user_detail).count() # How much posts user posted
+        tagged_in_posts_count = Post.objects.filter(people_tags=user_detail).count() # In how much posts user is tagged in
+        posts_likes_given_count = PostLike.objects.filter(user=user_detail).count() # How much posts likes user gave
+        my_posts_likes_count = PostLike.objects.filter(post__author=user_detail).count() # How much posts likes user have on his posts
+        comments_count = Comment.objects.filter(user=user_detail).count() # How much comments user sented
+        comments_likes_given_count = CommentLike.objects.filter(user=user_detail).count() # How much comments likes user gave
+        my_comments_likes_count = CommentLike.objects.filter(comment__user=user_detail).count()  # How much posts likes user have on his comments
+        chats_count = Chat.objects.filter(users=user_detail, is_group=False).count() # How much private chats user have
+        messenger_messages_count = Message.objects.filter(user=user_detail).count() # How much messages user sented
+        main_page = True
+        stats = {
+            "boards_count": boards_count,
+            "board_messages_count": board_messages_count,
+            "posts_count": posts_count,
+            "tagged_in_posts_count": tagged_in_posts_count,
+            "posts_likes_given_count": posts_likes_given_count,
+            "my_posts_likes_count": my_posts_likes_count,
+            "comments_count": comments_count,
+            "comments_likes_given_count": comments_likes_given_count,
+            "my_comments_likes_count": my_comments_likes_count,
+            "chats_count": chats_count,
+            "messenger_messages_count": messenger_messages_count,
+        }
         context = {
             "user_detail": user_detail,
             "followers": followers,
@@ -215,6 +246,7 @@ class UserDetailView(LoginRequiredMixin, View):
             "boards_paginator": boards_paginator,
             "posts_user_liked": posts_user_liked,
             "liked_paginator": liked_paginator,
+            "stats": stats
         }
 
         return render(request, self.template_name, context)

@@ -88,6 +88,7 @@ class MainPageView(LoginRequiredMixin, View):
         my_comments_likes_count = CommentLike.objects.filter(comment__user=current_user).count()  # How much posts likes current user have on his comments
         chats_count = Chat.objects.filter(users=current_user, is_group=False).count() # How much private chats current user have
         messenger_messages_count = Message.objects.filter(user=current_user).count() # How much messages current user sented
+        main_page = True
         stats = {
             "boards_count": boards_count,
             "board_messages_count": board_messages_count,
@@ -100,6 +101,7 @@ class MainPageView(LoginRequiredMixin, View):
             "my_comments_likes_count": my_comments_likes_count,
             "chats_count": chats_count,
             "messenger_messages_count": messenger_messages_count,
+            "main_page": main_page,
         }
 
         return render(request, self.template_name, {

@@ -15,25 +15,39 @@
 }
 
 .notifications-container {
-  max-width: 600px;
-  max-height: 600px;
-  overflow-y: auto;
-  margin: 0 auto;
+    max-width: 600px;
+    max-height: 600px;
+    overflow-y: auto;
+    margin: 0 auto;
+}
+
+.notifications-container::-webkit-scrollbar,
+#notifications-dropdown::-webkit-scrollbar {
+    width: 4px;
+}
+.notifications-container::-webkit-scrollbar-thumb,
+#notifications-dropdown::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+}
+.notifications-container::-webkit-scrollbar-track,
+#notifications-dropdown::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .notification-site-item {
-  padding: 12px 14px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  background: #2a2a2a;
-  color: #f1f1f1;
-  transition: background 0.3s;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: #2a2a2a;
+    color: #f1f1f1;
+    transition: background 0.3s;
 }
 
 .notification-site-item.unread {
-  background: #49c5ff;
-  color: #000;
-  font-weight: 600;
+    background: #49c5ff;
+    color: #000;
+    font-weight: 600;
 }
 
 .notification-item {

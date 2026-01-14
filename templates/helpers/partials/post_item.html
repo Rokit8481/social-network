@@ -1,6 +1,6 @@
 <div class="card mb-4 shadow-sm post-item" data-post-id="{{ post.id }}" style="border-radius: 16px;">
     <div class="card-header d-flex align-items-center" style="border-radius: 16px 16px 0 0;">
-        <img src="{{ post.author.avatar.url }}" class="rounded-circle me-3" width="45" height="45">
+        <img src="{{ post.author.avatar.url }}" class="avatar-small me-3" width="45" height="45">
         <div>
             <h6 class="mb-0 fw-bold">
                 <a href="{% url 'user_detail' post.author.slug %}" class="text-decoration-none text-white">
