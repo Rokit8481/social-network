@@ -51,9 +51,9 @@ class MainPageView(LoginRequiredMixin, View):
         if tab == "recommendations":
             posts = Post.objects.filter(
                 author__in=users_i_follow
-            ).order_by("-id")
+            ).exclude(author=current_user).order_by("-id")
         else:
-            posts = Post.objects.all().order_by("-id")
+            posts = Post.objects.all().exclude(author=current_user).order_by("-id")
 
         #5. TOP 5 BOARDS
         boards = Board.objects.annotate(

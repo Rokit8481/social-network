@@ -10,120 +10,94 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-7">
-            <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px; overflow: hidden;">
-                <div class="card-header bg-white d-flex align-items-center justify-content-between" style="border-radius: 16px 16px 0 0;">
+            <div class="card post-card shadow-sm mb-3">
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
-                        <img src="{{ post.author.avatar.url }}"
-                            alt="avatar"
-                            class="rounded-circle me-3"
-                            width="48" height="48">
+                        <img src="{{ post.author.avatar.url }}" alt="avatar" class="rounded-circle me-3" width="48" height="48">
                         <div>
                             <h6 class="fw-bold mb-0">
-                                <a href="{% url 'user_detail' post.author.slug %}" class="text-decoration-none text-dark">
+                                <a href="{% url 'user_detail' post.author.slug %}" class="text-decoration-none text-light">
                                     {{ post.author.username }}
                                 </a>
                             </h6>
-                            <small class="text-muted">{{ post.created_at|date:"d M Y, H:i" }}</small>
+                            <small class="text-light">{{ post.created_at|date:"d M Y, H:i" }}</small>
                         </div>
                     </div>
                     {% if post.author == request.user %}
                         {% include "helpers/posts/dd_post.html" %}
                     {% endif %}
-
                 </div>
+
                 <div class="card-body">
                     <h2 class="fw-bold mb-3">{{ post.title }}</h2>
-                    <p class="text-dark" style="font-size: 1.1rem; line-height: 1.6;">
-                        {{ post.content }}
-                    </p>
+                    <p>{{ post.content }}</p>
+
                     {% if media_files %}
                         {% include "helpers/post_files/media_preview.html" %}
                         {% include "helpers/post_files/media_modal.html" %}
                     {% endif %}
 
                     {% include "helpers/post_files/attachments.html" %}
-                    
-                    <hr>
-                    <div class="d-flex align-items-center justify-content-between mt-3 mb-2">
-                        <button class="like-btn btn btn-light border px-3"
-                                data-post-id="{{ post.id }}"
-                                style="border-radius: 12px;">
-                            ❤️ <span class="likes-count">{{ likes_count }}</span>
-                        </button>
-                        <div class="text-muted">
-                            👁️ {{ viewers_count }} views
-                        </div>
-                    </div>
-                {% if post.people_tags.exists %}
-                    <div class="mt-2 gap-3 d-flex flex-wrap tagged-people-container">
-                        👥 Tagged:
-                        {% for user in post.people_tags.all %}
-                            <a href="{% url 'user_detail' user.slug %}"
-                            class="badge bg-secondary text-decoration-none me-1 tagged-people-item">
-                                {{ user.username }}
-                            </a>
-                        {% endfor %}
 
-                        {% if post.people_tags.all|length > 3 %}
-                            <div class="d-flex gap-2">
-                                <button class="show-more-tagged-people btn btn-sm btn-link p-0 text-dark me-2 text-decoration-none">
-                                    Show more...
-                                </button>
-                                <button class="hide-tagged-people btn btn-sm btn-link p-0 text-dark text-decoration-none" style="display:none">
-                                    Hide
-                                </button>
-                            </div>
-                        {% endif %}
+                    <hr>
+
+                    <div class="d-flex align-items-center justify-content-between mt-3 mb-2">
+                        <button class="like-btn" data-post-id="{{ post.id }}">❤️ <span class="likes-count">{{ likes_count }}</span></button>
+                        <div class="text-light">👁️ {{ viewers_count }} views</div>
                     </div>
+
+                    {% if post.people_tags.exists %}
+                        <div class="mt-2 gap-3 d-flex flex-wrap tagged-people-container">
+                            👥 Tagged:
+                            {% for user in post.people_tags.all %}
+                                <a href="{% url 'user_detail' user.slug %}" class="badge tagged-people-item me-1">{{ user.username }}</a>
+                            {% endfor %}
+                            {% if post.people_tags.all|length > 3 %}
+                                <div class="d-flex gap-2">
+                                    <button class="show-more-tagged-people btn btn-sm btn-link p-0 text-light me-2">Show more...</button>
+                                    <button class="hide-tagged-people btn btn-sm btn-link p-0 text-light" style="display:none">Hide</button>
+                                </div>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-        <div class="col-md-5">
-            <div class="card shadow-sm border-0 d-flex flex-column"
-             style="height: 75vh; border-radius: 16px; overflow: hidden;">
-            <div id="comments-box"
-                 class="flex-grow-1 overflow-auto p-3"
-                 style="background: #fafafa;">
-                <h5 class="mb-3">Comments</h5>
-                <div id="comments">
-                {% for comment in comments %}
-                <div class="comment mb-2 p-2 border rounded bg-white"
-                     data-comment-id="{{ comment.id }}">
-                    <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <strong>{{ comment.user.username }}</strong>:
-                        <span class="comment-text">{{ comment.content }}</span>
-                    </div>
-                    {% if comment.user == request.user %}
-                        {% include "helpers/posts/dd_comment.html" %}
-                    {% endif %}
 
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 d-flex flex-column" style="border-radius:16px; overflow:hidden;">
+                <div id="comments-box" class="flex-grow-1">
+                    <h5 class="mb-3">Comments — {{ comments.count }}</h5>
+                    <div id="comments">
+                        {% for comment in comments %}
+                        <div class="comment" data-comment-id="{{ comment.id }}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div><strong>{{ comment.user.username }}</strong>: <span class="comment-text">{{ comment.content }}</span></div>
+                                {% if comment.user == request.user %}
+                                    {% include "helpers/posts/dd_comment.html" %}
+                                {% endif %}
+                            </div>
+                            <button class="like-comment-btn btn btn-sm mt-1" data-comment-id="{{ comment.id }}">👍 <span class="comment-likes-count">{{ comment.likes.count }}</span></button>
+                        </div>
+                        {% empty %}
+                        <p class="text-light">No comments yet.</p>
+                        {% endfor %}
                     </div>
-                    <br>
-                    <button class="like-comment-btn btn btn-sm btn-light px-2 mt-1"
-                        data-comment-id="{{ comment.id }}">
-                    👍 <span class="comment-likes-count">{{ comment.likes.count }}</span>
-                    </button>
                 </div>
-                {% empty %}
-                <p class="text-muted">No comments yet.</p>
-                {% endfor %}
+
+                <div id="comment-form" class="p-3">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ comment_form.content }}
+                        <div class="d-flex gap-2 edit-actions mt-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1 comment-sumbmit">Submit</button>
+                        </div>
+                    </form>
                 </div>
-            </div>
-            <div class="p-3 border-top bg-white">
-                <form method="POST" id="comment-form">
-                {% csrf_token %}
-                <div class="mb-2">
-                    {{ comment_form.content }}
-                </div>
-                <div class="d-flex gap-2 edit-actions">
-                    <button type="submit" class="btn btn-primary flex-grow-1 comment-sumbmit">Submit</button>
-                </div>
-                </form>
             </div>
         </div>
     </div>
+
 
 <script src="{% static 'js/posts/script.js' %}"></script>
 
