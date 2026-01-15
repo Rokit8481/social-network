@@ -1,6 +1,6 @@
 from django.views.generic import View, ListView, FormView
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth import logout, login
@@ -81,17 +81,6 @@ class RegisterStep2View(FormView):
         self.request.session.pop('registration_data', None)
         login(self.request, user)
         return super().form_valid(form)
-
-class UsersListView(UserPassesTestMixin, ListView):
-    model = User
-    template_name = 'accounts/users_list.html'
-    context_object_name = 'users'
-    paginate_by = 10
-    login_url = reverse_lazy('login')
-    redirect_field_name = 'next'
-
-    def test_func(self):
-        return self.request.user.is_superuser
 
 class EditUserView(LoginRequiredMixin, View):
     template_name = 'accounts/edit_user.html'
