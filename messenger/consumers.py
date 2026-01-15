@@ -26,7 +26,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 return
 
             from .models import Chat, Message
-            chat = await sync_to_async(Chat.objects.get)(id=self.chat_id)
+            chat = await sync_to_async(Chat.objects.select_related().get)(id=self.chat_id)
             message = await sync_to_async(Message.objects.create)(
                 chat=chat, user=user, text=text
             )
