@@ -132,7 +132,7 @@ class CreateGroupView(LoginRequiredMixin, CreateView):
 
         if not title:
             if users.count() >= 4:
-                title = "Група без назви"
+                title = "Group without title"
             else:
                 user_names = users.values_list('username', flat=True)
                 title = " and ".join(user_names)

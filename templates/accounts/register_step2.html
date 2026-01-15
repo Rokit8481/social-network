@@ -4,6 +4,9 @@
 {% block content %}
 <div class="d-flex justify-content-center align-items-center min-vh-100">
     <div class="form-card">
+        {% if request.user.is_authenticated %}
+        <h3 class="text-center card-title"><a href="{% url "main_page" %}" class="text-decoration-none">You are already authenticated</a></h3>
+        {% else %}
         <h3 class="text-center mb-4 card-title">Register — Step 2</h3>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -23,6 +26,7 @@
                 </button>
             </div>
         </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

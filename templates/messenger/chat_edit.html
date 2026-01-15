@@ -36,4 +36,12 @@
     {% endif %}
   </div>
 </div>
+<script>
+  $(document).ready(function () {
+    $('#id_users').select2({
+      placeholder: 'Edit tagged people',
+      width: '100'
+    });
+  });
+</script>
 {% endblock %}
