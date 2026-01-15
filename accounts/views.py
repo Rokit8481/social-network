@@ -82,17 +82,6 @@ class RegisterStep2View(FormView):
         login(self.request, user)
         return super().form_valid(form)
 
-class UsersListView(UserPassesTestMixin, ListView):
-    model = User
-    template_name = 'accounts/users_list.html'
-    context_object_name = 'users'
-    paginate_by = 10
-    login_url = reverse_lazy('login')
-    redirect_field_name = 'next'
-
-    def test_func(self):
-        return self.request.user.is_superuser
-
 class EditUserView(LoginRequiredMixin, View):
     template_name = 'accounts/edit_user.html'
     login_url = reverse_lazy('login')
