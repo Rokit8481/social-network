@@ -27,7 +27,7 @@ urlpatterns = [
     path('messenger/', include('messenger.urls')),
     path('notifications/', include('notifications.urls')),
     path('posts/', include('posts.urls')),
-    path('main/', include("main.urls")),
+    path('', include("main.urls")),
 ]
 
 if settings.DEBUG:
