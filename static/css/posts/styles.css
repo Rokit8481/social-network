@@ -89,38 +89,38 @@
     color: #fff !important;
     text-decoration: none;
 }
-
 .media-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* автоматично підлаштовується */
     gap: 4px;
 }
 
-.media-item,
-.media-item-small {
-    position: relative;
-    overflow: hidden;
+.media-item {
+    width: 100%;
+    aspect-ratio: 1 / 1;  /* квадрат */
     border-radius: 12px;
+    overflow: hidden;
     cursor: pointer;
+    position: relative;    /* важливо для overlay */
 }
 
 .media-item img,
-.media-item video,
-.media-item-small img,
-.media-item-small video {
+.media-item video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
 .media-overlay {
     position: absolute;
-    inset: 0;
+    inset: 0;  /* покриває тільки свій квадрат */
     background: rgba(0,0,0,0.55);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1.5rem;  /* трохи менше, щоб не виглядало гігантським */
     color: white;
     font-weight: bold;
+    border-radius: 12px;
 }

@@ -177,13 +177,6 @@ function initMessageActions() {
         else if (e.target.closest(".delete-message-btn")) handleDeleteMessage(msgDiv, msgId);
         else if (e.target.closest("[data-copy-message]")) handleCopyMessage(msgDiv);
     });
-
-    document.querySelectorAll(".media-item-small").forEach(item => {
-        item.addEventListener("click", () => {
-            const carousel = document.querySelector(item.dataset.bsTarget + " .carousel");
-            bootstrap.Carousel.getOrCreateInstance(carousel).to(item.dataset.index);
-        });
-    });
 }
 
 /* ===================== ADD MESSAGE TO DOM ===================== */

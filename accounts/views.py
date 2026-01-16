@@ -152,9 +152,13 @@ class UserDetailView(LoginRequiredMixin, View):
         followers = user_detail.followers.all()
         following = user_detail.following.all()
 
-        is_following = Follow.objects.filter(
+        user_is_following = Follow.objects.filter(
             follower=request.user,
             following=user_detail
+        ).exists()
+        is_following_user = Follow.objects.filter(
+            follower=user_detail,
+            following=request.user
         ).exists()
 
         #POSTS
@@ -208,7 +212,6 @@ class UserDetailView(LoginRequiredMixin, View):
         my_comments_likes_count = CommentLike.objects.filter(comment__user=user_detail).count()  # How much posts likes user have on his comments
         chats_count = Chat.objects.filter(users=user_detail, is_group=False).count() # How much private chats user have
         messenger_messages_count = Message.objects.filter(user=user_detail).count() # How much messages user sented
-        main_page = True
         stats = {
             "boards_count": boards_count,
             "board_messages_count": board_messages_count,
@@ -228,7 +231,8 @@ class UserDetailView(LoginRequiredMixin, View):
             "following": following,
             "followers_count": followers.count(),
             "following_count": following.count(),
-            "is_following": is_following,
+            "user_is_following": user_is_following,
+            "is_following_user": is_following_user,
             "posts": posts,
             "posts_paginator": posts_paginator,
             "user_boards": user_boards,

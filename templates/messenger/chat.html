@@ -16,7 +16,13 @@
 
   <div class="row">
     <div class="col-md-3">
+      <a href="{% url 'create_group' %}" class="mb-2 btn btn-outline-primary text-light w-100">➕ Create chat</a>
       <div id="user-list" class="list-group d-none mb-4">
+        <div class="sticky-top" style="background-color: #1f1f2e; border: 1px solid #333;">
+          <h4 class="text-center m-2 card-title">
+            USERS
+          </h4>
+        </div>
         {% for user in user_followers %}
           <form method="post" action="{% url 'create_chat' %}">
             {% csrf_token %}
@@ -36,7 +42,11 @@
       </div>
       
       <div id="chat-list" class="list-group mb-4">
-        <a href="{% url 'create_group' %}" class="mb-2 btn btn-outline-primary text-light">➕ Create chat</a>
+        <div class="sticky-top" style="background-color: #1f1f2e; border: 1px solid #333;">
+          <h4 class="text-center m-2 card-title" >
+            CHATS
+          </h4>
+        </div>
         {% for c in chats %}
           <a href="{% url 'chat' c.id %}"
             class="list-group-item list-group-item-action {% if c.pk == chat.pk %}active-chat{% endif %}">
