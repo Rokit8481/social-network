@@ -184,7 +184,7 @@ class ChatView(LoginRequiredMixin, View):
                 msg.reactions_by_emoji = reactions_by_emoji
                 msg.user_reacted_emoji = user_reaction_map.get(msg.id) 
 
-        default_background = Chat._meta.get_field('background').default
+        default_background = 'https://res.cloudinary.com/dcf7vcslc/image/upload/v1768654798/xoz3mmnu8m0qq8ktpxn6.webp'
 
         user_followers = User.objects.filter(
             id__in=Follow.objects.filter(
@@ -201,7 +201,7 @@ class ChatView(LoginRequiredMixin, View):
             "form": MessageForm(),
             "emoji_choices": EMOJI_CHOICES,
             "user_followers": user_followers,
-            "default_background": settings.MEDIA_URL + default_background,
+            "default_background": default_background,
         }
 
         return render(request, self.template_name, context)
