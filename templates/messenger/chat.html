@@ -134,10 +134,8 @@
       {% if chat.id %}
         <div id="chat-box"
               class="chat-box p-4 mb-3 rounded shadow-sm
-                      {% if chat.background %}chat-box--bg{% else %}chat-box--default{% endif %}"
-              {% if chat.has_custom_background %}
-                  data-bg-url="{{ chat.get_background_url }}"
-              {% endif %}
+                      {% if chat.get_background_url  %}chat-box--bg{% else %}chat-box--default{% endif %}"
+              data-bg-url="{{ chat.get_background_url }}"
               data-chat-id="{{ chat.id }}"
               data-current-user="{{ request.user }}"
           >

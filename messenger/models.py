@@ -3,6 +3,7 @@ from accounts.helpers.choices.emoji import EMOJI_CHOICES
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
 from cloudinary.models import CloudinaryField
+from cloudinary import uploader
 
 User = get_user_model()
 
@@ -22,7 +23,7 @@ class Chat(BaseModel):
             raise ValueError("Privately chats cannot have more than 2 users.")
     
     def get_background_url(self):
-        if self.background:
+        if self.background and getattr(self.background, 'public_id', None) != 'default/default_bg':
             return self.background.url
         return 'https://res.cloudinary.com/dcf7vcslc/image/upload/v1768654798/xoz3mmnu8m0qq8ktpxn6.webp'
             
@@ -34,7 +35,10 @@ class Chat(BaseModel):
     
     def delete(self, *args, **kwargs):
         if self.background and getattr(self.background, 'public_id', None) != 'default/default_bg':
-            self.background.delete(save=False)
+            try:
+                uploader.destroy(self.background.public_id)
+            except Exception as e:
+                print(f"Error deleting Cloudinary file: {e}")
         super().delete(*args, **kwargs)
 
 
