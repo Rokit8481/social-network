@@ -30,8 +30,8 @@ class Chat(BaseModel):
         return self.title or f"Chat between {' and '.join(user.username for user in self.users.all())}"
     
     def delete(self, *args, **kwargs):
-        if self.background and self.background.public_id != 'default/default_bg':
-            self.background.delete()
+        if self.background and getattr(self.background, 'public_id', None) != 'default/default_bg':
+            self.background.delete(save=False)
         super().delete(*args, **kwargs)
 
 
