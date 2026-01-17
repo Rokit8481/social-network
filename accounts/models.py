@@ -25,8 +25,12 @@ class UserProfile(AbstractUser):
     def delete(self, *args, **kwargs):
         if self.avatar and self.avatar.public_id != 'default/default_avatar':
             self.avatar.delete(save=False)
-
         super().delete(*args, **kwargs)
+
+    def get_avatar_url(self):
+        if self.avatar:
+            return self.avatar.url
+        return 'https://res.cloudinary.com/dcf7vcslc/image/upload/v1768654796/v1oczq9mbm66q0jbh64f.jpg'
 
     class Meta:
         verbose_name = 'User Profile'

@@ -12,7 +12,7 @@
         {% for user in chat.users.all %}
           <a href="{% url 'user_detail' user.slug %}"
              class="d-flex align-items-center gap-2 text-decoration-none text-light mb-2">
-            <img src="{{ user.avatar.url }}"
+            <img src="{{ user.get_avatar_url  }}"
                  class="rounded-circle"
                  width="40" height="40">
             <span>{{ user.username }}</span>

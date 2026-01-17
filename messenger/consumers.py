@@ -34,7 +34,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             def get_avatar_url(user):
                 if user.avatar:
                     return user.avatar.url
-                return None
+                return "https://res.cloudinary.com/dcf7vcslc/image/upload/v1768654796/v1oczq9mbm66q0jbh64f.jpg"
 
             event = {
                 'type': 'chat_message',
@@ -83,7 +83,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             def avatar_url(user):
                 if user.avatar:
                     return user.avatar.url
-                return None
+                return "https://res.cloudinary.com/dcf7vcslc/image/upload/v1768654796/v1oczq9mbm66q0jbh64f.jpg"
 
             counts = await sync_to_async(lambda: [
                 {

@@ -15,7 +15,7 @@
     <div class="profile-upper d-flex align-items-start gap-4 mb-4">
 
         <div class="profile-avatar flex-shrink-0">
-            <img src="{{ user_detail.avatar.url }}" alt="{{ user_detail.username }}"
+            <img src="{{ user_detail.get_avatar_url  }}" alt="{{ user_detail.username }}"
                 class="rounded-circle" style="width:150px; height:150px; object-fit:cover;">
         </div>
 

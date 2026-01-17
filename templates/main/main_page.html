@@ -21,7 +21,7 @@
                                 <div class="d-flex justify-content-between">
                                     <a href="{% url 'user_detail' possible_friend.slug %}"
                                     class="d-flex align-items-center mb-1 text-decoration-none text-dark gap-2">
-                                        <img src="{{ possible_friend.avatar.url }}" class="avatar-small">
+                                        <img src="{{ possible_friend.get_avatar_url  }}" class="avatar-small">
                                         <span>{{ possible_friend.username|truncatechars:11 }}</span>
                                     </a>
 

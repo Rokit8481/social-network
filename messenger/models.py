@@ -21,6 +21,11 @@ class Chat(BaseModel):
         super().save(*args, **kwargs)
         if not self.is_group and self.users.count() > 2:
             raise ValueError("Privately chats cannot have more than 2 users.")
+    
+    def get_background_url(self):
+        if self.background:
+            return self.background.url
+        return 'https://res.cloudinary.com/dcf7vcslc/image/upload/v1768654798/xoz3mmnu8m0qq8ktpxn6.webp'
             
     def __str__(self):
         return self.title or f"Chat between {' and '.join(user.username for user in self.users.all())}"

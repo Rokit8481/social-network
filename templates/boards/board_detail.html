@@ -135,7 +135,7 @@
         {% if board.members %}
             {% for member in board.members.all %}
                 <a href="{% url 'user_detail' member.slug %}" class="d-flex align-items-center mb-3 text-decoration-none text-light gap-2">
-                    <img src="{{ member.avatar.url }}" class="avatar-small">
+                    <img src="{{ member.get_avatar_url }}" class="avatar-small">
                     <span> {{ member.username }}</span>
                 </a>
             {% endfor %}
@@ -159,7 +159,7 @@
         {% if board.admins %}
             {% for admin in board.admins.all %}
                 <a href="{% url 'user_detail' admin.slug %}" class="d-flex align-items-center mb-3 text-decoration-none text-light gap-2">
-                    <img src="{{ admin.avatar.url }}" class="avatar-small">
+                    <img src="{{ admin.get_avatar_url  }}" class="avatar-small">
                     <span> {{ admin.username }}</span>
                 </a>
             {% endfor %}

@@ -11,7 +11,7 @@
         {% if followers %}
             {% for fl in followers %}
                 <a href="{% url 'user_detail' fl.follower.slug %}" class="d-flex align-items-center mb-3 text-decoration-none text-light gap-2">
-                    <img src="{{ fl.follower.avatar.url }}" class="avatar-small">
+                    <img src="{{ fl.follower.get_avatar_url  }}" class="avatar-small">
                     <span>{{ fl.follower.username|truncatechars:20 }}</span>
                 </a>
             {% endfor %}

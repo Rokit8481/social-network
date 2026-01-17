@@ -4,7 +4,7 @@
             <div class="d-flex align-items-start justify-content-between mb-2">
                 <div class="d-flex align-items-center">
                     {% if board_message.sender.avatar %}
-                    <img src="{{ board_message.sender.avatar.url }}" alt="" class="avatar-small">
+                    <img src="{{ board_message.sender.get_avatar_url  }}" alt="" class="avatar-small">
                     {% endif %}
                     <div class="ms-2">
                     <div class="fw-semibold">
