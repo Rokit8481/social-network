@@ -12,7 +12,6 @@ class Chat(BaseModel):
         'background',
         blank=True,
         null=True,
-        default='default/default_bg'
     )
     is_group = models.BooleanField(default=False, verbose_name = 'Is group chat')
     title = models.CharField(max_length=200, blank=True, null=True, verbose_name = 'Title')
