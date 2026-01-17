@@ -4,6 +4,7 @@ from accounts.models import BaseModel
 from accounts.helpers.choices.files import FILE_TYPE_MAP
 from cloudinary.models import CloudinaryField
 import os
+from urllib.parse import urlparse
 
 User = get_user_model()
 
@@ -34,7 +35,8 @@ class File(BaseModel):
         if not self.file:
             return "other"
 
-        ext = os.path.splitext(self.file.name)[1].lower()
+        parsed_url = urlparse(self.file.url)
+        ext = os.path.splitext(parsed_url.path)[1].lower()
 
         for file_type, extensions in FILE_TYPE_MAP.items():
             if ext in extensions:
