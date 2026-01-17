@@ -33,17 +33,19 @@
                     <div class="d-flex gap-2">
                         <form action="{% url 'toggle_follow' user_detail.slug %}" method="POST" class="d-inline">
                             {% csrf_token %}
-                            {% if is_following %}
+                            {% if user_is_following %}
                                 <button class="btn btn-outline-danger">Unfollow</button>
                             {% else %}
                                 <button class="btn btn-primary">Follow</button>
                             {% endif %}
                         </form>
+                        {% if is_following_user %}
                         <form method="post" action="{% url 'create_chat' %}">
                             {% csrf_token %}
                             <input type="hidden" name="user_id" value="{{ user_detail.id }}">
                             <button type="submit" href=""  class="btn btn-outline-secondary">Message</a>
                         </form>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
