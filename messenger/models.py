@@ -26,6 +26,9 @@ class Chat(BaseModel):
             return self.background.url
         return 'https://res.cloudinary.com/dcf7vcslc/image/upload/v1768654798/xoz3mmnu8m0qq8ktpxn6.webp'
             
+    def has_custom_background(self):
+        return self.background and getattr(self.background, 'public_id', None) != 'default/default_bg'
+    
     def __str__(self):
         return self.title or f"Chat between {' and '.join(user.username for user in self.users.all())}"
     
