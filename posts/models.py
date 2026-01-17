@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
 from accounts.helpers.choices.files import FILE_TYPE_MAP
+from cloudinary.models import CloudinaryField
 import os
 
 User = get_user_model()
@@ -23,7 +24,7 @@ class Post(BaseModel):
 
 class File(BaseModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='files', verbose_name='Post')
-    file = models.FileField(upload_to='post_files/', verbose_name='File')
+    file = CloudinaryField('file', folder='post_files/')
 
     def __str__(self):
         return f"File for {self.post.title}"
