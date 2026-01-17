@@ -234,10 +234,10 @@
                     {% if message.user == request.user %}
                       <div class="message-actions mt-2">
                         <a href="#" class="btn btn-sm btn-outline-danger message-delete-btn"
-                          data-message-id="{{ message.id }}">Видалити</a>
+                          data-message-id="{{ message.id }}">Delete</a>
                         <a href="{% url 'message_edit' message.pk %}"
                           class="btn btn-sm btn-outline-warning message-update-btn"
-                          data-message-id="{{ message.id }}">Редагувати</a>
+                          data-message-id="{{ message.id }}">Edit</a>
                       </div>
                     {% endif %}
                   </div>

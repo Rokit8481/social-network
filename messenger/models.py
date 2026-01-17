@@ -2,18 +2,22 @@ from django.db import models
 from accounts.helpers.choices.emoji import EMOJI_CHOICES
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
+from cloudinary.models import CloudinaryField
 
 User = get_user_model()
 
 class Chat(BaseModel):
     users = models.ManyToManyField(User, related_name='chats', blank=False)
-    background = models.ImageField(upload_to='backgrounds/', null=True, blank=True, default='default/default_bg.png', verbose_name = 'Background')
+    background = CloudinaryField(
+        'background',
+        blank=True,
+        null=True,
+        default='default/default_bg'
+    )
     is_group = models.BooleanField(default=False, verbose_name = 'Is group chat')
     title = models.CharField(max_length=200, blank=True, null=True, verbose_name = 'Title')
 
     def save(self, *args, **kwargs):
-        if not self.background:
-            self.background = 'default/default_bg.png'
         super().save(*args, **kwargs)
         if not self.is_group and self.users.count() > 2:
             raise ValueError("Privately chats cannot have more than 2 users.")
@@ -22,10 +26,10 @@ class Chat(BaseModel):
         return self.title or f"Chat between {' and '.join(user.username for user in self.users.all())}"
     
     def delete(self, *args, **kwargs):
-        if self.background and self.background.name != 'default/default_bg.png':
-            self.background.delete(save=False)
-
+        if self.background and self.background.public_id != 'default/default_bg':
+            self.background.delete()
         super().delete(*args, **kwargs)
+
 
     class Meta: 
         ordering = ["created_at"]

@@ -33,9 +33,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             def get_avatar_url(user):
                 if user.avatar:
-                    return settings.MEDIA_URL + user.avatar.name
-                return settings.MEDIA_URL + 'default/default_avatar.png'
-
+                    return user.avatar.url
+                return None
 
             event = {
                 'type': 'chat_message',
@@ -81,10 +80,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 action = 'added'
 
-            def avatar_url(avatar):
-                if avatar:
-                    return settings.MEDIA_URL + avatar
-                return settings.MEDIA_URL + 'default/default_avatar.png'
+            def avatar_url(user):
+                if user.avatar:
+                    return user.avatar.url
+                return None
 
             counts = await sync_to_async(lambda: [
                 {
@@ -92,13 +91,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'count': item['count'],
                     'users': [
                         {
-                            'username': u['user__username'],
-                            'avatar': avatar_url(u['user__avatar'])
+                            'username': u.user.username,
+                            'avatar': avatar_url(u.user)
                         }
                         for u in message.reactions
                             .filter(emoji=item['emoji'])
                             .select_related('user')[:3]
-                            .values('user__username', 'user__avatar')
                     ]
                 }
                 for item in message.reactions
