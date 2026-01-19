@@ -111,6 +111,7 @@ class MessageUpdateView(LoginRequiredMixin, View):
             }
         })
 
+# Вью для створення групи
 class CreateGroupView(LoginRequiredMixin, CreateView):
     model = Chat
     form_class = GroupForm

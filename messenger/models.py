@@ -19,7 +19,7 @@ class Chat(BaseModel):
             raise ValueError("Privately chats cannot have more than 2 users.")
             
     def __str__(self):
-        return self.title or f"Chat between {' and '.join(user.username for user in self.users.all())}"
+        return self.title
     
     def delete(self, *args, **kwargs):
         if self.background and self.background.name != 'default/default_bg.png':
@@ -38,7 +38,7 @@ class Message(BaseModel):
     text = models.TextField(null=True, blank=True, verbose_name = 'Text')
 
     def __str__(self):
-        return f"{self.user}: {self.text[:30] if self.text else '[файл]'}"
+        return f"{self.user}: {self.text[:30] if self.text else '[file]'}"
     
     def was_edited(self):
         if (self.updated_at - self.created_at).total_seconds() > 1:

@@ -115,7 +115,7 @@ if (deleteChatBtn && chatId) {
 
   deleteChatBtn.addEventListener('click', function(e) {
     e.preventDefault();
-    const confirmed = confirm("Ви впевнені що хочете видалити цей чат?");
+    const confirmed = confirm("Are you sure you want to delete this chat?");
     if (!confirmed) return;
 
     fetch(deleteChatUrl, {
@@ -138,7 +138,7 @@ if (deleteChatBtn && chatId) {
 document.querySelectorAll('.message-delete-btn').forEach(btn => {
   btn.addEventListener('click', function(e) {
     e.preventDefault();
-    if (!confirm("Ви впевнені що хочете видалити це повідомлення?")) return;
+    if (!confirm("Are you sure you want to delete this message?")) return;
 
     const messageId = this.dataset.messageId;
 
@@ -169,7 +169,7 @@ document.querySelectorAll(".message-update-btn").forEach(btn => {
     textInput.focus();
 
     editingMessageId = messageId;
-    sendBtn.textContent = "Зберегти зміни";
+    sendBtn.textContent = "Save changes";
     sendBtn.classList.remove("btn-primary");
     sendBtn.classList.add("btn-warning");
   });
@@ -189,7 +189,7 @@ form.addEventListener('submit', e => {
   
     textInput.value = "";
     editingMessageId = null;
-    sendBtn.textContent = "Надіслати";
+    sendBtn.textContent = "Sent";
     sendBtn.classList.remove("btn-warning");
     sendBtn.classList.add("btn-primary");
   }
@@ -284,11 +284,11 @@ function formatHumanDate(dateISO) {
   yesterday.setDate(today.getDate() - 1);
 
   if (date.toDateString() === today.toDateString()) {
-    return "Сьогодні";
+    return "Today";
   }
 
   if (date.toDateString() === yesterday.toDateString()) {
-    return "Вчора";
+    return "Yesterday";
   }
 
   return date.toLocaleDateString('uk-UA', {
