@@ -41,9 +41,14 @@
             <div class="mb-3">
                 {{ form.people_tags.label_tag }}
                 {{ form.people_tags }}
-                {% if form.people_tags.errors %}
-                    <div class="text-danger mt-1">{{ form.people_tags.errors }}</div>
-                {% endif %}
+                <div id="people-tags-error" class="text-danger mt-1">
+                    {% if form.people_tags.errors %}
+                        {% for error in form.people_tags.errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <small class="text-muted d-block mt-1">You can tag up to 25 people.</small>
             </div>
 
             <div class="mb-3">
@@ -102,7 +107,13 @@
   $(document).ready(function () {
     $('#id_people_tags').select2({
       placeholder: 'Edit tagged people',
-      width: '100'
+      width: '100%',
+      maximumSelectionLength: 25,
+      language: {
+        maximumSelected: function (args) {
+          return "You can select up to 25 people.";
+        }
+      }
     });
   });
 </script>

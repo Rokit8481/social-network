@@ -124,3 +124,43 @@
     font-weight: bold;
     border-radius: 12px;
 }
+
+
+.attachment-item {
+    font-size: 0.75rem;          
+    text-decoration: none;
+    color: #f8f9fa;              /* lighter text for contrast */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 250px;               
+    height: 60px;                 
+    border: 1px solid #444;       /* darker border */
+    border-radius: 6px;          
+    background-color: #343a40;    /* dark background */
+    padding: 4px;
+    margin: 6px;                 
+    overflow: hidden;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.attachment-item:hover {
+    background-color: #212529;    /* even darker on hover */
+    border-color: #666;
+    text-decoration: none;
+    color: #ffffff;               /* pure white text on hover */
+}
+
+.attachments-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    gap: 10px;                             /* spacing between items */
+}
+
+.attachments-grid .attachment-item {
+    flex: 0 0 auto;   
+    width: 100%;       /* let grid control width */
+    height: 80px;
+}
