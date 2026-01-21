@@ -187,21 +187,16 @@ class ChatView(LoginRequiredMixin, View):
 
         default_background = Chat._meta.get_field('background').default
 
-        user_followers = User.objects.filter(
-            id__in=Follow.objects.filter(
-                following=request.user
-            ).values_list('follower_id', flat=True)
-        )
+        user_friends = User.objects.filter(id__in=[u.id for u in request.user.get_friends()])
 
                 
         context = {
             "chat": chat,
             "messages": messages,
-            "users": User.objects.exclude(id=request.user.id),
             "chats": Chat.objects.filter(users=request.user),
             "form": MessageForm(),
             "emoji_choices": EMOJI_CHOICES,
-            "user_followers": user_followers,
+            "user_friends": user_friends,
             "default_background": settings.MEDIA_URL + default_background,
         }
 

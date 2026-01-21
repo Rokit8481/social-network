@@ -39,7 +39,7 @@
                                 <button class="btn btn-primary">Follow</button>
                             {% endif %}
                         </form>
-                        {% if is_following_user %}
+                        {% if is_user_friend %}
                         <form method="post" action="{% url 'create_chat' %}">
                             {% csrf_token %}
                             <input type="hidden" name="user_id" value="{{ user_detail.id }}">
@@ -66,7 +66,7 @@
 
 
     <!-- ====================== STATS CARD ====================== -->
-    {% if request.user == user_detail %}
+    {% if is_user_friend %}
         {% include "helpers/partials/profile_stats.html" %}
     {% endif %}
     <!-- ====================== TABS: POSTS / BOARDS / LIKED ====================== -->
@@ -170,7 +170,7 @@
                 </nav>
                 {% endif %}
             {% else %}
-                <p class="text-muted text-center">This user hasn't liked any posts yet.</p>
+                <p class="text-light text-center">This user hasn't liked any posts yet.</p>
             {% endif %}
         </div>
 

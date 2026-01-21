@@ -13,10 +13,9 @@ def create_new_post_notification(sender, instance, created, **kwargs):
         return
     
     post_author = instance.author
-    followers = post_author.followers.all()
+    friends = post_author.get_friends()
 
-    for follow_obj in followers:
-        follower = follow_obj.follower 
+    for follower in friends:
 
         already = Notification.objects.filter(
             to_user=follower,

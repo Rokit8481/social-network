@@ -10,7 +10,7 @@ class MessageForm(forms.ModelForm):
         fields = ['text']
         widgets = {
             'text': forms.TextInput(attrs={
-                'placeholder': "Напишіть повідомлення...",
+                'placeholder': "Write down message...",
                 'class': 'form-control',
                 'id': 'message-input'
             })
@@ -25,14 +25,13 @@ class GroupForm(forms.ModelForm):
                 'class': 'form-select',
             }),
             'title': forms.TextInput(attrs={
-                'placeholder': "Напишіть назву цього чату",
+                'placeholder': "Write down group title...",
                 'class': 'form-control',
             }),
             'background': forms.ClearableFileInput(attrs={
                 'class': 'form-control',
             }),
         }
-        title = forms.CharField(required=True)
 
     def __init__(self, *args, **kwargs):
         # Витягуємо поточного користувача
@@ -40,8 +39,8 @@ class GroupForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         if user:
-            following_qs = User.objects.filter(followers__follower=user)
-            self.fields['users'].queryset = following_qs
+            friends_qs = User.objects.filter(id__in=[u.id for u in user.get_friends()])
+            self.fields['users'].queryset = friends_qs
 
 class ChatForm(forms.ModelForm):
     class Meta:
