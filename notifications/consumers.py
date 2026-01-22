@@ -7,7 +7,8 @@ from channels.db import database_sync_to_async
 class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
-        from .models import Notification 
+        from notifications.models import Notification
+        self.group_name = None 
 
         user = self.scope["user"]
         if isinstance(user, AnonymousUser):
@@ -24,10 +25,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            self.group_name,
-            self.channel_name
-        )
+        if self.group_name:
+            await self.channel_layer.group_discard(
+                self.group_name,
+                self.channel_name
+            )
 
     async def send_notification(self, event):
         from .models import Notification  

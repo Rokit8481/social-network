@@ -14,7 +14,11 @@
     <link rel="stylesheet" href="{% static 'css/general/notifications/styles.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body {% if request.resolver_match.url_name == 'notifications_list' %}data-notifications-page="true"{% endif %}>
+<body 
+data-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}"
+{% if request.resolver_match.url_name == 'notifications_list' %}
+    data-notifications-page="true"
+{% endif %}>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
         <a class="navbar-brand" href="{% url 'main_page' %}"><i class="bi bi-house"></i></a>
@@ -49,13 +53,18 @@
                             class="shadow rounded bg-gray d-none">
                             <div class="p-2 border-bottom fw-bold small">
                                 <div class="d-flex align-items-center mb-2 gap-2">
-                                    <a href="{% url "notifications:notifications_list" %}" class="text-decoration-none text-light">
+                                    <a href="{% url "notifications:notifications_list" %}" class="text-decoration-none card-title fs-6">
                                     Notifications
                                     </a>
                                     <button class="mark-all-read-btn btn-dd d-none" title="Mark all read">✓</button>
                                 </div>
                             </div>
                             <div id="notifications-container"></div>
+                            <div class="p-2 border-top text-center align-content-center"> 
+                                <a href="{% url "notifications:notifications_list" %}" class="text-decoration-none card-title fs-2">
+                                    View all
+                                </a>
+                            </div>
                         </div>
                     </li>
                     <li class="nav-item">
