@@ -4,8 +4,21 @@ from posts.models import Post, PostLike, Comment, CommentLike
 from django.contrib.auth import get_user_model
 from notifications.models import Notification
 from notifications.signals import notify_user
+from accounts.helpers.custom_settings import MAX_PEOPLE_TAGS
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
+
+@receiver(m2m_changed, sender=Post.people_tags.through)
+def limit_people_tags(sender, instance, action, pk_set, **kwargs):
+    if action != "pre_add":
+        return
+
+    current_count = instance.people_tags.count()
+    if current_count + len(pk_set) > MAX_PEOPLE_TAGS:
+        raise ValidationError(
+            f"You can tag at most {MAX_PEOPLE_TAGS} people."
+        )
 
 @receiver(post_save, sender=Post)
 def create_new_post_notification(sender, instance, created, **kwargs):

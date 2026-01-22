@@ -71,7 +71,13 @@
   $(document).ready(function () {
     $('#id_people_tags').select2({
       placeholder: 'Choose people to tag',
-      width: '100'
+      width: '100%',
+      maximumSelectionLength: 25,
+      language: {
+        maximumSelected: function (args) {
+          return "You can select up to 25 people.";
+        }
+      }
     });
   });
 </script>
