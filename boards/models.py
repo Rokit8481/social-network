@@ -19,8 +19,9 @@ class Tag(BaseModel):
         ordering = ['name']
         
     def save(self, *args, **kwargs):
-        formatted = slugify(self.name, separator="_", lowercase=False)
+        formatted = slugify(self.name).lower()
         self.name = formatted
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def __str__(self):

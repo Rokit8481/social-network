@@ -31,7 +31,7 @@ class Chat(BaseModel):
         return self.background and getattr(self.background, 'public_id', None) != 'default/default_bg'
     
     def __str__(self):
-        return self.title or f"Chat between {' and '.join(user.username for user in self.users.all())}"
+        return self.title
     
     def delete(self, *args, **kwargs):
         if self.background and getattr(self.background, 'public_id', None) != 'default/default_bg':
@@ -53,7 +53,7 @@ class Message(BaseModel):
     text = models.TextField(null=True, blank=True, verbose_name = 'Text')
 
     def __str__(self):
-        return f"{self.user}: {self.text[:30] if self.text else '[файл]'}"
+        return f"{self.user}: {self.text[:30] if self.text else '[file]'}"
     
     def was_edited(self):
         if (self.updated_at - self.created_at).total_seconds() > 1:

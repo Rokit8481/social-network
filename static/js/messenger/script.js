@@ -284,11 +284,11 @@ function formatHumanDate(dateISO) {
   yesterday.setDate(today.getDate() - 1);
 
   if (date.toDateString() === today.toDateString()) {
-    return "Сьогодні";
+    return "Today";
   }
 
   if (date.toDateString() === yesterday.toDateString()) {
-    return "Вчора";
+    return "Yesterday";
   }
 
   return date.toLocaleDateString('uk-UA', {

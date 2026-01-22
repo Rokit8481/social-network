@@ -28,8 +28,10 @@
                                     {% if request.user != possible_friend %}
                                         <form action="{% url 'toggle_follow' possible_friend.slug %}" method="POST">
                                             {% csrf_token %}
-                                            {% if possible_friend.is_following %}
+                                            {% if user_is_following %}
                                                 <button class="btn btn-outline-danger">Unfollow</button>
+                                            {% elif is_following_user %}
+                                                <button class="btn btn-success">Follow back</button>
                                             {% else %}
                                                 <button class="btn btn-primary">Follow</button>
                                             {% endif %}

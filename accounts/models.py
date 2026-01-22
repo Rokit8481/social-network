@@ -31,6 +31,14 @@ class UserProfile(AbstractUser):
         if self.avatar:
             return self.avatar.url
         return 'https://res.cloudinary.com/dcf7vcslc/image/upload/v1768654796/v1oczq9mbm66q0jbh64f.jpg'
+    def get_friends(self):
+        from accounts.models import Follow
+        following_qs = Follow.objects.filter(follower=self)
+        friends = []
+        for follow in following_qs:
+            if Follow.is_friends(self, follow.following):
+                friends.append(follow.following)
+        return friends
 
     class Meta:
         verbose_name = 'User Profile'
@@ -49,3 +57,20 @@ class Follow(BaseModel):
 
     def __str__(self):
         return f"{self.follower} → {self.following}"
+    
+    @classmethod
+    def is_friends(self, user1, user2):
+        follow_obj_1 = Follow.objects.filter(follower=user1, following=user2)
+        follow_obj_2 = Follow.objects.filter(follower=user2, following=user1)
+        if follow_obj_1.exists() and follow_obj_2.exists():
+            return True
+        return False
+    
+    @classmethod
+    def follow_user(self, follower, following):
+        follow_obj, created = Follow.objects.get_or_create(follower=follower, following=following)
+        return created
+
+    @classmethod
+    def unfollow_user(self, follower, following):
+        Follow.objects.filter(follower=follower, following=following).delete()

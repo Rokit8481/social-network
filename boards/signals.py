@@ -4,8 +4,19 @@ from boards.models import Board, BoardMessage
 from django.contrib.auth import get_user_model
 from notifications.models import Notification
 from notifications.signals import notify_user
+from accounts.helpers.custom_settings import MAX_TAGS_PER_BOARD
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
+
+@receiver(m2m_changed, sender=Board.tags.through)
+def limit_tags(sender, instance, action, pk_set, **kwargs):
+    if action == "pre_add":
+        if instance.tags.count() + len(pk_set) > MAX_TAGS_PER_BOARD:
+            raise ValidationError(
+                f"Board can have at most {MAX_TAGS_PER_BOARD} tags"
+            )
+
 
 @receiver(post_save, sender=BoardMessage)
 def create_new_board_message_notification(sender, instance, created, **kwargs):

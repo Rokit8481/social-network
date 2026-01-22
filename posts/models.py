@@ -1,8 +1,10 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from accounts.models import BaseModel
+from accounts.helpers.custom_settings import MAX_FILES_PER_POST
 from accounts.helpers.choices.files import FILE_TYPE_MAP
 from cloudinary.models import CloudinaryField
+from django.core.exceptions import ValidationError
 import os
 from urllib.parse import urlparse
 
@@ -51,6 +53,24 @@ class File(BaseModel):
     @property
     def is_attachment(self):
         return not self.is_media
+    
+    def clean(self):
+        if not self.post_id:
+            return
+
+        qs = self.post.files.all()
+        if self.pk:
+            qs = qs.exclude(pk=self.pk)
+
+        if qs.count() >= MAX_FILES_PER_POST:
+            raise ValidationError(
+                f"One post can have at most {MAX_FILES_PER_POST} files."
+            )
+
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
         
     class Meta:
         verbose_name = 'File'

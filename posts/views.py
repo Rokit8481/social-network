@@ -6,7 +6,7 @@ from posts.models import Post, PostLike, Comment, CommentLike, File
 from posts.forms import PostForm, CommentForm
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count, Q
 from django.template.loader import render_to_string
 import json
@@ -28,22 +28,31 @@ class CreatePostView(LoginRequiredMixin, View):
     template_name = 'posts/post_create.html'
     
     def get(self, request):
-        form = self.form_class()
+        form = self.form_class(user=request.user)
         return render(request, self.template_name, {'form': form})
     
     def post(self, request):
-        form = self.form_class(request.POST, request.FILES)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            form.save_m2m()
-            
+        form = self.form_class(request.POST, request.FILES, user=request.user)
+
+        if not form.is_valid():
+            return render(request, self.template_name, {'form': form})
+
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        form.save_m2m()
+
+        try:
             for f in request.FILES.getlist('files'):
                 File.objects.create(post=post, file=f)
-            return redirect('post_detail', post_pk=post.pk)
-        
-        return render(request, self.template_name, {'form': form})
+
+        except ValidationError as e:
+            for errors in e.message_dict.values():
+                for error in errors:
+                    form.add_error(None, error)
+
+            return render(request, self.template_name, {'form': form})
+        return redirect('post_detail', post_pk=post.pk)
 
 class TogglePostLikeAPI(LoginRequiredMixin, View):
     def post(self, request, post_pk):
@@ -142,25 +151,37 @@ class PostEditView(LoginRequiredMixin, View):
         if post.author != request.user:
             raise PermissionDenied
 
-        form = self.form_class(instance=post)
+        form = self.form_class(instance=post, user=request.user)
         return render(request, self.template_name, {"form": form, "post": post})
     
     def post(self, request, post_pk, *args, **kwargs):
         post = get_object_or_404(self.model, pk=post_pk, author=request.user)
-        form = self.form_class(request.POST, request.FILES, instance=post)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.save()
-            form.save_m2m()
+        form = self.form_class(
+            request.POST,
+            request.FILES,
+            instance=post,
+            user=request.user
+        )
+        if not form.is_valid():
+            return render(request, self.template_name, {"form": form, "post": post})
+        
+        post = form.save(commit=False)
+        post.save()
+        form.save_m2m()
 
-            delete_ids = request.POST.getlist("delete_files")
-            post.files.filter(id__in=delete_ids).delete()
+        delete_ids = request.POST.getlist("delete_files")
+        post.files.filter(id__in=delete_ids).delete()
 
+        try:
             for f in request.FILES.getlist("files"):
                 File.objects.create(post=post, file=f)
-            
-            return redirect('post_detail', post_pk=post_pk)
-        return render(request, self.template_name, {"form": form, "post": post})
+
+        except ValidationError as e:
+            for errors in e.message_dict.values():
+                for error in errors:
+                    form.add_error(None, error)
+            return render(request, self.template_name, {"form": form, "post": post})
+        return redirect('post_detail', post_pk=post_pk)
 
 class PostDeleteView(LoginRequiredMixin, View):
     def post(self, request, post_pk):
