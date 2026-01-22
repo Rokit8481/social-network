@@ -160,6 +160,7 @@ class UserDetailView(LoginRequiredMixin, View):
             follower=user_detail,
             following=request.user
         ).exists()
+        is_user_friend = Follow.is_friends(request.user, user_detail)
 
         #POSTS
         posts_qs = Post.objects.filter(author=user_detail).order_by('-created_at')
@@ -233,6 +234,7 @@ class UserDetailView(LoginRequiredMixin, View):
             "following_count": following.count(),
             "user_is_following": user_is_following,
             "is_following_user": is_following_user,
+            "is_user_friend": is_user_friend,
             "posts": posts,
             "posts_paginator": posts_paginator,
             "user_boards": user_boards,
@@ -257,11 +259,8 @@ class ToggleFollowView(LoginRequiredMixin, View):
         )
 
         if follow_obj.exists():
-            follow_obj.delete()
+            Follow.unfollow_user(follower=request.user, following=user_to_follow)
         else:
-            Follow.objects.create(
-                follower=request.user,
-                following=user_to_follow
-            )
+            Follow.follow_user(follower=request.user, following=user_to_follow)
 
         return redirect("user_detail", slug=slug)

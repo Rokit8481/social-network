@@ -40,9 +40,23 @@ class MainPageView(LoginRequiredMixin, View):
                 following__in=possible_friends
             ).values_list('following_id', flat=True)
         )
+        following_ids = set(
+            Follow.objects.filter(follower=current_user)
+            .values_list("following_id", flat=True)
+        )
+
+        followers_ids = set(
+            Follow.objects.filter(following=current_user)
+            .values_list("follower_id", flat=True)
+        )
 
         for possible_friend in possible_friends:
             possible_friend.is_following = possible_friend.id in already_following
+            possible_friend.user_is_following = possible_friend.id in following_ids
+            possible_friend.is_following_user = possible_friend.id in followers_ids
+            possible_friend.is_user_friend = (
+                possible_friend.id in following_ids and possible_friend.id in followers_ids
+            )
         
         #3.TABS
         tab = request.GET.get("tab", "feed")
@@ -114,9 +128,6 @@ class MainPageView(LoginRequiredMixin, View):
             "main_page": main_page,
         }
 
-        #8. TOP 5 POSTS
-        top_posts = Post.objects.all().order_by("viewers")[:5]
-
         return render(request, self.template_name, {
             "user": current_user,
             "active_tab": tab,
@@ -125,7 +136,6 @@ class MainPageView(LoginRequiredMixin, View):
             "top_tags": tags,
             "possible_friends": possible_friends[:15],
             "stats": stats,
-            "top_posts": top_posts,
         })
     
     def post(self, request):

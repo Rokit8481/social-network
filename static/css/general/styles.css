@@ -123,6 +123,36 @@ body {
     transform: translateY(-2px);
 }
 
+.btn-danger {
+    background: linear-gradient(45deg, #dc2626, #ef4444);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); 
+}
+
+.btn-danger:hover {
+    background: linear-gradient(45deg, #b91c1c, #dc2626); 
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+    transform: translateY(-2px);
+}
+
+.btn-outline-danger {
+    background-color: transparent;
+    border: 2px solid #ef4444; 
+    color: #ef4444;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-danger:hover {
+    background: #ef4444;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
+    transform: translateY(-2px);
+}
+
 .profile-header {
     display: flex;
     align-items: center;
@@ -313,4 +343,24 @@ input.form-control::placeholder {
 .list-group-item:hover {
     background-color: #383850;
     color: #fff;
+}
+
+.friend-badge-over {
+    position: absolute;
+    top: -6px;         
+    right: -30px;       
+
+    z-index: 2;      
+
+    font-size: 12px;
+    font-weight: 600;
+
+    padding: 4px 8px;
+    border-radius: 999px;
+
+    background-color: rgba(25, 135, 84, 0.4);
+    color: #fff;
+
+    line-height: 1;
+    white-space: nowrap;
 }

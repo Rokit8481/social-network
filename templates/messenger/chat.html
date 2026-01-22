@@ -23,7 +23,7 @@
             USERS
           </h4>
         </div>
-        {% for user in user_followers %}
+        {% for user in user_friends %}
           <form method="post" action="{% url 'create_chat' %}">
             {% csrf_token %}
             <input type="hidden" name="user_id" value="{{ user.id }}">
