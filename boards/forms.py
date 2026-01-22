@@ -1,6 +1,7 @@
 from django import forms
 from boards.models import Board, BoardMessage
 from boards.widgets import TagSelect2Widget
+from accounts.helpers.custom_settings import MAX_TAGS_PER_BOARD, MAX_TAG_LEN
 
 class CreateBoardForm(forms.ModelForm):
     class Meta:
@@ -17,12 +18,19 @@ class CreateBoardForm(forms.ModelForm):
     
     def clean_tags(self):
         tags = self.cleaned_data.get("tags")
-        MAX_LEN = 40
+        
+        if not tags:
+            return tags
 
+        if tags.count() > MAX_TAGS_PER_BOARD:
+            raise forms.ValidationError(
+                f"You can add no more than {MAX_TAGS_PER_BOARD} tags."
+            )
+        
         for tag in tags:
-            if len(tag.name) > MAX_LEN:
+            if len(tag.name) > MAX_TAG_LEN:
                 raise forms.ValidationError(
-                    f"Tag “{tag.name[:20]}…” is too long (max {MAX_LEN} characters)"
+                    f"Tag “{tag.name[:20]}…” is too long (max {MAX_TAG_LEN} characters)"
                 )
 
         return tags
@@ -49,12 +57,19 @@ class EditBoardForm(forms.ModelForm):
 
     def clean_tags(self):
         tags = self.cleaned_data.get("tags")
-        MAX_LEN = 40
 
+        if not tags:
+            return tags
+
+        if tags.count() > MAX_TAGS_PER_BOARD:
+            raise forms.ValidationError(
+                f"You can add no more than {MAX_TAGS_PER_BOARD} tags."
+            )
+        
         for tag in tags:
-            if len(tag.name) > MAX_LEN:
+            if len(tag.name) > MAX_TAG_LEN:
                 raise forms.ValidationError(
-                    f"Tag “{tag.name[:20]}…” is too long (max {MAX_LEN} characters)"
+                    f"Tag “{tag.name[:20]}…” is too long (max {MAX_TAG_LEN} characters)"
                 )
 
         return tags
