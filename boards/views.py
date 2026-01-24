@@ -81,11 +81,11 @@ class CreateBoardView(LoginRequiredMixin, View):
     success_url = reverse_lazy("boards_list")
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class()
+        form = self.form_class(user=request.user)
         return render(request, self.template_name, {"form": form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.POST, user=request.user)
         if form.is_valid():
             board = form.save(commit=False)
             board.creator = request.user
