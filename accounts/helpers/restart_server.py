@@ -26,8 +26,13 @@ def collect_static():
 
 def start_uvicorn():
     print("Starting uvicorn server...")
-    if os.name == "nt":
-        subprocess.Popen(["uvicorn", "social_network.asgi:application", "--reload"], shell=True)
+    subprocess.Popen(
+        [sys.executable, "-m", "uvicorn", "social_network.asgi:application"],
+        stdin=sys.stdin,
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+    )
+
 
 if __name__ == "__main__":
     stop_uvicorn()
