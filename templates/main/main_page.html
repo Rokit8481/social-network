@@ -12,7 +12,7 @@
         <!-- LEFT COLUMN -->
         <div class="col-lg-3">
             <div class="sidebar-sticky p-3">
-                {% include "helpers/partials/profile_stats.html" %}
+                {% include "helpers/partials/general/profile_stats.html" %}
                 {% if possible_friends %}
                     <div class="card mb-4">
                         <div class="card-body">
@@ -87,7 +87,7 @@
             </div>
 
             <div id="posts-container">
-                {% include "helpers/partials/posts_list.html" %}
+                {% include "helpers/partials/posts/posts_list.html" %}
             </div>
 
             <div id="loader" class="text-center my-4 d-none">
@@ -105,7 +105,7 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title d-flex justify-content-center mb-2">Top 5 Boards</h5>
-                            {% include "helpers/partials/boards_list.html" with boards=top_boards %}
+                            {% include "helpers/partials/boards/boards_list.html" with boards=top_boards %}
                             <div class="d-flex justify-content-center mt-2">
                                 <a href="{% url 'boards_list' %}"
                                 class="btn btn-m btn-link p-0 text-dark text-decoration-none">

@@ -1,7 +1,7 @@
 {% if boards %}
     <div class="row">
         {% for board in boards %}
-            {% include "helpers/partials/board_item.html" with board=board %}
+            {% include "helpers/partials/boards/board_item.html" with board=board %}
         {% endfor %}
     </div>
 {% else %}

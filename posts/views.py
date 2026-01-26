@@ -98,7 +98,7 @@ class PostDetailView(LoginRequiredMixin, View):
             post.viewers.add(request.user)
         viewers_count = post.viewers.count()
 
-        comments = post.comments.all().select_related("user")
+        comments = post.comments.all().select_related("user").order_by('-id')[:4]
 
         media_files = [f for f in post.files.all() if f.is_media]
         attachments = [f for f in post.files.all() if f.is_attachment]
@@ -213,7 +213,7 @@ class CommentEditView(LoginRequiredMixin, View):
         if not content or not content.strip():
             return JsonResponse({
                 "success": False,
-                "error": "Порожнє повідомлення"
+                "error": "Empty content is not allowed."
             }, status=400)
         
         comment.content = content
@@ -253,7 +253,7 @@ class PostsInfiniteAPI(LoginRequiredMixin, View):
         posts = list(qs[:5])
 
         html = render_to_string(
-            "helpers/partials/posts_list.html",
+            "helpers/partials/posts/posts_list.html",
             {"posts": posts},
             request=request
         )
@@ -261,4 +261,33 @@ class PostsInfiniteAPI(LoginRequiredMixin, View):
         return JsonResponse({
             "html": html,
             "has_more": len(posts) == 5
+        })
+    
+class CommentMessagesInfiniteAPI(LoginRequiredMixin, View):
+    def get(self, request, post_pk):
+        post = get_object_or_404(Post, pk=post_pk)
+        last_id = request.GET.get("last_id")
+
+        qs = (
+            Comment.objects
+            .filter(post=post)
+            .select_related("user")
+            .order_by('-id')
+        )
+
+        if last_id:
+            qs = qs.filter(id__lt=last_id)
+
+        post_comments = list(qs[:4])
+
+
+        html = render_to_string(
+            "helpers/partials/posts/comments_list.html",
+            {"comments": post_comments},
+            request=request
+        )
+
+        return JsonResponse({
+            "html": html,
+            "has_more": len(post_comments) == 4
         })

@@ -1,6 +1,6 @@
 {% if posts %}
     {% for post in posts %}
-        {% include "helpers/partials/post_item.html" with post=post %}
+        {% include "helpers/partials/posts/post_item.html" with post=post %}
     {% endfor %}
 {% else %}
     <p class="text-light">No posts to display.</p>
