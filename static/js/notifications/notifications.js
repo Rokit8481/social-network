@@ -1,6 +1,8 @@
 (() => {
     'use strict';
 
+    const IS_AUTH = document.body.dataset.authenticated === 'true';
+    if (!IS_AUTH) return;
     const IS_PAGE = document.body.dataset.notificationsPage === 'true';
     console.log('Notifications page mode:', IS_PAGE);
 
@@ -39,7 +41,10 @@
     async function loadOldNotifications() {
         if (loadedOld) return;
         try {
-            const res = await fetch('/notifications/api/');
+            const url = IS_PAGE
+                ? '/notifications/api/'
+                : '/notifications/api/unread/';
+            const res = await fetch(url);
             if (!res.ok) throw new Error('Failed to fetch notifications');
             const data = await res.json();
 
@@ -117,7 +122,7 @@
                 li.classList.remove('unread');
                 btn.remove();
                 if (!IS_PAGE) await loadUnreadCount();
-                toggleMarkAllReadButton(); // оновлюємо кнопку
+                toggleMarkAllReadButton();
             });
         }
 

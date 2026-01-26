@@ -22,7 +22,15 @@
         <div class="profile-main flex-grow-1 d-flex flex-column justify-content-start">
 
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
-                <h2 class="username mb-0">{{ user_detail.username }}</h2>
+                <h2 class="username mb-0 position-relative d-inline-block">
+                    {{ user_detail.username }}
+
+                    {% if is_user_friend %}
+                        <span class="friend-badge-over">friend</span>
+                    {% endif %}
+                </h2>
+
+
 
                 {% if request.user == user_detail %}
                     <div class="dropdown">
@@ -35,11 +43,13 @@
                             {% csrf_token %}
                             {% if user_is_following %}
                                 <button class="btn btn-outline-danger">Unfollow</button>
+                            {% elif is_following_user %}
+                                <button class="btn btn-success">Follow back</button>
                             {% else %}
                                 <button class="btn btn-primary">Follow</button>
                             {% endif %}
                         </form>
-                        {% if is_following_user %}
+                        {% if is_user_friend %}
                         <form method="post" action="{% url 'create_chat' %}">
                             {% csrf_token %}
                             <input type="hidden" name="user_id" value="{{ user_detail.id }}">
@@ -170,7 +180,7 @@
                 </nav>
                 {% endif %}
             {% else %}
-                <p class="text-muted text-center">This user hasn't liked any posts yet.</p>
+                <p class="text-light text-center">This user hasn't liked any posts yet.</p>
             {% endif %}
         </div>
 

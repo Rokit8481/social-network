@@ -44,6 +44,25 @@ class NotificationAPIView(LoginRequiredMixin, View):
         ]
 
         return JsonResponse(data, safe=False)
+
+class UnreadNotificationsAPI(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        notifications = Notification.objects.filter(
+            to_user=request.user,
+            is_read=False
+        ).order_by("-created_at")
+
+        data = [
+            {
+                "id": n.id,
+                "message": n.get_message(),
+                "is_read": n.is_read,
+                "created": n.created_at.strftime("%H:%M %d/%m/%Y"),
+            }
+            for n in notifications
+        ]
+
+        return JsonResponse(data, safe=False)
     
 class UnreadCountAPI(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):

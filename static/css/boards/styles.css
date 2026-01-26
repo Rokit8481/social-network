@@ -10,6 +10,19 @@
   height:60vh
 }
 
+.board-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.board-messages::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+}
+
+.board-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
 .board-message-item .board-card {
   border-radius: 12px;
   margin-bottom: 12px;
