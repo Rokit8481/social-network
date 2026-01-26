@@ -283,7 +283,10 @@ class CommentMessagesInfiniteAPI(LoginRequiredMixin, View):
 
         html = render_to_string(
             "helpers/partials/posts/comments_list.html",
-            {"comments": post_comments},
+            {
+                "comments": post_comments,
+                "post": post,
+            },
             request=request
         )
 

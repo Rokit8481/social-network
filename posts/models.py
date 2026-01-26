@@ -10,8 +10,8 @@ User = get_user_model()
 
 class Post(BaseModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts', verbose_name='Author')
-    title = models.CharField(max_length=100, verbose_name='Title', blank=False, null=False)
-    content = models.TextField(blank=False, null=False, verbose_name='Content')
+    title = models.CharField(max_length=128, verbose_name='Title', blank=False, null=False)
+    content = models.CharField(max_length=4096, blank=False, null=False, verbose_name='Content')
     people_tags = models.ManyToManyField(User, related_name='tagged_posts', blank=True, verbose_name='Tagged People')
     viewers = models.ManyToManyField(User, related_name='viewed_posts', blank=True, verbose_name='Viewers')
 
@@ -77,7 +77,7 @@ class File(BaseModel):
 class Comment(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments', verbose_name='User')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name='Post')
-    content = models.TextField(blank=False, null=False, verbose_name='Content')
+    content = models.CharField(max_length=4096, blank=False, null=False, verbose_name='Content')
     
 
     def __str__(self):

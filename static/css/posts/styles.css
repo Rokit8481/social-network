@@ -164,3 +164,9 @@
     width: 100%;       /* let grid control width */
     height: 80px;
 }
+
+.comment-text,
+.comment-item span {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}

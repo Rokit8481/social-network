@@ -28,7 +28,7 @@ class Tag(BaseModel):
     
 class Board(BaseModel):
     title = models.CharField(max_length=100, verbose_name='Title', null=False, blank=False)
-    description = models.TextField(verbose_name='Description', null=True, blank=True)
+    description = models.CharField(max_length=1028, verbose_name='Description', null=True, blank=True)
     slug = models.SlugField(unique=True, default=shortuuid.uuid, editable=False)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_boards', null=False)
     admins = models.ManyToManyField(User, related_name='admin_boards', blank=True)
@@ -75,7 +75,7 @@ class BoardMessage(BaseModel):
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='messages', null=False)
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='board_messages', null=False)
     slug = models.CharField(max_length=8, unique=True, default=generate_code, editable=False)
-    content = models.TextField(verbose_name='Message Content', null=False, blank=False)
+    content = models.CharField(max_length=2048, verbose_name='Message Content', null=False, blank=False)
     
     class Meta:
         verbose_name = 'Board Message'

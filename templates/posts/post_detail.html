@@ -71,7 +71,7 @@
                 <div id="comments-box"
                     class="flex-grow-1 overflow-auto p-3"
                     data-post-id="{{ post.id }}" 
-                    data-url="{% url 'posts_comments_infinite' post.id %}">
+                    data-url="{% url 'posts_comments_infinite' post_pk=post.id %}">
 
                     <h5 class="mb-3">Comments</h5>
 
@@ -102,7 +102,9 @@
     </div>
 
 
-<script src="{% static 'js/posts/comments_infinite_scroll.js' %}"></script>
+<script type="module"
+        src="{% static 'js/posts/comments/comments_infinite_scroll.js' %}">
+</script>
 <script src="{% static 'js/posts/script.js' %}"></script>
 
 {% endblock %}

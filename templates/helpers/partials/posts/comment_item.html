@@ -2,7 +2,9 @@
     <div class="d-flex justify-content-between align-items-start">
         <div>
             <strong>{{ comment.user.username }}</strong>:
-            <span>{{ comment.content }}</span>
+            <span class="comment-text">
+                {{ comment.content }}
+            </span>
         </div>
 
         {% if comment.user == request.user %}
@@ -12,7 +14,7 @@
 
     <button class="like-comment-btn btn btn-sm mt-1"
             data-comment-id="{{ comment.id }}">
-        👍 <span>{{ comment.likes.count }}</span>
+        👍 <span class="comment-likes-count">{{ comment.likes.count }}</span>
     </button>
 </div>
 
