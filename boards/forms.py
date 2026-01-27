@@ -11,15 +11,10 @@ class CreateBoardForm(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs={'class': 'form-control'}),
             "description": forms.Textarea(attrs={'class': 'form-control'}),
+            "tags": TagSelect2Widget(
+                attrs={"data-placeholder": "Add or choose tags", "style": "width:100%"}
+            ),
         }
-
-    def __init__(self, *args, **kwargs):
-        request_user = kwargs.pop("user", None)  # обов'язково request.user
-        super().__init__(*args, **kwargs)
-        self.fields["tags"].widget = TagSelect2Widget(
-            attrs={"data-placeholder": "Add or choose tags", "style": "width:100%"},
-            request=request_user
-        )
     
     def clean_tags(self):
         tags = self.cleaned_data.get("tags")
@@ -56,13 +51,9 @@ class EditBoardForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        request_user = kwargs.pop("user", None)
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         self.fields['admins'].queryset = self.instance.members.all()
-        self.fields["tags"].widget = TagSelect2Widget(
-            attrs={"data-placeholder": "Add or choose tags", "style": "width:100%"},
-            request=request_user
-        )
 
     def clean_tags(self):
         tags = self.cleaned_data.get("tags")
