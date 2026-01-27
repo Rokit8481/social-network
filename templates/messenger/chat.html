@@ -186,7 +186,7 @@
                 {{ message.text|linebreaksbr }}
               </div>
 
-              <div class="message-time text-muted small text-end">
+              <div class="message-time small text-end">
                 {% if message.was_edited %}edited {% endif %}{{ message.created_at|date:"H:i" }}
               </div>
 

@@ -237,32 +237,38 @@ function positionPicker(picker, x, y) {
 }
 
 function attachRightClickEvents() {
-  document.querySelectorAll('.message-content').forEach(msg => {
-    msg.oncontextmenu = e => {
-      e.preventDefault();
-      document.querySelectorAll('.emoji-picker').forEach(p => p.classList.add('d-none'));
-      const picker = msg.querySelector('.emoji-picker');
-      if (!picker) return;
-      positionPicker(picker, e.clientX, e.clientY);
-    };
+  document.addEventListener('contextmenu', e => {
+    const msg = e.target.closest('.message-content');
+    if (!msg) return;
+
+    e.preventDefault();
+
+    document.querySelectorAll('.emoji-picker')
+      .forEach(p => p.classList.add('d-none'));
+
+    const picker = msg.querySelector('.emoji-picker');
+    if (!picker) return;
+
+    positionPicker(picker, e.clientX, e.clientY);
   });
 }
 
 function attachEmojiClickEvents() {
-  document.querySelectorAll('.emoji-choice').forEach(choice => {
-    choice.onclick = () => {
-      const emoji = choice.dataset.emoji;
-      const picker = choice.closest('.emoji-picker');
-      const messageId = picker.closest('.message-content').dataset.messageId;
+  document.addEventListener('click', e => {
+    const choice = e.target.closest('.emoji-choice');
+    if (!choice) return;
 
-      socket.send(JSON.stringify({
-        type: 'reaction_update',
-        message_id: messageId,
-        emoji: emoji
-      }));
+    const emoji = choice.dataset.emoji;
+    const picker = choice.closest('.emoji-picker');
+    const msg = picker.closest('.message-content');
 
-      picker.classList.add('d-none');
-    };
+    socket.send(JSON.stringify({
+      type: 'reaction_update',
+      message_id: msg.dataset.messageId,
+      emoji: emoji
+    }));
+
+    picker.classList.add('d-none');
   });
 }
 
