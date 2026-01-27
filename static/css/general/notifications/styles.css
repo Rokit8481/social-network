@@ -118,3 +118,34 @@
     background: #871919;
     color: #fff;
 }
+.custom-pagination {
+    display: flex;
+    gap: 6px;
+    list-style: none;
+    padding: 0;
+    margin: 20px auto;
+    justify-content: center;
+}
+
+.custom-pagination li a {
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    background: #2c2c2c;
+    color: #e0e0e0;
+    border: 1px solid #444;
+}
+
+.custom-pagination li.active a {
+    background: #4f46e5;
+    color: white;
+}
+
+.custom-pagination li a:hover {
+    background: #3a32e3;;
+}
+
+.custom-pagination .dots {
+    padding: 6px 10px;
+    color: #999;
+}

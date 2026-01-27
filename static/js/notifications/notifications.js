@@ -16,9 +16,7 @@
     let loadedOld = false;
 
     function getContainer() {
-        const container = IS_PAGE 
-            ? document.querySelector('.notifications-container') 
-            : document.getElementById('notifications-container');
+        const container = document.querySelector('.notifications-container');
         if (!container) console.warn('Notifications container not found!');
         return container;
     }
@@ -93,6 +91,86 @@
             badge.classList.add('d-none');
         }
     }
+
+    async function loadNotifications(page = 1) {
+        try {
+            const url = `/notifications/api/?page=${page}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Failed to fetch notifications');
+
+            const data = await res.json();
+            const container = document.querySelector('.notifications-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+            data.results.forEach(n => renderNotification(n, true));
+
+            renderPaginator(data.page, data.num_pages);
+
+        } catch (err) {
+            console.error('Error loading notifications:', err);
+        }
+    }
+
+    function renderPaginator(currentPage, totalPages) {
+        const container = document.querySelector('.pagination-wrapper');
+        if (!container) return;
+
+        let html = '<ul class="custom-pagination">';
+
+        if (currentPage > 1) {
+            html += `<li><a href="#" data-page="${currentPage - 1}">‹</a></li>`;
+        }
+
+        const maxVisible = 7; 
+        let startPage = 1;
+        let endPage = totalPages;
+
+        if (totalPages > maxVisible) {
+            if (currentPage <= 4) {
+                startPage = 1;
+                endPage = maxVisible;
+            } else if (currentPage >= totalPages - 3) {
+                startPage = totalPages - (maxVisible - 1);
+                endPage = totalPages;
+            } else {
+                startPage = currentPage - 3;
+                endPage = currentPage + 3;
+            }
+        }
+
+        if (startPage > 1) {
+            html += `<li><a href="#" data-page="1">1</a></li>`;
+            html += `<li class="dots">…</li>`;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<li class="${i === currentPage ? 'active' : ''}">
+                        <a href="#" data-page="${i}">${i}</a>
+                    </li>`;
+        }
+
+        if (endPage < totalPages) {
+            html += `<li class="dots">…</li>`;
+            html += `<li><a href="#" data-page="${totalPages}">${totalPages}</a></li>`;
+        }
+
+        if (currentPage < totalPages) {
+            html += `<li><a href="#" data-page="${currentPage + 1}">›</a></li>`;
+        }
+
+        html += '</ul>';
+        container.innerHTML = html;
+
+        container.querySelectorAll('a[data-page]').forEach(a => {
+            a.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const page = parseInt(a.dataset.page);
+                await loadNotifications(page);
+            });
+        });
+    }
+
 
     function renderNotification(notification, fromHistory = false) {
         const container = getContainer();
@@ -169,7 +247,7 @@
         if (IS_PAGE) {
             toggle?.classList.add('d-none');
             dropdown?.classList.add('d-none');
-            await loadOldNotifications();
+            await loadNotifications(1);
         } else {
             await loadUnreadCount();
 
