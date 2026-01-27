@@ -92,9 +92,11 @@
                     <form method="POST">
                         {% csrf_token %}
                         {{ comment_form.content }}
-                        <button type="submit" class="btn btn-primary w-100 mt-2">
+                        <button type="submit"
+                        class="btn btn-primary w-100 mt-2 comment-submit">
                             Submit
                         </button>
+                        <div class="edit-actions d-flex gap-2 mt-2"></div>
                     </form>
                 </div>
             </div>

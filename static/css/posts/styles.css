@@ -78,11 +78,6 @@
     resize: none;
 }
 
-#comment-form button {
-    background: linear-gradient(45deg, #2563eb, #3b82f6);
-    color: #fff;
-}
-
 .tagged-people-item,
 .badge {
     background-color: #505070 !important;

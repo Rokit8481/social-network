@@ -1,7 +1,7 @@
 <div class="comment-item mb-2" data-comment-id="{{ comment.id }}">
     <div class="d-flex justify-content-between align-items-start">
         <div>
-            <strong>{{ comment.user.username }}</strong>:
+            <strong><a class="text-decoration-none text-light" href="{% url "user_detail" comment.user.slug %}">{{ comment.user.username }}</a></strong>:
             <span class="comment-text">
                 {{ comment.content }}
             </span>

@@ -5,7 +5,7 @@ export function initCommentEdit() {
     const textarea = form.querySelector("textarea");
     const submitBtn = form.querySelector("button[type='submit']");
     const editActions = form.querySelector(".edit-actions");
-    const commentSubmit = form.querySelector(".comment-sumbmit");
+    const commentSubmit = form.querySelector(".comment-submit");
 
     let editingId = null;
 
@@ -26,20 +26,21 @@ export function initCommentEdit() {
             `[data-comment-id="${editingId}"] .comment-text`
         );
 
+        if (!comment) {
+            console.error("Comment not found:", editingId);
+            return;
+        }
+
         textarea.value = comment.textContent.trim();
         textarea.focus();
 
         submitBtn.classList.add("d-none");
-        commentSubmit.classList.add("d-none");
 
         if (!document.getElementById("save-edit-btn")) {
-            editActions.insertAdjacentHTML(
-                "beforeend",
-                `
-                <button id="save-edit-btn" class="btn btn-success flex-grow-1">💾 Save</button>
-                <button id="cancel-edit-btn" class="btn btn-secondary flex-grow-1">✖ Cancel</button>
-                `
-            );
+            editActions.innerHTML = `
+                <button type="button" id="save-edit-btn" class="btn btn-success flex-grow-1">💾 Save</button>
+                <button type="button" id="cancel-edit-btn" class="btn btn-secondary flex-grow-1">✖ Cancel</button>
+            `;
         }
     }
 
