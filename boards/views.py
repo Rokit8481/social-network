@@ -229,7 +229,7 @@ class BoardsInfiniteAPI(LoginRequiredMixin, View):
                 board.user_is_member = board.is_member(request.user)
 
         html = render_to_string(
-            "helpers/partials/boards_list.html",
+            "helpers/partials/boards/boards_list.html",
             {"boards": boards},
             request=request
         )
@@ -259,7 +259,7 @@ class BoardMessagesInfiniteAPI(MemberRequiredMixin, View):
 
 
         html = render_to_string(
-            "helpers/partials/board_messages_list.html",
+            "helpers/partials/boards/board_messages_list.html",
             {"board_messages": board_messages},
             request=request
         )

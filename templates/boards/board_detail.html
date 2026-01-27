@@ -49,7 +49,7 @@
           data-delete-url="{% url 'delete_board_message_ajax' board.slug 0 %}">
           {% if board_messages %}
             <div id="messages-list">
-              {% include "helpers/partials/board_messages_list.html" with board_messages=board_messages %}
+              {% include "helpers/partials/boards/board_messages_list.html" with board_messages=board_messages %}
             </div>
           {% else %}
               <p class="end-text text-light text-center my-4">No board messages yet.</p>

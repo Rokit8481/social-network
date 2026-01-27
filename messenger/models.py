@@ -50,7 +50,7 @@ class Chat(BaseModel):
 class Message(BaseModel):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages', null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages', null=False)
-    text = models.TextField(null=True, blank=True, verbose_name = 'Text')
+    text = models.CharField(max_length=4096, null=True, blank=True, verbose_name = 'Text')
 
     def __str__(self):
         return f"{self.user}: {self.text[:30] if self.text else '[file]'}"

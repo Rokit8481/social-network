@@ -7,12 +7,17 @@
 <link rel="stylesheet" href="{% static 'css/general/notifications/styles.css' %}">
 {% endblock %}
 {% block content %}
-<div class="d-flex align-items-center mb-2 gap-2">
+<div class="d-flex justify-content-center mb-2 gap-2">
     <h2>Your Notifications</h2>
     <button class="mark-all-read-btn" title="Mark all read">✓</button>
 </div>
 
+{% if is_paginated %}
+    <div class="pagination-wrapper mb-3"></div>
+{% endif %}
+
 <ul class="notifications-container list-unstyled"></ul>
+
 
 <script src="{% static 'js/notifications/notifications.js' %}"></script>
 {% endblock content %}
