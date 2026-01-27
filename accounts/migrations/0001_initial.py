@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
                 ('bio', models.CharField(blank=True, default='Bio is not set.', max_length=200, null=True, verbose_name='Bio')),
                 ('avatar', models.ImageField(blank=True, default='default/default_avatar.png', null=True, upload_to='avatars/', verbose_name='Avatar')),
-                ('mobile', phonenumber_field.modelfields.PhoneNumberField(blank=True, default='No mobile number.', max_length=128, null=True, region=None, verbose_name='Mobile Number')),
+                ('mobile', phonenumber_field.modelfields.PhoneNumberField(blank=True, max_length=128, null=True, region=None, verbose_name='Mobile Number')),
                 ('slug', autoslug.fields.AutoSlugField(editable=False, populate_from='username', unique=True, verbose_name='Slug')),
                 ('birthday', models.DateField(blank=True, null=True, verbose_name='Birthday')),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),

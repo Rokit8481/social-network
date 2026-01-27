@@ -11,6 +11,7 @@ def generate_code():
 User = get_user_model()
 
 class Tag(BaseModel):
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_tags', null=False)
     name = models.CharField(max_length=40, unique=True, verbose_name='Tag Name', null=False, blank=False)
 
     class Meta:
