@@ -261,9 +261,10 @@ If you have ideas or suggestions, they are always welcome.
 
 ## 📄 License
 
-This project is released under the Creative Commons CC0 1.0 Universal license.
-The code is dedicated to the public domain and may be used without restriction.
+This project is licensed under the **MIT License**.
 
+You are free to use, modify, and distribute this software, provided that the
+original copyright notice is included.
 ---
 
 ## 🙌 Credits
