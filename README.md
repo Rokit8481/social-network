@@ -12,7 +12,6 @@
 
 <!-- Languages -->
 ![Top language](https://img.shields.io/github/languages/top/Rokit8481/social-network)
-![Top language percent](https://img.shields.io/badge/top%20language-Python%2048.9%25-blue?logo=python&logoColor=white)
 ![Languages count](https://img.shields.io/github/languages/count/Rokit8481/social-network)
 
 <!-- Repo health -->
