@@ -58,60 +58,53 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             message = await sync_to_async(Message.objects.get)(id=message_id)
 
-            existing = await sync_to_async(Reaction.objects.filter(message=message, user=user, emoji=emoji).first)()
+            existing = await sync_to_async(
+                Reaction.objects.filter(message=message, user=user).first
+            )()
 
             if existing:
-                await sync_to_async(existing.delete)()
-                action = 'removed'
-            else:
-                existing = await sync_to_async(Reaction.objects.filter)(
-                    message=message, user=user
-                )
-                if await sync_to_async(existing.exists)():
-                    reaction = await sync_to_async(existing.first)()
-                    if reaction.emoji == emoji:
-                        await sync_to_async(reaction.delete)()
-                    else:
-                        reaction.emoji = emoji
-                        await sync_to_async(reaction.save)()
+                if existing.emoji == emoji:
+                    await sync_to_async(existing.delete)()
                 else:
-                    await sync_to_async(Reaction.objects.create)(
-                        message=message, user=user, emoji=emoji
+                    existing.emoji = emoji
+                    await sync_to_async(existing.save)()
+            else:
+                await sync_to_async(Reaction.objects.create)(
+                    message=message,
+                    user=user,
+                    emoji=emoji
                 )
-                action = 'added'
 
             def avatar_url(user):
                 if user.avatar:
                     return user.avatar.url
                 return "https://res.cloudinary.com/dcf7vcslc/image/upload/v1768654796/v1oczq9mbm66q0jbh64f.jpg"
 
-            counts = await sync_to_async(lambda: [
+            reactions = await sync_to_async(lambda: [
                 {
-                    'emoji': item['emoji'],
-                    'count': item['count'],
-                    'users': [
+                    "emoji": r["emoji"],
+                    "count": r["count"],
+                    "users": [
                         {
-                            'username': u.user.username,
-                            'avatar': avatar_url(u.user)
+                            "username": u.user.username,
+                            "avatar": avatar_url(u.user.avatar)
                         }
-                        for u in message.reactions
-                            .filter(emoji=item['emoji'])
-                            .select_related('user')[:3]
-                    ]
+                        for u in Reaction.objects.filter(
+                            message=message,
+                            emoji=r["emoji"]
+                        ).select_related("user")
+                    ],
                 }
-                for item in message.reactions
-                    .values('emoji')
-                    .annotate(count=Count('emoji'))
+                for r in Reaction.objects
+                    .filter(message=message)
+                    .values("emoji")
+                    .annotate(count=Count("emoji"))
             ])()
 
-
             await self.channel_layer.group_send(self.room_group_name, {
-                'type': 'reaction_update',
-                'message_id': message_id,
-                'emoji': emoji,
-                'action': action,
-                'counts': counts,
-                'user_reacted_emojis': await sync_to_async(lambda: list(Reaction.objects.filter(message=message, user=user).values_list('emoji', flat=True)))()
+                "type": "reaction_update",
+                "message_id": message_id,
+                "reactions": reactions
             })
 
         elif data['type'] == 'delete_message':

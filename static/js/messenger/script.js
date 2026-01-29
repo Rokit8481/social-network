@@ -23,16 +23,13 @@ const currentUser = chatBox.dataset.currentUser;
 const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 const socket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${chatId}/`);
 
-function createReactionButton(emoji, count, users, userReactedEmojis) {
+function createReactionButton(emoji, count, users, reactedByMe) {
   const btn = document.createElement('button');
   btn.classList.add('reaction-btn');
   btn.dataset.emoji = emoji;
 
-  if (userReactedEmojis.includes(emoji)) {
-      btn.classList.add('active-reaction-btn');
-  } else {
-      btn.classList.add('reaction-inactive-btn');
-  }
+  btn.classList.toggle('active-reaction-btn', reactedByMe);
+  btn.classList.toggle('reaction-inactive-btn', !reactedByMe);
 
   let html = `${emoji} `;
 
@@ -85,8 +82,18 @@ socket.onmessage = function(e) {
     const list = msgEl.querySelector('.reactions-list');
     list.innerHTML = '';
 
-    data.counts.forEach(r => {
-      const btn = createReactionButton(r.emoji, r.count, r.users, data.user_reacted_emojis);
+    data.reactions.forEach(r => {
+      const reactedByMe = r.users.some(
+        u => u.username === currentUser
+      );
+
+      const btn = createReactionButton(
+        r.emoji,
+        r.count,
+        r.users,
+        reactedByMe
+      );
+
       list.appendChild(btn);
     });
   }

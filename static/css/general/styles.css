@@ -345,7 +345,7 @@ input.form-control::placeholder {
     color: #fff;
 }
 
-.friend-badge-over {
+.badge-over {
     position: absolute;
     top: -6px;         
     right: -30px;       
