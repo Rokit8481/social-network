@@ -16,7 +16,9 @@
     let loadedOld = false;
 
     function getContainer() {
-        const container = document.querySelector('.notifications-container');
+        const container = IS_PAGE
+                    ? document.querySelector('.notifications-container')
+                    : document.querySelector('#notifications-container');
         if (!container) console.warn('Notifications container not found!');
         return container;
     }
