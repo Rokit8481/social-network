@@ -127,6 +127,14 @@ class MainPageView(LoginRequiredMixin, View):
             "messenger_messages_count": messenger_messages_count,
             "main_page": main_page,
         }
+        def cut_number(number):
+            if number > 1000:
+                number = "+999"
+                return number
+            return number
+
+        for key in stats:
+            stats[key] = cut_number(stats[key])
 
         return render(request, self.template_name, {
             "user": current_user,
