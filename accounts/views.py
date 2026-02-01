@@ -226,6 +226,15 @@ class UserDetailView(LoginRequiredMixin, View):
             "chats_count": chats_count,
             "messenger_messages_count": messenger_messages_count,
         }
+        def cut_number(number):
+            if number > 1000:
+                number = "+999"
+                return number
+            return number
+
+        for key in stats:
+            stats[key] = cut_number(stats[key])
+
         context = {
             "user_detail": user_detail,
             "followers": followers,
