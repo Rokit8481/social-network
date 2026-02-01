@@ -60,9 +60,10 @@ data-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}"
                                 </div>
                             </div>
                             <div id="notifications-container"></div>
-                            <div class="p-2 border-top text-center align-content-center"> 
-                                <a href="{% url "notifications:notifications_list" %}" class="text-decoration-none card-title fs-2">
-                                    View all
+                            <div class="notifications-footer">
+                                <a href="{% url 'notifications:notifications_list' %}" class="view-all-btn">
+                                    <span>View all notifications</span>
+                                    <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
                         </div>

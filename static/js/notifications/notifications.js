@@ -16,9 +16,17 @@
     let loadedOld = false;
 
     function getContainer() {
+<<<<<<< HEAD
         return IS_PAGE
             ? document.querySelector('.notifications-container')
             : document.getElementById('notifications-container');
+=======
+        const container = IS_PAGE
+                    ? document.querySelector('.notifications-container')
+                    : document.querySelector('#notifications-container');
+        if (!container) console.warn('Notifications container not found!');
+        return container;
+>>>>>>> bac528a2bbac3a793e84c04529d7dd621d7d3ad4
     }
 
     function toggleMarkAllReadButton() {

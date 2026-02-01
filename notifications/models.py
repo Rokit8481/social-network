@@ -125,9 +125,12 @@ class Notification(BaseModel):
             if message:
                 chat = message.chat
                 author = message.user
+                message_text = message.text
+                if len(message_text) >= 10:
+                    message_text = f"{message_text[:10]}..."
                 if chat.is_group == True:
                     return f"You have a new message in group '{chat.title}' by {author.username}"
-                return f"You have a new message from '{author.username}'"
+                return f"You have a new message '{message_text}' from '{author.username}'"
             return f"You have a new message in chat/group"
         elif self.event_type == self.EventType.MESSAGE_REACTION:
             from messenger.models import Reaction

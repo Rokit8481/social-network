@@ -58,7 +58,7 @@ class UnreadNotificationsAPI(LoginRequiredMixin, View):
         notifications = Notification.objects.filter(
             to_user=request.user,
             is_read=False
-        ).order_by("-created_at")
+        ).order_by("-created_at")[:99]
 
         data = [
             {
