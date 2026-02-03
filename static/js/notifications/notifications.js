@@ -16,9 +16,11 @@
     let loadedOld = false;
 
     function getContainer() {
-        return IS_PAGE
-            ? document.querySelector('.notifications-container')
-            : document.getElementById('notifications-container');
+        const container = IS_PAGE
+                    ? document.querySelector('.notifications-container')
+                    : document.querySelector('#notifications-container');
+        if (!container) console.warn('Notifications container not found!');
+        return container;
     }
 
     function toggleMarkAllReadButton() {

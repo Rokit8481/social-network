@@ -8,6 +8,9 @@ import uuid
 def generate_code():
     return str(uuid.uuid4().int)[:8]
 
+def generate_slug():
+    return shortuuid.uuid()
+
 User = get_user_model()
 
 class Tag(BaseModel):
@@ -19,9 +22,7 @@ class Tag(BaseModel):
         ordering = ['name']
         
     def save(self, *args, **kwargs):
-        formatted = slugify(self.name).lower()
-        self.name = formatted
-        self.full_clean()
+        self.name = self.name.strip().lower()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -30,7 +31,7 @@ class Tag(BaseModel):
 class Board(BaseModel):
     title = models.CharField(max_length=100, verbose_name='Title', null=False, blank=False)
     description = models.TextField(verbose_name='Description', null=True, blank=True)
-    slug = models.SlugField(unique=True, default=shortuuid.uuid, editable=False)
+    slug = models.SlugField(unique=True, default=generate_slug, editable=False)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_boards', null=False)
     admins = models.ManyToManyField(User, related_name='admin_boards', blank=True)
     members = models.ManyToManyField(User, related_name='members_in_boards', blank=True)
