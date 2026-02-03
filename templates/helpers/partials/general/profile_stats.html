@@ -9,49 +9,95 @@
   <div id="statsBody" class="collapse show">
     <div class="card-body py-2">
       <ul class="list-group list-group-flush small">
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Boards created</span>
-            <strong>{{ stats.boards_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Boards created">
+          <i class="bi bi-kanban me-2"></i>
+          <strong>{{ stats.boards_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Board messages</span>
-            <strong>{{ stats.board_messages_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Board messages posted">
+          <i class="bi bi-chat-square-text me-2"></i>
+          <strong>{{ stats.board_messages_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Posts</span>
-            <strong>{{ stats.posts_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Posts created">
+          <i class="bi bi-grid-3x3 me-2"></i>
+          <strong>{{ stats.posts_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Tagged in posts</span>
-            <strong>{{ stats.tagged_in_posts_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Times tagged in posts">
+          <i class="bi bi-at me-2"></i>
+          <strong>{{ stats.tagged_in_posts_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Post likes given</span>
-            <strong>{{ stats.posts_likes_given_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Post likes given">
+          <i class="bi bi-hand-thumbs-up me-2"></i>
+          <strong>{{ stats.posts_likes_given_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Post likes obtained</span>
-            <strong>{{ stats.my_posts_likes_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Likes received on your posts">
+          <i class="bi bi-heart-fill me-2 text-danger"></i>
+          <strong>{{ stats.my_posts_likes_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Comments</span>
-            <strong>{{ stats.comments_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Comments written">
+          <i class="bi bi-chat-left-text me-2"></i>
+          <strong>{{ stats.comments_given_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Comment likes given</span>
-            <strong>{{ stats.comments_likes_given_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Comments received">
+          <i class="bi bi-chat-left-quote me-2"></i>
+          <strong>{{ stats.comments_got_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Comment likes obtained</span>
-            <strong>{{ stats.my_comments_likes_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Comment likes given">
+          <i class="bi bi-hand-thumbs-up-fill me-2"></i>
+          <strong>{{ stats.comments_likes_given_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Private chats</span>
-            <strong>{{ stats.chats_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Likes received on your comments">
+          <i class="bi bi-hand-thumbs-up me-2 text-primary"></i>
+          <strong>{{ stats.my_comments_likes_count }}</strong>
         </li>
-        <li class="list-group-item d-flex justify-content-between">
-            <span>Messages sent</span>
-            <strong>{{ stats.messenger_messages_count }}</strong>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Private chats">
+          <i class="bi bi-chat-dots me-2"></i>
+          <strong>{{ stats.chats_count }}</strong>
+        </li>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Groups joined">
+          <i class="bi bi-people-fill me-2"></i>
+          <strong>{{ stats.groups_count }}</strong>
+        </li>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Messages sent in messenger">
+          <i class="bi bi-send me-2"></i>
+          <strong>{{ stats.messenger_messages_count }}</strong>
+        </li>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Reactions given">
+          <i class="bi bi-emoji-smile me-2"></i>
+          <strong>{{ stats.reactions_given_count }}</strong>
+        </li>
+        
+        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Reactions received">
+          <i class="bi bi-emoji-smile-fill me-2 text-warning"></i>
+          <strong>{{ stats.reactions_got_count }}</strong>
         </li>
       </ul>
     </div>

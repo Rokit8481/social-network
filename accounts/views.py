@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth import logout, login
 from accounts.models import Follow
 from posts.models import Post, PostLike, Comment, CommentLike
-from messenger.models import Chat, Message
+from messenger.models import Chat, Message, Reaction
 from boards.models import Board, BoardMessage
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -202,17 +202,21 @@ class UserDetailView(LoginRequiredMixin, View):
 
         
 
-        boards_count = Board.objects.filter(creator=user_detail).count() # How much boards user have
-        board_messages_count = BoardMessage.objects.filter(sender=user_detail).count() # How much board messages user posted
-        posts_count = Post.objects.filter(author=user_detail).count() # How much posts user posted
-        tagged_in_posts_count = Post.objects.filter(people_tags=user_detail).count() # In how much posts user is tagged in
-        posts_likes_given_count = PostLike.objects.filter(user=user_detail).count() # How much posts likes user gave
-        my_posts_likes_count = PostLike.objects.filter(post__author=user_detail).count() # How much posts likes user have on his posts
-        comments_count = Comment.objects.filter(user=user_detail).count() # How much comments user sented
-        comments_likes_given_count = CommentLike.objects.filter(user=user_detail).count() # How much comments likes user gave
-        my_comments_likes_count = CommentLike.objects.filter(comment__user=user_detail).count()  # How much posts likes user have on his comments
-        chats_count = Chat.objects.filter(users=user_detail, is_group=False).count() # How much private chats user have
-        messenger_messages_count = Message.objects.filter(user=user_detail).count() # How much messages user sented
+        boards_count = Board.objects.filter(creator=user_detail).count() # How much boards current user have
+        board_messages_count = BoardMessage.objects.filter(sender=user_detail).count() # How much board messages current user posted
+        posts_count = Post.objects.filter(author=user_detail).count() # How much posts current user posted
+        tagged_in_posts_count = Post.objects.filter(people_tags=user_detail).count() # In how much posts current user is tagged in
+        posts_likes_given_count = PostLike.objects.filter(user=user_detail).count() # How much posts likes current user gave
+        my_posts_likes_count = PostLike.objects.filter(post__author=user_detail).count() # How much posts likes current user revieved on his posts
+        comments_given_count = Comment.objects.filter(user=user_detail).count() # How much comments current user sented
+        comments_got_count = Comment.objects.filter(post__author = user_detail).count() # How much comments current user recieved
+        comments_likes_given_count = CommentLike.objects.filter(user=user_detail).count() # How much comments likes current user gave
+        my_comments_likes_count = CommentLike.objects.filter(comment__user=user_detail).count()  # How much posts likes current user revieved on his comments
+        chats_count = Chat.objects.filter(users=user_detail, is_group=False).count() # How much private chats current user have
+        groups_count = Chat.objects.filter(users=user_detail, is_group=True).count() # How much groups current user have
+        messenger_messages_count = Message.objects.filter(user=user_detail).count() # How much messages current user sented
+        reactions_given_count = Reaction.objects.filter(user=user_detail).count() # How much reactions user sent
+        reactions_got_count = Reaction.objects.filter(message__user=user_detail).count() # How much reactions user revieved
         stats = {
             "boards_count": boards_count,
             "board_messages_count": board_messages_count,
@@ -220,11 +224,15 @@ class UserDetailView(LoginRequiredMixin, View):
             "tagged_in_posts_count": tagged_in_posts_count,
             "posts_likes_given_count": posts_likes_given_count,
             "my_posts_likes_count": my_posts_likes_count,
-            "comments_count": comments_count,
+            "comments_given_count": comments_given_count,
+            "comments_got_count": comments_got_count,
             "comments_likes_given_count": comments_likes_given_count,
             "my_comments_likes_count": my_comments_likes_count,
             "chats_count": chats_count,
+            "groups_count": groups_count,
             "messenger_messages_count": messenger_messages_count,
+            "reactions_given_count": reactions_given_count,
+            "reactions_got_count": reactions_got_count,
         }
         def cut_number(number):
             if number > 1000:

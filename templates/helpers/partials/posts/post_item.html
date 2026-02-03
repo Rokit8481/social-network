@@ -26,19 +26,19 @@
                 {% with files=post.files.all %}
                     {% for file in files|slice:":3" %}
                         {% if file.file_type == "image" %}
-                            <img src="{{ file.file.url }}" class="rounded" style="height:100px; width:100px; object-fit:cover;">
+                            <img src="{{ file.file.url }}" class="rounded" style="height:100px; width:100px; object-fit:cover; margin: 6px;">
                         {% elif file.file_type == "video" %}
-                            <video class="rounded" style="height:100px; width:100px; object-fit:cover;" muted>
+                            <video class="rounded" style="height:100px; width:100px; object-fit:cover; margin: 6px;" muted>
                                 <source src="{{ file.file.url }}">
                             </video>
                         {% else %}
-                            <a href="{% url 'post_detail' post_pk=post.pk %}" class="d-block text-primary small">
+                            <a href="{% url 'post_detail' post_pk=post.pk %}" class="d-block attachment-item rounded align-content-center" style="height:100px; width:100px; object-fit:cover;">
                                 📄 {{ file.file.name|truncatechars:15 }}
                             </a>
                         {% endif %}
                     {% endfor %}
                     {% if files|length > 3 %}
-                        <div class="d-flex align-items-center justify-content-center rounded bg-secondary text-white" style="height:100px; width:100px;">
+                        <div class="d-flex align-items-center justify-content-center rounded bg-secondary text-white" style="height:100px; width:100px; margin: 6px;">
                             +{{ files|length|add:"-3" }}
                         </div>
                     {% endif %}

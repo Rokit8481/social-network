@@ -106,12 +106,16 @@ class MainPageView(LoginRequiredMixin, View):
         posts_count = Post.objects.filter(author=current_user).count() # How much posts current user posted
         tagged_in_posts_count = Post.objects.filter(people_tags=current_user).count() # In how much posts current user is tagged in
         posts_likes_given_count = PostLike.objects.filter(user=current_user).count() # How much posts likes current user gave
-        my_posts_likes_count = PostLike.objects.filter(post__author=current_user).count() # How much posts likes current user have on his posts
-        comments_count = Comment.objects.filter(user=current_user).count() # How much comments current user sented
+        my_posts_likes_count = PostLike.objects.filter(post__author=current_user).count() # How much posts likes current user revieved on his posts
+        comments_given_count = Comment.objects.filter(user=current_user).count() # How much comments current user sented
+        comments_got_count = Comment.objects.filter(post__author = current_user).count() # How much comments current user recieved
         comments_likes_given_count = CommentLike.objects.filter(user=current_user).count() # How much comments likes current user gave
-        my_comments_likes_count = CommentLike.objects.filter(comment__user=current_user).count()  # How much posts likes current user have on his comments
+        my_comments_likes_count = CommentLike.objects.filter(comment__user=current_user).count()  # How much posts likes current user revieved on his comments
         chats_count = Chat.objects.filter(users=current_user, is_group=False).count() # How much private chats current user have
+        groups_count = Chat.objects.filter(users=current_user, is_group=True).count() # How much groups current user have
         messenger_messages_count = Message.objects.filter(user=current_user).count() # How much messages current user sented
+        reactions_given_count = Reaction.objects.filter(user=current_user).count() # How much reactions user sent
+        reactions_got_count = Reaction.objects.filter(message__user=current_user).count() # How much reactions user revieved
         main_page = True
         stats = {
             "boards_count": boards_count,
@@ -120,11 +124,15 @@ class MainPageView(LoginRequiredMixin, View):
             "tagged_in_posts_count": tagged_in_posts_count,
             "posts_likes_given_count": posts_likes_given_count,
             "my_posts_likes_count": my_posts_likes_count,
-            "comments_count": comments_count,
+            "comments_given_count": comments_given_count,
+            "comments_got_count": comments_got_count,
             "comments_likes_given_count": comments_likes_given_count,
             "my_comments_likes_count": my_comments_likes_count,
             "chats_count": chats_count,
+            "groups_count": groups_count,
             "messenger_messages_count": messenger_messages_count,
+            "reactions_given_count": reactions_given_count,
+            "reactions_got_count": reactions_got_count,
             "main_page": main_page,
         }
         def cut_number(number):
