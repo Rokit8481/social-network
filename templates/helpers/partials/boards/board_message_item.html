@@ -11,7 +11,15 @@
                         <a href="{% url 'user_detail' board_message.sender.slug %}" class="text-decoration-none text-light">
                         {{ board_message.sender.username }}
                         </a></div>
-                    <div class="text-light small">{{ board_message.created_at|date:"d.m.Y H:i" }}</div>
+                        <div class="text-light small">{{ board_message.created_at|date:"d.m.Y H:i" }}
+                            {% if board_message.was_edited %}
+                                <span
+                                    class="ms-1 text-light css-tooltip"
+                                    data-title="edited at {{ board_message.updated_at|date:'H:i d.m.Y' }}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 <div class="ms-2">

@@ -16,5 +16,16 @@
             data-comment-id="{{ comment.id }}">
         👍 <span class="comment-likes-count">{{ comment.likes.count }}</span>
     </button>
+    <div class="message-time small text-end">
+        {{ comment.created_at|date:"H:i" }}
+        
+        {% if comment.was_edited %}
+        <span
+            class="ms-1 text-light css-tooltip"
+            data-title="edited at {{ comment.updated_at|date:'H:i d.m.Y' }}">
+            <i class="bi bi-pencil-square"></i>
+        </span>
+        {% endif %}
+    </div>
 </div>
 

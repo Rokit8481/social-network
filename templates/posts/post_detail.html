@@ -20,7 +20,18 @@
                                     {{ post.author.username }}
                                 </a>
                             </h6>
-                            <small class="text-light">{{ post.created_at|date:"d M Y, H:i" }}</small>
+                            <div class="message-time small text-end">
+                                {{ post.created_at|date:"d M Y, H:i" }}
+                                
+                                {% if post.was_edited %}
+                                <span
+                                    class="ms-1 text-light css-tooltip"
+                                    data-title="edited at {{ post.updated_at|date:'H:i d.m.Y' }}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </span>
+                                {% endif %}
+
+                            </div>
                         </div>
                     </div>
                     {% if post.author == request.user %}

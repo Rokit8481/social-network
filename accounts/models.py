@@ -9,6 +9,11 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+    
+    def was_edited(self):
+        if (self.updated_at - self.created_at).total_seconds() > 1:
+            return True
+        return False
 
 class UserProfile(AbstractUser):
     bio = models.CharField(max_length=200, blank=True, null=True, verbose_name='Bio', default='Bio is not set.')
