@@ -6,6 +6,7 @@ from notifications.models import Notification
 from notifications.signals import notify_user
 from accounts.helpers.custom_settings import MAX_TAGS_PER_BOARD
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -35,7 +36,8 @@ def create_new_board_message_notification(sender, instance, created, **kwargs):
             to_user=member,
             from_user=sender,
             event_type=Notification.EventType.NEW_BOARD_MESSAGE,
-            target=board
+            target=board,
+            target_url=reverse("board_detail", kwargs={"slug": instance.slug})
         )
 
 @receiver(m2m_changed, sender=Board.members.through)
@@ -66,5 +68,6 @@ def create_join_board_notification(sender, instance, pk_set, action, **kwargs):
                     to_user=admin,
                     from_user=new_user,
                     event_type=Notification.EventType.JOIN_BOARD,
-                    target=instance
+                    target=instance,
+                    target_url=reverse("board_detail", kwargs={"slug": instance.slug})
                 )

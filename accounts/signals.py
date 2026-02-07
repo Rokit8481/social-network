@@ -3,6 +3,7 @@ from django.db.models.signals import post_save
 from accounts.models import Follow
 from notifications.models import Notification
 from notifications.signals import notify_user
+from django.urls import reverse
 
 
 @receiver(post_save, sender=Follow)
@@ -29,5 +30,6 @@ def create_follow_notification(sender, instance, created, **kwargs):
             to_user=following,
             from_user=follower,
             event_type=Notification.EventType.NEW_FOLLOWER,
-            target=following
+            target=following,
+            target_url=reverse("user_detail", kwargs={"slug": following.slug})
         )

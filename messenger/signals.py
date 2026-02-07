@@ -4,6 +4,7 @@ from messenger.models import Message, Reaction
 from django.contrib.auth import get_user_model
 from notifications.models import Notification
 from notifications.signals import notify_user
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -31,7 +32,8 @@ def new_messanger_message_notifications(sender, instance, created, **kwargs):
                 to_user=user,
                 from_user=message_user,
                 event_type=Notification.EventType.NEW_MESSENGER_MESSAGE,
-                target=message
+                target=message,
+                target_url=reverse("chat", kwargs={"chat_pk": chat.pk})
             )
 
 @receiver(post_save, sender=Reaction)
@@ -60,5 +62,6 @@ def new_message_notification_notifications(sender, instance, created, **kwargs):
             to_user=message_user,
             from_user=reaction_user,
             event_type=Notification.EventType.MESSAGE_REACTION,
-            target=reaction
+            target=reaction,
+            target_url=reverse("chat", kwargs={"chat_pk": message.chat.pk})
         )

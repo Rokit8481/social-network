@@ -6,6 +6,7 @@ from notifications.models import Notification
 from notifications.signals import notify_user
 from accounts.helpers.custom_settings import MAX_PEOPLE_TAGS
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -43,7 +44,8 @@ def create_new_post_notification(sender, instance, created, **kwargs):
                 to_user=follower,
                 from_user=post_author,
                 event_type=Notification.EventType.NEW_POST,
-                target=instance
+                target=instance,
+                target_url=reverse("post_detail", kwargs={"post_pk": instance.pk})
             )
 
 
@@ -73,7 +75,8 @@ def create_new_comment_notification(sender, instance, created, **kwargs):
             to_user=post_author,
             from_user=comment_author,
             event_type=Notification.EventType.NEW_COMMENT,
-            target=post
+            target=post,
+            target_url=reverse("post_detail", kwargs={"post_pk": instance.pk})
         )
 
 @receiver(post_save, sender=PostLike)
@@ -102,7 +105,8 @@ def create_new_post_like_notification(sender, instance, created, **kwargs):
             to_user=post_author,
             from_user=like_author,
             event_type=Notification.EventType.POST_LIKE,
-            target=post
+            target=post,
+            target_url=reverse("post_detail", kwargs={"post_pk": instance.pk})
         )
     
 
@@ -132,7 +136,8 @@ def create_new_comment_like_notification(sender, instance, created, **kwargs):
             to_user=comment_author,
             from_user=like_author,
             event_type=Notification.EventType.COMMENT_LIKE,
-            target=comment
+            target=comment,
+            target_url=reverse("post_detail", kwargs={"post_pk": instance.pk})
         )
     
 
@@ -163,5 +168,6 @@ def create_tagged_in_post_notification(sender, instance, pk_set, action, **kwarg
                     to_user=tagged_user,
                     from_user=author,
                     event_type=Notification.EventType.TAGGED_IN_POST,
-                    target=instance
+                    target=instance,
+                    target_url=reverse("post_detail", kwargs={"post_pk": instance.pk})
                 )

@@ -15,7 +15,4 @@ media/post_files/
 media/backgrounds/
 media/group_messages/
 /staticfiles
-
-# Test bd creation
-main/test_bd.py
-templates/main/create_test_db.html
+*/management

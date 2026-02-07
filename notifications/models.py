@@ -49,19 +49,21 @@ class Notification(BaseModel):
     event_type = models.CharField(max_length=100, choices=EventType.choices, verbose_name="Event Type")
     target_type = models.CharField(max_length=100, choices=TargetType.choices, verbose_name="Target Type")
     target_id = models.IntegerField(verbose_name="Target ID")
+    target_url = models.CharField(max_length=500, verbose_name = "Target URL")
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.to_user} - {self.event_type}"
 
     @classmethod
-    def create_notification(cls, to_user, from_user, event_type, target):
+    def create_notification(cls, to_user, from_user, event_type, target, target_url):
         notification = cls.objects.create(
             to_user=to_user,
             from_user=from_user,
             event_type=event_type,
             target_type=cls.TYPE_MAP[target.__class__.__name__],
-            target_id=target.id
+            target_id=target.id,
+            target_url=target_url,
         )
         return notification
         
@@ -143,7 +145,6 @@ class Notification(BaseModel):
                     return f"{author.username} put a {reaction.emoji} on your message '{message.text[:15]}...' in group '{chat.title}'"
                 return f"{author.username} put a {reaction.emoji} on your message '{message.text[:15]}...' in your chat"
             return "You have a new reaction on your message"
-        
         return "You have a new notification"
     
     @database_sync_to_async

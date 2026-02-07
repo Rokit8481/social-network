@@ -45,6 +45,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             "notification": {
                 "id": notification.id,
                 "message": message,
+                "target_url":  str(notification.target_url or ""),
                 "event_type": notification.event_type,
                 "created": notification.created_at.strftime("%H:%M %d/%m/%Y"),
                 "is_read": False,
