@@ -142,35 +142,35 @@ if (deleteChatBtn && chatId) {
   });
 }
 
-document.querySelectorAll('.message-delete-btn').forEach(btn => {
-  btn.addEventListener('click', function(e) {
+let editingMessageId = null;
+const sendBtn = form.querySelector('button[type="submit"]');
+
+document.addEventListener('click', function(e) {
+  const deleteBtn = e.target.closest('.message-delete-btn');
+  if (deleteBtn) {
     e.preventDefault();
     if (!confirm("Are you sure you want to delete this message?")) return;
 
-    const messageId = this.dataset.messageId;
+    const messageId = deleteBtn.dataset.messageId;
 
     socket.send(JSON.stringify({
       type: "delete_message",
       message_id: messageId
     }));
-  });
-});
+    return;  
+  }
 
-
-let editingMessageId = null;
-const sendBtn = form.querySelector('button[type="submit"]');
-
-document.querySelectorAll(".message-update-btn").forEach(btn => {
-  btn.addEventListener("click", function (e) {
+  const updateBtn = e.target.closest('.message-update-btn');
+  if (updateBtn) {
     e.preventDefault();
-    const messageBlock = this.closest('.message-content');
-    const messageId = this.dataset.messageId;
+
+    const messageBlock = updateBtn.closest('.message-content');
+    const messageId = updateBtn.dataset.messageId;
     const messageTextEl = messageBlock.querySelector('.message-text');
     const messageText = messageTextEl ? messageTextEl.innerText.trim() : '';
 
     document.querySelectorAll('.message-content').forEach(el => el.classList.remove('editing'));
     messageBlock.classList.add('editing');
-
 
     textInput.value = messageText;
     textInput.focus();
@@ -179,9 +179,10 @@ document.querySelectorAll(".message-update-btn").forEach(btn => {
     sendBtn.textContent = "Save changes";
     sendBtn.classList.remove("btn-primary");
     sendBtn.classList.add("btn-warning");
-  });
-});
 
+    return;
+  }
+});
 form.addEventListener('submit', e => {
   e.preventDefault();
   const text = textInput.value.trim();

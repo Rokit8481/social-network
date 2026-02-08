@@ -33,7 +33,7 @@ def new_messanger_message_notifications(sender, instance, created, **kwargs):
                 from_user=message_user,
                 event_type=Notification.EventType.NEW_MESSENGER_MESSAGE,
                 target=message,
-                target_url=reverse("chat", kwargs={"chat_pk": chat.pk})
+                target_url=reverse("chat", kwargs={"chat_pk": chat.pk}) + f"#message-{message.id}"
             )
 
 @receiver(post_save, sender=Reaction)
@@ -63,5 +63,5 @@ def new_message_notification_notifications(sender, instance, created, **kwargs):
             from_user=reaction_user,
             event_type=Notification.EventType.MESSAGE_REACTION,
             target=reaction,
-            target_url=reverse("chat", kwargs={"chat_pk": message.chat.pk})
+            target_url=reverse("chat", kwargs={"chat_pk": message.chat.pk}) + f"#message-{message.id}"
         )

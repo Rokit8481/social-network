@@ -37,7 +37,7 @@ def create_new_board_message_notification(sender, instance, created, **kwargs):
             from_user=sender,
             event_type=Notification.EventType.NEW_BOARD_MESSAGE,
             target=board,
-            target_url=reverse("board_detail", kwargs={"slug": instance.slug})
+            target_url=reverse("board_detail", kwargs={"slug": board.slug}) + f"#board-message-{instance.id}"
         )
 
 @receiver(m2m_changed, sender=Board.members.through)

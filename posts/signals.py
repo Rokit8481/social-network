@@ -66,8 +66,8 @@ def create_new_comment_notification(sender, instance, created, **kwargs):
         to_user=post_author,
         from_user=comment_author,
         event_type=Notification.EventType.NEW_COMMENT,
-        target_type=Notification.TargetType.POST,
-        target_id=post.id
+        target_type=Notification.TargetType.COMMENT,
+        target_id=comment.id
     ).exists()
 
     if not already:
@@ -75,8 +75,8 @@ def create_new_comment_notification(sender, instance, created, **kwargs):
             to_user=post_author,
             from_user=comment_author,
             event_type=Notification.EventType.NEW_COMMENT,
-            target=post,
-            target_url=reverse("post_detail", kwargs={"post_pk": instance.pk})
+            target=comment,
+            target_url=reverse("post_detail", kwargs={"post_pk": post.pk}) + f"#comment-{comment.id}"
         )
 
 @receiver(post_save, sender=PostLike)
@@ -106,7 +106,7 @@ def create_new_post_like_notification(sender, instance, created, **kwargs):
             from_user=like_author,
             event_type=Notification.EventType.POST_LIKE,
             target=post,
-            target_url=reverse("post_detail", kwargs={"post_pk": instance.pk})
+            target_url=reverse("post_detail", kwargs={"post_pk": post.pk})
         )
     
 
@@ -117,6 +117,7 @@ def create_new_comment_like_notification(sender, instance, created, **kwargs):
     
     comment_like = instance
     comment = comment_like.comment
+    post = comment_like.comment.post
     like_author = comment_like.user
     comment_author = comment.user
 
@@ -137,7 +138,7 @@ def create_new_comment_like_notification(sender, instance, created, **kwargs):
             from_user=like_author,
             event_type=Notification.EventType.COMMENT_LIKE,
             target=comment,
-            target_url=reverse("post_detail", kwargs={"post_pk": instance.pk})
+            target_url=reverse("post_detail", kwargs={"post_pk": post.pk}) + f"#comment-{comment.id}"
         )
     
 
