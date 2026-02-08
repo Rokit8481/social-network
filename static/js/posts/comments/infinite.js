@@ -28,6 +28,7 @@ export function initInfiniteComments(container) {
             .then(res => res.json())
             .then(data => {
                 commentsList.insertAdjacentHTML("beforeend", data.html);
+                scrollToHashIfNeeded();
                 hasMore = data.has_more;
 
                 if (!hasMore) endBlock.classList.remove("d-none");
@@ -36,5 +37,18 @@ export function initInfiniteComments(container) {
                 loader.classList.add("d-none");
                 loading = false;
             });
+    }
+}
+
+function scrollToHashIfNeeded() {
+    if (!window.location.hash) return;
+
+    const targetId = window.location.hash.substring(1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetElement.classList.add('highlighted');
+        setTimeout(() => targetElement.classList.remove('highlighted'), 7500);
     }
 }

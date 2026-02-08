@@ -36,7 +36,15 @@
               </span>
               {% endif %}
             </div>
-            <div class="text-light small">Created: {{ board.created_at|date:"d.m.Y" }}</div>
+            <div class="text-light small">Created: {{ board.created_at|date:"d.m.Y" }}
+              {% if board.was_edited %}
+                <span
+                    class="ms-1 text-light css-tooltip"
+                    data-title="edited at {{ board.updated_at|date:'H:i d.m.Y' }}">
+                    <i class="bi bi-pencil-square"></i>
+                </span>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>

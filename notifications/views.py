@@ -41,6 +41,7 @@ class NotificationAPIView(LoginRequiredMixin, View):
             {
                 "id": n.id,
                 "message": n.get_message(),
+                "target_url": n.target_url or "",
                 "is_read": n.is_read,
                 "created": n.created_at.strftime("%H:%M %d/%m/%Y"),
             }
@@ -64,6 +65,7 @@ class UnreadNotificationsAPI(LoginRequiredMixin, View):
             {
                 "id": n.id,
                 "message": n.get_message(),
+                "target_url": n.target_url or "",
                 "is_read": n.is_read,
                 "created": n.created_at.strftime("%H:%M %d/%m/%Y"),
             }

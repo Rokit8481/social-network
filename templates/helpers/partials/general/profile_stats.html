@@ -1,105 +1,167 @@
 <div class="card mb-4">
   <div class="card-header py-2 d-flex justify-content-between align-items-center">
     <h5 class="mb-0">Stats</h5>
-    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#statsBody">
+    <button class="btn btn-sm btn-outline-primary" type="button"
+            data-bs-toggle="collapse" data-bs-target="#statsBody">
       Toggle
     </button>
   </div>
-  
+
   <div id="statsBody" class="collapse show">
     <div class="card-body py-2">
       <ul class="list-group list-group-flush small">
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Boards created">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Boards created">
           <i class="bi bi-kanban me-2"></i>
           <strong>{{ stats.boards_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Board messages posted">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Board messages posted">
           <i class="bi bi-chat-square-text me-2"></i>
           <strong>{{ stats.board_messages_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Posts created">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Posts created">
           <i class="bi bi-grid-3x3 me-2"></i>
           <strong>{{ stats.posts_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Times tagged in posts">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Times tagged in posts">
           <i class="bi bi-at me-2"></i>
           <strong>{{ stats.tagged_in_posts_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Post likes given">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Post likes given">
           <i class="bi bi-hand-thumbs-up me-2"></i>
           <strong>{{ stats.posts_likes_given_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Likes received on your posts">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Likes received on your posts">
           <i class="bi bi-heart-fill me-2 text-danger"></i>
           <strong>{{ stats.my_posts_likes_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Comments written">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Comments written">
           <i class="bi bi-chat-left-text me-2"></i>
           <strong>{{ stats.comments_given_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Comments received">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Comments received">
           <i class="bi bi-chat-left-quote me-2"></i>
           <strong>{{ stats.comments_got_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Comment likes given">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Comment likes given">
           <i class="bi bi-hand-thumbs-up-fill me-2"></i>
           <strong>{{ stats.comments_likes_given_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Likes received on your comments">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Likes received on your comments">
           <i class="bi bi-hand-thumbs-up me-2 text-primary"></i>
           <strong>{{ stats.my_comments_likes_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Private chats">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Private chats">
           <i class="bi bi-chat-dots me-2"></i>
           <strong>{{ stats.chats_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Groups joined">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Groups joined">
           <i class="bi bi-people-fill me-2"></i>
           <strong>{{ stats.groups_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Messages sent in messenger">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Messages sent in messenger">
           <i class="bi bi-send me-2"></i>
           <strong>{{ stats.messenger_messages_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Reactions given">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Reactions given">
           <i class="bi bi-emoji-smile me-2"></i>
           <strong>{{ stats.reactions_given_count }}</strong>
         </li>
-        
-        <li class="list-group-item d-flex justify-content-between align-items-center stats-tooltip" 
-            data-bs-toggle="tooltip" data-bs-placement="right" title="Reactions received">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center stat-popover"
+            data-bs-toggle="popover"
+            data-bs-trigger="click"
+            data-bs-placement="auto"
+            data-bs-content="Reactions received">
           <i class="bi bi-emoji-smile-fill me-2 text-warning"></i>
           <strong>{{ stats.reactions_got_count }}</strong>
         </li>
+
       </ul>
     </div>
   </div>
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+    const popover = new bootstrap.Popover(el)
+
+    el.addEventListener("shown.bs.popover", () => {
+      setTimeout(() => {
+        popover.hide()
+      }, 3000) 
+    })
+  })
+})
+</script>

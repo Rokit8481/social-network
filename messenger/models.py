@@ -54,11 +54,6 @@ class Message(BaseModel):
 
     def __str__(self):
         return f"{self.user}: {self.text[:30] if self.text else '[file]'}"
-    
-    def was_edited(self):
-        if (self.updated_at - self.created_at).total_seconds() > 1:
-            return True
-        return False
 
     class Meta: 
         ordering = ["created_at"]

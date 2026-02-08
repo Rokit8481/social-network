@@ -83,23 +83,32 @@
     <ul class="nav nav-tabs nav-fill mt-4" id="profileTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active text-secondary" id="posts-tab" 
-                    data-bs-toggle="tab" data-bs-target="#posts-tab-pane" 
-                    type="button" role="tab">
+                data-bs-toggle="tab" data-bs-target="#posts-tab-pane" 
+                type="button" role="tab">
+                <span class="ms-1 css-tooltip"
+                data-title="Your Posts">
                 <i class="bi bi-journal-text"></i>
+                </span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link text-secondary" id="boards-tab" 
-                    data-bs-toggle="tab" data-bs-target="#boards-tab-pane" 
-                    type="button" role="tab">
+                data-bs-toggle="tab" data-bs-target="#boards-tab-pane" 
+                type="button" role="tab">
+                <span class="ms-1 css-tooltip"
+                data-title="Your Boards">
                 <i class="bi bi-collection"></i>
+                </span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link text-danger" id="liked-tab" 
                     data-bs-toggle="tab" data-bs-target="#liked-tab-pane" 
                     type="button" role="tab">
+                <span class="ms-1 css-tooltip"
+                data-title="Liked Posts">
                 <i class="bi bi-suit-heart-fill"></i>
+                </span>
             </button>
         </li>
     </ul>

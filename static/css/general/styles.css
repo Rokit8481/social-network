@@ -364,3 +364,81 @@ input.form-control::placeholder {
     line-height: 1;
     white-space: nowrap;
 }
+
+.badge-over-board {
+    position: absolute;
+    top: 10px;         
+    right: 10px;       
+
+    z-index: 2;      
+
+    font-size: 12px;
+    font-weight: 600;
+
+    padding: 4px 8px;
+    border-radius: 999px;
+
+    background-color: rgba(25, 135, 84, 0.4);
+    color: #fff;
+
+    line-height: 1;
+    white-space: nowrap;
+}
+
+
+.css-tooltip {
+    position: relative;
+    cursor: pointer;
+}
+
+.css-tooltip::after {
+    content: attr(data-title);
+    position: absolute;
+    top: 50%;
+    right: 110%;
+    transform: translateY(-50%);
+
+    background: #212529;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 1000;
+}
+
+.css-tooltip::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 102%;
+    transform: translateY(-50%);
+
+    border: 5px solid transparent;
+    border-left-color: #212529;
+
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.css-tooltip:hover::after,
+.css-tooltip:hover::before {
+  opacity: 1;
+}
+
+.highlighted {
+    background-color: rgba(255, 255, 0, 0.25);
+    transition: background-color 0.8s ease, box-shadow 0.8s ease;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px 6px;
+}
+
+.highlighted:hover {
+    background-color: rgba(255, 255, 120, 0.5);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}

@@ -182,11 +182,11 @@
         li.className = IS_PAGE 
             ? `notification-site-item ${notification.is_read ? '' : 'unread'}`
             : `notification-item ${notification.is_read ? '' : 'unread'}`;
-
+        
         li.innerHTML = `
             <div class="d-flex justify-content-between align-items-start">
                 <div class="flex-grow-1 me-2">
-                    <div class="small">${notification.message}</div>
+                    <div class="small"><a class="text-decoration-none text-light" href="${notification.target_url}">${notification.message}</a></div>
                     <div class="text-light notification-time">${notification.created || 'just now'}</div>
                 </div>
                 ${notification.is_read ? '' : `<button class="mark-read-btn" title="Mark read">✓</button>`}
