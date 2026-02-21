@@ -231,3 +231,28 @@
     font-size: 0.75rem;
     opacity: 0.85;
 }
+
+.reply-btn-external {
+  margin: 0px 1% 1% 1%;
+  padding: 3px 6px;
+  background: linear-gradient(90deg, #2c2c2c 0%, #4a4a4a 100%);
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;     
+  transition: all 0.3s ease; 
+}
+
+.reply-btn-external:hover {
+  background: linear-gradient(90deg, #3a3a3a 0%, #5a5a5a 100%);
+  transform: scale(1.08);  
+}
+
+.reply-text-inner {
+  background: linear-gradient(90deg, #e0e0e0 0%, #a8d0e6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 600;
+}
+
+

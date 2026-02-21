@@ -6,6 +6,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/messenger/styles.css' %}">
 {% endblock %}
+
 {% block content %}
 <div class="container mt-4">
 
@@ -17,22 +18,17 @@
   <div class="row">
     <div class="col-md-3">
       <a href="{% url 'create_group' %}" class="mb-2 btn btn-outline-primary text-light w-100">➕ Create chat</a>
+
       <div id="user-list" class="list-group d-none mb-4">
         <div class="sticky-top" style="background-color: #1f1f2e; border: 1px solid #333;">
-          <h4 class="text-center m-2 card-title">
-            USERS
-          </h4>
+          <h4 class="text-center m-2 card-title">USERS</h4>
         </div>
         {% for user in user_friends %}
           <form method="post" action="{% url 'create_chat' %}">
             {% csrf_token %}
             <input type="hidden" name="user_id" value="{{ user.id }}">
-
-            <button type="submit"
-                    class="list-group-item list-group-item-action d-flex align-items-center gap-2">
-              <img src="{{ user.avatar.url }}"
-                  class="avatar-tiny rounded-circle"
-                  alt="{{ user.username }}">
+            <button type="submit" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+              <img src="{{ user.avatar.url }}" class="avatar-tiny rounded-circle" alt="{{ user.username }}">
               <strong>{{ user.username }}</strong>
             </button>
           </form>
@@ -40,12 +36,10 @@
           <p class="text-light px-3 m-2">No one is following you.</p>
         {% endfor %}
       </div>
-      
+
       <div id="chat-list" class="list-group mb-4">
         <div class="sticky-top" style="background-color: #1f1f2e; border: 1px solid #333;">
-          <h4 class="text-center m-2 card-title" >
-            CHATS
-          </h4>
+          <h4 class="text-center m-2 card-title">CHATS</h4>
         </div>
         {% for c in chats %}
           <a href="{% url 'chat' c.id %}"
@@ -54,7 +48,6 @@
               {% with first_user=c.users.first %}
                 <div class="d-flex gap-2">
                   <img src="{{ first_user.avatar.url }}" class="avatar-tiny rounded-circle">
-
                   <div class="d-flex flex-column">
                     <strong>{{ c.title }}</strong>
                     <small class="text-light opacity-75" style="font-size: 0.75rem;">
@@ -66,7 +59,7 @@
             {% else %}
               {% for u in c.users.all %}
                 {% if u != request.user %}
-                  <div class="gap-2 d-flex align-items-left">
+                  <div class="d-flex gap-2 align-items-center">
                     <img src="{{ u.avatar.url }}" class="avatar-tiny rounded-circle">
                     <strong>{{ u.username }}</strong>
                   </div>
@@ -81,127 +74,117 @@
     </div>
 
     <div class="col-md-9">
+
       {% if chat.id %}
-        <div class="d-flex align-items-center justify-content-between p-2 rounded bg-dark shadow-sm">
-
+        <div class="d-flex align-items-center justify-content-between p-2 rounded bg-dark shadow-sm mb-3">
           <div class="d-flex align-items-center gap-2">
-
             {% if chat.is_group %}
               {% with first_user=chat.users.first %}
-              <a href="{% url 'user_detail' first_user.slug %}" class="text-decoration-none">
-                <img src="{{ first_user.avatar.url }}"
-                    class="avatar-small rounded-circle">
-              </a>
+                <a href="{% url 'user_detail' first_user.slug %}" class="text-decoration-none">
+                  <img src="{{ first_user.avatar.url }}" class="avatar-small rounded-circle">
+                </a>
               {% endwith %}
             {% else %}
               {% for u in chat.users.all %}
                 {% if u != request.user %}
-                  <a href="{% url 'user_detail' u.slug %}">
-                    <img src="{{ u.avatar.url }}"
-                        class="avatar-small rounded-circle">
+                  <a href="{% url 'user_detail' u.slug %}" class="text-decoration-none">
+                    <img src="{{ u.avatar.url }}" class="avatar-small rounded-circle">
                   </a>
                 {% endif %}
               {% endfor %}
             {% endif %}
-
             <div class="d-flex flex-column">
               <strong class="text-light">{{ chat.title }}</strong>
               {% if chat.is_group %}
-                <small class="text-light">
-                  {{ chat.users.count }} members
-                </small>
+                <small class="text-light">{{ chat.users.count }} members</small>
               {% endif %}
             </div>
           </div>
 
           <div class="d-flex gap-2">
             {% if chat.is_group %}
-              <button class="btn btn-sm btn-outline-info"
-                      data-bs-toggle="modal"
-                      data-bs-target="#groupInfoModal">
-                ℹ️
-              </button>
+              <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#groupInfoModal">ℹ️</button>
             {% endif %}
-
             <a href="{% url 'chat_edit' chat.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-            <a href="#" class="btn btn-sm btn-outline-danger" id="chat-delete-btn" 
-                        data-delete-url="{% url 'chat_delete' chat.id %}" 
-                        >Delete</a>
+            <a href="#" class="btn btn-sm btn-outline-danger" id="chat-delete-btn"
+               data-delete-url="{% url 'chat_delete' chat.id %}">Delete</a>
           </div>
         </div>
-        {% endif %}
+      {% endif %}
 
       {% if chat.id %}
         <div id="chat-box"
-              class="chat-box p-4 mb-3 rounded shadow-sm
-                      {% if chat.background %}chat-box--bg{% else %}chat-box--default{% endif %}"
-              {% if chat.background %}
-                data-bg-url="{{ chat.background.url }}"
-              {% endif %}
-              data-chat-id="{{ chat.id }}"
-              data-current-user="{{ request.user }}"
-          >
+             class="chat-box p-4 mb-3 rounded shadow-sm
+                    {% if chat.background %}chat-box--bg{% else %}chat-box--default{% endif %}"
+             {% if chat.background %}data-bg-url="{{ chat.background.url }}"{% endif %}
+             data-chat-id="{{ chat.id }}"
+             data-current-user="{{ request.user.username }}">
+
           {% for message in messages %}
             {% ifchanged message.created_at.date %}
-              <div class="chat-date-divider my-3 text-center"
-              data-date="{{ message.created_at|date:'Y-m-d' }}">
+              <div class="chat-date-divider my-3 text-center" data-date="{{ message.created_at|date:'Y-m-d' }}">
                 <span class="px-3 py-1 rounded bg-dark text-light small">
-                  <span class="date-label"
-                        data-iso="{{ message.created_at|date:'Y-m-d' }}">
+                  <span class="date-label" data-iso="{{ message.created_at|date:'Y-m-d' }}">
                     {{ message.created_at|date:"j E Y" }}
                   </span>
                 </span>
               </div>
             {% endifchanged %}
-            <div class="d-flex message-row
-              {% if message.user == request.user %}
-                justify-content-end
-              {% else %}
-                justify-content-start
-              {% endif %}
-              mb-3" id="message-{{ message.id }}">
 
-            {% if message.user != request.user %}
-            <a href="{% url 'user_detail' message.user.slug %}" class="text-decoration-none">
-              <img src="{{ message.user.avatar.url }}"
-                  class="message-avatar">
-            </a>
-            {% endif %}
+            <div class="d-flex message-row mb-3 position-relative
+                        {% if message.user == request.user %}justify-content-end{% else %}justify-content-start{% endif %}"
+                 id="message-{{ message.id }}">
 
-            <div class="message-content
-                {% if message.user == request.user %}
-                  message-own
-                {% else %}
-                  message-other
-                {% endif %}"
-                data-message-id="{{ message.id }}">
-
-              <div>
-                <a href="{% url 'user_detail' message.user.slug %}" class="text-decoration-none message-username">
-                {{ message.user.username }}
+              {% if message.user != request.user %}
+                <a href="{% url 'user_detail' message.user.slug %}" class="text-decoration-none me-2">
+                  <img src="{{ message.user.avatar.url }}" class="message-avatar rounded-circle">
                 </a>
+              {% endif %}
+              {% if message.user == request.user %}
+              <div class="reply-btn-external" title="Reply" data-message-id="2">
+                  <i class="bi bi-reply-fill reply-text-inner"></i>
               </div>
+              {% endif %}
+              <div class="message-content
+                  {% if message.user == request.user %}message-own{% else %}message-other{% endif %}"
+                  data-message-id="{{ message.id }}"
+                  {% if message.reply_on %}data-reply-on-id="{{ message.reply_on.id }}"{% endif %}>
 
-              <div class="message-text">
-                {{ message.text|linebreaksbr }}
-              </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <a href="{% url 'user_detail' message.user.slug %}"
+                    class="text-decoration-none message-username">
+                    {{ message.user.username }}
+                  </a>
+                </div>
 
-              <div class="message-time small text-end">
-                {% if message.was_edited %}edited {% endif %}{{ message.created_at|date:"H:i" }}
-              </div>
+                {% if message.reply_on %}
+                  <div class="reply-indicator mb-1 p-1 bg-dark rounded small" data-reply-to="{{ message.reply_on.id }}">
+                    <i class="bi bi-reply-fill reply-text-inner"></i> Replying to:
+                    <a href="{% url 'user_detail' message.reply_on.user.slug %}" class="reply-user text-primary">
+                      {{ message.reply_on.user.username }}
+                    </a>
+                    <span class="reply-text text-light opacity-75">
+                      {{ message.reply_on.text|truncatechars:40 }}
+                    </span>
+                  </div>
+                {% endif %}
+
+                <div class="message-text">
+                  {{ message.text|linebreaksbr }}
+                </div>
+
+                <div class="message-time small text-end opacity-75">
+                  {% if message.was_edited %}<small>edited</small> {% endif %}
+                  {{ message.created_at|date:"H:i" }}
+                </div>
 
                 <div class="message-reactions mt-1">
                   <div class="reactions-list d-inline-block">
                     {% for emoji, data in message.reactions_by_emoji.items %}
                       <button class="reaction-btn
-                          {% if message.user_reacted_emoji == emoji %}
-                            active-reaction-btn
-                          {% else %}
-                            reaction-inactive-btn
-                          {% endif %}"
-                          data-emoji="{{ emoji }}">
+                                    {% if message.user_reacted_emoji == emoji %}active-reaction-btn{% else %}reaction-inactive-btn{% endif %}"
+                              data-emoji="{{ emoji }}">
                         {{ emoji }}
-                        
                         {% if data.count <= 3 %}
                           {% for user in data.users %}
                             <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="reaction-avatar" />
@@ -209,17 +192,14 @@
                         {% else %}
                           <span class="reaction-count">{{ data.count }}</span>
                         {% endif %}
-                        
                       </button>
                     {% endfor %}
                   </div>
-                  
+
                   <div class="emoji-picker d-none">
                     {% if message.was_edited %}
-                      <div class="emoji-picker-header">
-                        <span class="edited-time">
-                          edited at {{ message.updated_at|date:"H:i d/m/Y" }}
-                        </span>
+                      <div class="emoji-picker-header small opacity-75">
+                        edited at {{ message.updated_at|date:"H:i d.m.Y" }}
                       </div>
                     {% endif %}
 
@@ -229,75 +209,91 @@
                       {% endfor %}
                     </div>
 
-                    <hr>
+                    <hr class="my-2">
 
                     {% if message.user == request.user %}
-                      <div class="message-actions mt-2">
+                      <div class="message-actions mt-2 d-flex gap-2">
                         <a href="#" class="btn btn-sm btn-outline-danger message-delete-btn"
                           data-message-id="{{ message.id }}">Delete</a>
-                        <a href="{% url 'message_edit' message.pk %}"
-                          class="btn btn-sm btn-outline-warning message-update-btn"
+                        <a href="#" class="btn btn-sm btn-outline-warning message-update-btn"
                           data-message-id="{{ message.id }}">Edit</a>
                       </div>
                     {% endif %}
                   </div>
                 </div>
               </div>
+              {% if message.user != request.user %}
+              <div class="reply-btn-external" title="Reply" data-message-id="2">
+                  <i class="bi bi-reply-fill reply-text-inner"></i>
+              </div>
+              {% endif %}
             </div>
           {% endfor %}
+        </div>
+
+        <div id="replying-to" class="d-none card py-1 px-3 mb-2 d-flex justify-content-between align-items-center small">
+          <div>
+            <small class="text-light">Replying to</small><br>
+            <span id="reply-user" class="fw-bold text-primary"></span>:
+            <span id="reply-text" class="text-light opacity-75"></span>
+            <button id="cancel-reply-btn" class="btn btn-sm btn-outline-danger py-0 px-2">✕</button>
+          </div>
         </div>
 
         <form id="message-form" class="d-flex" method="post" action="javascript:void(0)">
           {% csrf_token %}
           {{ form.text }}
-          <button type="submit" class="btn btn-primary ms-2">Sent</button>
+          <button type="submit" class="btn btn-primary ms-2">Send</button>
         </form>
 
       {% else %}
-        <div id="chat-box"
-            class="chat-box chat-box--empty d-flex justify-content-center align-items-center">
-          <p class="card text-center p-2 fs-4 bg-dark text-light">
-            Choose chat or user to start messaging.
+        <div id="chat-box" class="chat-box chat-box--empty d-flex justify-content-center align-items-center">
+          <p class="card text-center p-4 fs-4 bg-dark text-light">
+            Choose chat or user to start!
           </p>
         </div>
       {% endif %}
+
     </div>
   </div>
 </div>
 
+<!-- Шаблони -->
 <template id="message-template">
-  <div class="d-flex message-row mb-3">
-    <a class="message-avatar-link d-none">
-      <img class="message-avatar avatar-small">
+  <div class="d-flex message-row mb-3 position-relative">
+    <a class="message-avatar-link d-none me-2">
+      <img class="message-avatar rounded-circle avatar-small">
     </a>
-
+    <div class="reply-btn-external reply-btn-external-own" title="Reply" data-message-id="2">
+        <i class="bi bi-reply-fill reply-text-inner"></i>
+    </div>
     <div class="message-content" data-message-id="">
-      <div>
+      <div class="d-flex align-items-center justify-content-between">
         <a class="message-username text-decoration-none"></a>
       </div>
 
       <div class="message-text"></div>
 
-      <div class="message-time"></div>
+      <div class="message-time small text-end opacity-75"></div>
 
       <div class="message-reactions mt-1">
         <div class="reactions-list d-inline-block"></div>
-
         <div class="emoji-picker d-none">
           <div class="emoji-picker-body">
             {% for emoji, label in emoji_choices %}
               <span class="emoji-choice" data-emoji="{{ emoji }}">{{ emoji }}</span>
             {% endfor %}
           </div>
-
-          <hr>
-
-          <div class="message-actions mt-2 d-none">
+          <hr class="my-2">
+          <div class="message-actions mt-2 d-none d-flex gap-2">
             <a href="#" class="btn btn-sm btn-outline-danger message-delete-btn">Delete</a>
             <a href="#" class="btn btn-sm btn-outline-warning message-update-btn">Edit</a>
           </div>
         </div>
       </div>
+    </div>
+    <div class="reply-btn-external reply-btn-external-other" title="Reply" data-message-id="2">
+        <i class="bi bi-reply-fill reply-text-inner"></i>
     </div>
   </div>
 </template>
@@ -308,23 +304,20 @@
   </div>
 </template>
 
-
-
 {% include "helpers/messenger/modal_info.html" %}
+
 <script>
+// highlight при переході за посиланням з #message-...
 document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.hash) {
-        const targetId = window.location.hash.substring(1);
-        const targetElement = document.getElementById(targetId);
-        
-        if (targetElement) {
-            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            targetElement.classList.add('highlighted');
-            setTimeout(() => {
-                targetElement.classList.remove('highlighted');
-            }, 7500);
-        }
+  if (window.location.hash) {
+    const targetId = window.location.hash.substring(1);
+    const el = document.getElementById(targetId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('highlighted');
+      setTimeout(() => el.classList.remove('highlighted'), 6000);
     }
+  }
 });
 </script>
 <script src="{% static 'js/messenger/script.js' %}"></script>

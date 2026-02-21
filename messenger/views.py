@@ -5,10 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from messenger.models import Chat, Message, Reaction
 from messenger.forms import MessageForm, GroupForm, ChatForm
-from django.db.models import Count
 from accounts.helpers.choices.emoji import EMOJI_CHOICES
 from django.contrib.auth import get_user_model
-from accounts.models import Follow
 from django.conf import settings
 import json
 
@@ -76,6 +74,7 @@ class MessageEditView(LoginRequiredMixin, View):
             "message": {
                 "id": message.id,
                 "text": message.text,
+                "reply_to": message.reply_on.id if message.reply_on else None,
                 "created_at": message.created_at.strftime("%H:%M %d/%m/%Y"),
                 "updated_at": message.updated_at.strftime("%H:%M %d/%m/%Y"),
             }
@@ -87,29 +86,6 @@ class MessageDeleteView(LoginRequiredMixin, View):
         message = get_object_or_404(Message, id=message_pk, user=request.user)
         message.delete()
         return JsonResponse({"success": True})
-    
-# Вью для редагування повідомлення без шаблона
-class MessageUpdateView(LoginRequiredMixin, View):
-    def post(self, request, message_pk, *args, **kwargs):
-        message = get_object_or_404(Message, id=message_pk, user=request.user)
-        data = json.loads(request.body)
-        text = data.get("text")
-
-        if not text.strip():
-            return JsonResponse({"success": False, "error": "Порожнє повідомлення"}, status=400)
-
-        message.text = text
-        message.save()
-
-        return JsonResponse({
-            "success": True,
-            "message": {
-                "id": message.id,
-                "text": message.text,
-                "created_at": message.created_at.strftime("%H:%M %d/%m/%Y"),
-                "updated_at": message.updated_at.strftime("%H:%M %d/%m/%Y"),
-            }
-        })
 
 # Вью для створення групи
 class CreateGroupView(LoginRequiredMixin, CreateView):
@@ -160,7 +136,7 @@ class ChatView(LoginRequiredMixin, View):
         if chat:
             messages = (
                 chat.messages.all()
-                .select_related("user")
+                .select_related("user", "reply_on", "reply_on__user") 
                 .prefetch_related("reactions")
             )
 
@@ -212,13 +188,15 @@ class SendMessageView(LoginRequiredMixin, View):
             message = Message.objects.create(
                 chat = chat,
                 user = request.user,
-                text = form.cleaned_data['text']
+                text = form.cleaned_data['text'],
+                reply_on = form.cleaned_data.get('reply_to')
             )
 
             return JsonResponse({
                 "id": message.id, 
                 "user": message.user.username,
                 "text": message.text,
+                "reply_to": message.reply_on.id if message.reply_on else None,
                 "created_at": message.created_at.strftime("%H:%M %d/%m/%Y"),
                 "updated_at": message.updated_at.strftime("%H:%M %d/%m/%Y"),
             })
