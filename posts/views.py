@@ -207,7 +207,13 @@ class CommentDeleteView(LoginRequiredMixin, View):
 class CommentEditView(LoginRequiredMixin, View):
     def post(self, request, comment_pk, *args, **kwargs):
         comment = get_object_or_404(Comment, pk=comment_pk, user=request.user)
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({
+                "success": False,
+                "error": "Invalid JSON body.",
+            }, status=400)
         content = data.get("content")
 
         if not content or not content.strip():

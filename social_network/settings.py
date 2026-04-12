@@ -10,22 +10,34 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
+def _env_bool(name, default="false"):
+    return os.environ.get(name, default).lower() in ("1", "true", "yes", "on")
+
+
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# Override via environment: DJANGO_SECRET_KEY, DJANGO_DEBUG, DJANGO_ALLOWED_HOSTS
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-dev-only-change-me-in-production",
+)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f)=w+nx!t2@*e&h8eilr7bil1tb5pfj(+3)j$l5)%n@vv3(kzt'
+DEBUG = _env_bool("DJANGO_DEBUG", "true")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "localhost,127.0.0.1",
+    ).split(",")
+    if h.strip()
+]
 
 
 # Application definition
@@ -79,11 +91,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'social_network.wsgi.application'
 ASGI_APPLICATION = 'social_network.asgi.application'
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    },
-}
+# Use Redis in production: pip install channels-redis, set REDIS_URL=redis://127.0.0.1:6379/0
+_redis_url = os.environ.get("REDIS_URL", "").strip()
+_use_redis = False
+if _redis_url:
+    try:
+        import channels_redis  # noqa: F401
+        _use_redis = True
+    except ImportError:
+        _use_redis = False
+
+if _use_redis and _redis_url:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {"hosts": [_redis_url]},
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

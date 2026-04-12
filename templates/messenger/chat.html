@@ -94,7 +94,7 @@
               {% endfor %}
             {% endif %}
             <div class="d-flex flex-column">
-              <strong class="text-light">{{ chat.title }}</strong>
+              <strong class="text-light">{{ chat.display_title }}</strong>
               {% if chat.is_group %}
                 <small class="text-light">{{ chat.users.count }} members</small>
               {% endif %}

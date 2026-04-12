@@ -15,8 +15,6 @@ class Chat(BaseModel):
         if not self.background:
             self.background = 'default/default_bg.png'
         super().save(*args, **kwargs)
-        if not self.is_group and self.users.count() > 2:
-            raise ValueError("Privately chats cannot have more than 2 users.")
             
     def __str__(self):
         return self.title
@@ -54,8 +52,13 @@ class Reaction(BaseModel):
     def __str__(self):
         return f"{self.emoji} --- {self.message}"
     
-    class Meta: 
-        unique_together = ("message", "user")
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("message", "user"),
+                name='messenger_reaction_message_user_uniq',
+            ),
+        ]
         ordering = ["created_at"]
         verbose_name = 'Reaction'
         verbose_name_plural = 'Reactions'

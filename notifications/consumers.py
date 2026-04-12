@@ -1,14 +1,16 @@
 import json
+
+from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
+
 from notifications.models import Notification
-from channels.db import database_sync_to_async
+
 
 class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
-        from notifications.models import Notification
-        self.group_name = None 
+        self.group_name = None
 
         user = self.scope["user"]
         if isinstance(user, AnonymousUser):
@@ -32,11 +34,12 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             )
 
     async def send_notification(self, event):
-        from .models import Notification  
-
         notification_id = event["notification_id"]
 
-        notification = await Notification.objects.aget(pk=notification_id)
+        notification = await self._get_notification_for_user(notification_id)
+        if notification is None:
+            return
+
         message = await notification.async_get_message()
 
         unread_count = await self.get_unread_count()
@@ -45,13 +48,20 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             "notification": {
                 "id": notification.id,
                 "message": message,
-                "target_url":  str(notification.target_url or ""),
+                "target_url": str(notification.target_url or ""),
                 "event_type": notification.event_type,
                 "created": notification.created_at.strftime("%H:%M %d/%m/%Y"),
                 "is_read": False,
             },
             "unread_count": unread_count
         }))
+
+    @database_sync_to_async
+    def _get_notification_for_user(self, notification_id):
+        return Notification.objects.filter(
+            pk=notification_id,
+            to_user=self.user,
+        ).first()
 
     @database_sync_to_async
     def get_unread_count(self):

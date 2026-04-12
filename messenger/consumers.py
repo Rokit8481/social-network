@@ -1,15 +1,30 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+
 from asgiref.sync import sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
+from django.contrib.auth.models import AnonymousUser
 from django.db.models import Count
 from django.conf import settings
+
 from messenger.models import Chat, Message, Reaction
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.chat_id = self.scope['url_route']['kwargs']['chat_id']
+        self.chat_id = int(self.scope['url_route']['kwargs']['chat_id'])
         self.room_group_name = f"chat_{self.chat_id}"
+        user = self.scope["user"]
+
+        if isinstance(user, AnonymousUser):
+            await self.close()
+            return
+
+        is_member = await sync_to_async(
+            Chat.objects.filter(id=self.chat_id, users=user).exists
+        )()
+        if not is_member:
+            await self.close()
+            return
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
@@ -18,25 +33,33 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
         user = self.scope["user"]
+        if isinstance(user, AnonymousUser):
+            return
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError:
+            return
 
-        if data["type"] == "chat_message":
+        if data.get("type") == "chat_message":
             await self.handle_chat_message(data, user)
 
-        elif data["type"] == "reaction_update":
+        elif data.get("type") == "reaction_update":
             await self.handle_reaction_update(data, user)
 
-        elif data["type"] == "delete_message":
+        elif data.get("type") == "delete_message":
             await self.handle_delete_message(data, user)
 
-        elif data["type"] == "update_message":
+        elif data.get("type") == "update_message":
             await self.handle_update_message(data, user)
 
-    # ──────────────────────────────────────────────
-    # Нове повідомлення
-    # ──────────────────────────────────────────────
     async def handle_chat_message(self, data, user):
+        is_member = await sync_to_async(
+            Chat.objects.filter(id=self.chat_id, users=user).exists
+        )()
+        if not is_member:
+            return
+
         text = data.get("text", "").strip()
         if not text:
             return
@@ -60,20 +83,29 @@ class ChatConsumer(AsyncWebsocketConsumer):
             reply_on=reply_on,
         )
 
-        # Завантажуємо всі потрібні related-об'єкти одразу
         message = await self._get_message_with_related(message.pk)
 
         event = await self._build_message_event(message, user)
         await self.channel_layer.group_send(self.room_group_name, event)
 
-    # ──────────────────────────────────────────────
-    # Оновлення реакцій
-    # ──────────────────────────────────────────────
     async def handle_reaction_update(self, data, user):
-        message_id = data["message_id"]
-        emoji = data["emoji"]
+        is_member = await sync_to_async(
+            Chat.objects.filter(id=self.chat_id, users=user).exists
+        )()
+        if not is_member:
+            return
 
-        message = await sync_to_async(Message.objects.get)(id=message_id)
+        message_id = data.get("message_id")
+        emoji = data.get("emoji")
+        if message_id is None or emoji is None:
+            return
+
+        try:
+            message = await sync_to_async(Message.objects.get)(
+                id=message_id, chat_id=self.chat_id
+            )
+        except Message.DoesNotExist:
+            return
 
         existing = await sync_to_async(
             Reaction.objects.filter(message=message, user=user).first
@@ -101,13 +133,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             },
         )
 
-    # ──────────────────────────────────────────────
-    # Видалення повідомлення
-    # ──────────────────────────────────────────────
     async def handle_delete_message(self, data, user):
-        message_id = data["message_id"]
+        message_id = data.get("message_id")
+        if message_id is None:
+            return
+
         message = await sync_to_async(
-            Message.objects.filter(id=message_id, user=user).first
+            Message.objects.filter(
+                id=message_id, user=user, chat_id=self.chat_id
+            ).first
         )()
 
         if not message:
@@ -120,38 +154,36 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {"type": "message_deleted", "message_id": message_id},
         )
 
-    # ──────────────────────────────────────────────
-    # Редагування повідомлення (тільки текст, reply_on не змінюється)
-    # ──────────────────────────────────────────────
     async def handle_update_message(self, data, user):
-        message_id = data["message_id"]
+        message_id = data.get("message_id")
+        if message_id is None:
+            return
+
         new_text = data.get("text", "").strip()
 
         message = await sync_to_async(
-            Message.objects.filter(id=message_id, user=user).first
+            Message.objects.filter(
+                id=message_id, user=user, chat_id=self.chat_id
+            ).first
         )()
         if not message:
             return
 
         if not new_text or new_text == message.text:
-            return  # нічого не змінилось → не оновлюємо
+            return
 
         message.text = new_text
         await sync_to_async(message.save)()
 
-        # Завантажуємо свіжий об'єкт з related-полями
         message = await self._get_message_with_related(message.pk)
 
         event = await self._build_message_event(message, user, event_type="update_message")
         await self.channel_layer.group_send(self.room_group_name, event)
 
-    # ──────────────────────────────────────────────
-    # Допоміжні методи
-    # ──────────────────────────────────────────────
     async def _get_message_with_related(self, pk):
         return await sync_to_async(
             Message.objects.select_related("user", "reply_on", "reply_on__user").get
-        )(pk=pk)
+        )(pk=pk, chat_id=self.chat_id)
 
     async def _get_reactions_for_message(self, message):
         def inner():
@@ -204,12 +236,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "created_time": message.created_at.strftime("%H:%M"),
             "created_date": message.created_at.date().isoformat(),
             "updated_time": message.updated_at.strftime("%H:%M %d/%m/%Y"),
-            "is_own": False,  # клієнт сам визначить
+            "is_own": False,
         }
 
-    # ──────────────────────────────────────────────
-    # Відправники подій
-    # ──────────────────────────────────────────────
     async def chat_message(self, event):
         await self.send(text_data=json.dumps(event))
 

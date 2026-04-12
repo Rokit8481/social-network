@@ -1,12 +1,15 @@
 from django.views.generic import ListView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Notification
+from django.db.models import Q
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 
+from .models import Notification
+
+
 class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification
-    template_name = "notifications/list.html"
+    template_name = "notifications/notification_list.html"
     context_object_name = "notifications"
     paginate_by = 5
 
@@ -17,12 +20,17 @@ class NotificationListView(LoginRequiredMixin, ListView):
 
         q = self.request.GET.get("q")
         if q:
-            qs = qs.filter(message__icontains=q)
+            qs = qs.filter(
+                Q(from_user__username__icontains=q)
+                | Q(target_url__icontains=q)
+                | Q(event_type__icontains=q)
+            )
 
         return qs
 
+
 class NotificationMarkReadAPIView(LoginRequiredMixin, View):
-    def get(self, request, pk, *args, **kwargs):
+    def post(self, request, pk, *args, **kwargs):
         Notification.objects.filter(
             pk=pk,
             to_user=request.user
@@ -30,10 +38,11 @@ class NotificationMarkReadAPIView(LoginRequiredMixin, View):
 
         return JsonResponse({"status": "ok"})
 
+
 class NotificationAPIView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         notifications = Notification.objects.filter(to_user=request.user).order_by("-created_at")
-        paginator = Paginator(notifications, 7)  
+        paginator = Paginator(notifications, 7)
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
@@ -54,6 +63,7 @@ class NotificationAPIView(LoginRequiredMixin, View):
             "num_pages": paginator.num_pages
         })
 
+
 class UnreadNotificationsAPI(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         notifications = Notification.objects.filter(
@@ -73,7 +83,8 @@ class UnreadNotificationsAPI(LoginRequiredMixin, View):
         ]
 
         return JsonResponse(data, safe=False)
-    
+
+
 class UnreadCountAPI(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         count = Notification.objects.filter(
@@ -81,9 +92,10 @@ class UnreadCountAPI(LoginRequiredMixin, View):
             is_read=False
         ).count()
         return JsonResponse({"count": count})
-    
+
+
 class MarkAllReadAPI(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         Notification.objects.filter(
             to_user=request.user,
             is_read=False

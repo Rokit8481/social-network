@@ -1,39 +1,37 @@
 from django.views.generic import View
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from accounts.helpers.profile_stats import profile_stats_for_display
 from accounts.models import Follow
-from posts.models import Post, PostLike, Comment, CommentLike, File
+from posts.models import Post, File
 from posts.forms import PostForm
-from messenger.models import Chat, Message, Reaction
-from boards.models import Board, BoardMessage, Tag
-from notifications.models import Notification
+from boards.models import Board, Tag
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
+
 class MainPageView(LoginRequiredMixin, View):
     template_name = "main/main_page.html"
-    def get(self, request, *args, **kwargs):
-        #1. CURRENT USER
+
+    def _build_context(self, request, form=None):
         current_user = request.user
 
         users_i_follow = Follow.objects.filter(
             follower=current_user
         ).values_list('following', flat=True)
 
-        second_level_ids  = Follow.objects.filter(follower__in=users_i_follow
+        second_level_ids = Follow.objects.filter(follower__in=users_i_follow
         ).exclude(following=current_user
         ).exclude(following__in=users_i_follow
         ).values_list('following', flat=True).distinct()
 
-        #2. POSSIBLE FRIENDS
         possible_friends = User.objects.filter(
             id__in=second_level_ids
         )
 
-        #2.1. ALREADY FOLLOWING
         already_following = set(
             Follow.objects.filter(
                 follower=current_user,
@@ -57,11 +55,9 @@ class MainPageView(LoginRequiredMixin, View):
             possible_friend.is_user_friend = (
                 possible_friend.id in following_ids and possible_friend.id in followers_ids
             )
-        
-        #3.TABS
+
         tab = request.GET.get("tab", "feed")
 
-        #4. POSTS
         q = request.GET.get("q", "").strip()
         if tab == "recommendations":
             posts = Post.objects.filter(
@@ -79,7 +75,6 @@ class MainPageView(LoginRequiredMixin, View):
 
         posts = posts.order_by("-id")
 
-        #5. TOP 5 BOARDS
         boards = Board.objects.annotate(
             members_count=Count("members")
         ).order_by("-members_count")[:5]
@@ -87,7 +82,6 @@ class MainPageView(LoginRequiredMixin, View):
             board.user_is_member = board.is_member(current_user)
             board.boards_mini = True
 
-        #6. TOP 10 TAGS
         tags = (
             Tag.objects
             .annotate(boards_count=Count('boards'))
@@ -97,54 +91,12 @@ class MainPageView(LoginRequiredMixin, View):
         for tag in tags:
             if tag.boards_count >= 100:
                 tag.boards_count = "+99"
-            else: 
+            else:
                 tag.boards_count = tag.boards_count
-            
-        #7. STATS
-        boards_count = Board.objects.filter(creator=current_user).count() # How much boards current user have
-        board_messages_count = BoardMessage.objects.filter(sender=current_user).count() # How much board messages current user posted
-        posts_count = Post.objects.filter(author=current_user).count() # How much posts current user posted
-        tagged_in_posts_count = Post.objects.filter(people_tags=current_user).count() # In how much posts current user is tagged in
-        posts_likes_given_count = PostLike.objects.filter(user=current_user).count() # How much posts likes current user gave
-        my_posts_likes_count = PostLike.objects.filter(post__author=current_user).count() # How much posts likes current user revieved on his posts
-        comments_given_count = Comment.objects.filter(user=current_user).count() # How much comments current user sented
-        comments_got_count = Comment.objects.filter(post__author = current_user).count() # How much comments current user recieved
-        comments_likes_given_count = CommentLike.objects.filter(user=current_user).count() # How much comments likes current user gave
-        my_comments_likes_count = CommentLike.objects.filter(comment__user=current_user).count()  # How much posts likes current user revieved on his comments
-        chats_count = Chat.objects.filter(users=current_user, is_group=False).count() # How much private chats current user have
-        groups_count = Chat.objects.filter(users=current_user, is_group=True).count() # How much groups current user have
-        messenger_messages_count = Message.objects.filter(user=current_user).count() # How much messages current user sented
-        reactions_given_count = Reaction.objects.filter(user=current_user).count() # How much reactions user sent
-        reactions_got_count = Reaction.objects.filter(message__user=current_user).count() # How much reactions user revieved
-        main_page = True
-        stats = {
-            "boards_count": boards_count,
-            "board_messages_count": board_messages_count,
-            "posts_count": posts_count,
-            "tagged_in_posts_count": tagged_in_posts_count,
-            "posts_likes_given_count": posts_likes_given_count,
-            "my_posts_likes_count": my_posts_likes_count,
-            "comments_given_count": comments_given_count,
-            "comments_got_count": comments_got_count,
-            "comments_likes_given_count": comments_likes_given_count,
-            "my_comments_likes_count": my_comments_likes_count,
-            "chats_count": chats_count,
-            "groups_count": groups_count,
-            "messenger_messages_count": messenger_messages_count,
-            "reactions_given_count": reactions_given_count,
-            "reactions_got_count": reactions_got_count,
-            "main_page": main_page,
-        }
-        def cut_number(number):
-            if number > 1000:
-                number = "+999"
-                return number
-            return number
 
-        for key in stats:
-            stats[key] = cut_number(stats[key])
+        stats = profile_stats_for_display(current_user, main_page=True)
 
-        return render(request, self.template_name, {
+        ctx = {
             "user": current_user,
             "active_tab": tab,
             "posts": posts[:5],
@@ -152,18 +104,39 @@ class MainPageView(LoginRequiredMixin, View):
             "top_tags": tags,
             "possible_friends": possible_friends[:15],
             "stats": stats,
-        })
-    
+        }
+        if form is not None:
+            ctx["form"] = form
+        return ctx
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self._build_context(request))
+
     def post(self, request):
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            form.save_m2m()
-            
+        form = PostForm(request.POST, request.FILES, user=request.user)
+        if not form.is_valid():
+            return render(
+                request,
+                self.template_name,
+                self._build_context(request, form=form),
+            )
+
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        form.save_m2m()
+
+        try:
             for f in request.FILES.getlist('files'):
                 File.objects.create(post=post, file=f)
-            return redirect('post_detail', post_pk=post.pk)
-        
-        return render(request, self.template_name, {'form': form})
+        except ValidationError as e:
+            for errors in e.message_dict.values():
+                for error in errors:
+                    form.add_error(None, error)
+            return render(
+                request,
+                self.template_name,
+                self._build_context(request, form=form),
+            )
+
+        return redirect('post_detail', post_pk=post.pk)

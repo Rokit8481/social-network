@@ -1,13 +1,13 @@
-from django.views.generic import View, ListView, FormView
+from django.views.generic import View, FormView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth import logout, login
+from accounts.helpers.profile_stats import profile_stats_for_display
 from accounts.models import Follow
-from posts.models import Post, PostLike, Comment, CommentLike
-from messenger.models import Chat, Message, Reaction
-from boards.models import Board, BoardMessage
+from posts.models import Post, PostLike
+from boards.models import Board
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from accounts.forms import RegistrationStep1Form, RegistrationStep2Form, CustomAuthenticationForm, UserEditForm
@@ -22,9 +22,10 @@ class CustomLoginView(LoginView):
     form_class = CustomAuthenticationForm 
 
 class CustomLogoutView(View):
+    http_method_names = ['post', 'options', 'head']
     next_page = reverse_lazy('login')
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         logout(request)
         return redirect(self.next_page)
 
@@ -202,46 +203,7 @@ class UserDetailView(LoginRequiredMixin, View):
 
         
 
-        boards_count = Board.objects.filter(creator=user_detail).count() # How much boards current user have
-        board_messages_count = BoardMessage.objects.filter(sender=user_detail).count() # How much board messages current user posted
-        posts_count = Post.objects.filter(author=user_detail).count() # How much posts current user posted
-        tagged_in_posts_count = Post.objects.filter(people_tags=user_detail).count() # In how much posts current user is tagged in
-        posts_likes_given_count = PostLike.objects.filter(user=user_detail).count() # How much posts likes current user gave
-        my_posts_likes_count = PostLike.objects.filter(post__author=user_detail).count() # How much posts likes current user revieved on his posts
-        comments_given_count = Comment.objects.filter(user=user_detail).count() # How much comments current user sented
-        comments_got_count = Comment.objects.filter(post__author = user_detail).count() # How much comments current user recieved
-        comments_likes_given_count = CommentLike.objects.filter(user=user_detail).count() # How much comments likes current user gave
-        my_comments_likes_count = CommentLike.objects.filter(comment__user=user_detail).count()  # How much posts likes current user revieved on his comments
-        chats_count = Chat.objects.filter(users=user_detail, is_group=False).count() # How much private chats current user have
-        groups_count = Chat.objects.filter(users=user_detail, is_group=True).count() # How much groups current user have
-        messenger_messages_count = Message.objects.filter(user=user_detail).count() # How much messages current user sented
-        reactions_given_count = Reaction.objects.filter(user=user_detail).count() # How much reactions user sent
-        reactions_got_count = Reaction.objects.filter(message__user=user_detail).count() # How much reactions user revieved
-        stats = {
-            "boards_count": boards_count,
-            "board_messages_count": board_messages_count,
-            "posts_count": posts_count,
-            "tagged_in_posts_count": tagged_in_posts_count,
-            "posts_likes_given_count": posts_likes_given_count,
-            "my_posts_likes_count": my_posts_likes_count,
-            "comments_given_count": comments_given_count,
-            "comments_got_count": comments_got_count,
-            "comments_likes_given_count": comments_likes_given_count,
-            "my_comments_likes_count": my_comments_likes_count,
-            "chats_count": chats_count,
-            "groups_count": groups_count,
-            "messenger_messages_count": messenger_messages_count,
-            "reactions_given_count": reactions_given_count,
-            "reactions_got_count": reactions_got_count,
-        }
-        def cut_number(number):
-            if number > 1000:
-                number = "+999"
-                return number
-            return number
-
-        for key in stats:
-            stats[key] = cut_number(stats[key])
+        stats = profile_stats_for_display(user_detail)
 
         context = {
             "user_detail": user_detail,
@@ -269,6 +231,9 @@ class ToggleFollowView(LoginRequiredMixin, View):
 
     def post(self, request, slug, *args, **kwargs):
         user_to_follow = get_object_or_404(User, slug=slug)
+
+        if user_to_follow.pk == request.user.pk:
+            return redirect("user_detail", slug=slug)
 
         follow_obj = Follow.objects.filter(
             follower=request.user,

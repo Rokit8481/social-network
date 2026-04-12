@@ -114,6 +114,7 @@
 
 .message-row {
   align-items: flex-end;
+  gap: 8px;
 }
 
 .message-avatar {
@@ -233,8 +234,11 @@
 }
 
 .reply-btn-external {
-  margin: 0px 1% 1% 1%;
-  padding: 3px 6px;
+  margin: 0;
+  padding: 4px 8px;
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin-bottom: 6px;
   background: linear-gradient(90deg, #2c2c2c 0%, #4a4a4a 100%);
   border-radius: 12px;
   border: none;
@@ -245,6 +249,16 @@
 .reply-btn-external:hover {
   background: linear-gradient(90deg, #3a3a3a 0%, #5a5a5a 100%);
   transform: scale(1.08);  
+}
+
+/* Для власних повідомлень кнопка буде ліворуч */
+.reply-btn-external-own {
+    order: -1;   /* гарантує, що кнопка буде перед повідомленням */
+}
+
+/* Для чужих — кнопка праворуч */
+.reply-btn-external-other {
+    order: 1;
 }
 
 .reply-text-inner {

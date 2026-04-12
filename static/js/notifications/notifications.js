@@ -6,6 +6,11 @@
     const IS_PAGE = document.body.dataset.notificationsPage === 'true';
     console.log('Notifications page mode:', IS_PAGE);
 
+    function csrfHeader() {
+        const token = typeof CSRF_TOKEN !== 'undefined' ? CSRF_TOKEN : null;
+        return token ? {'X-CSRFToken': token} : {};
+    }
+
     const WS_URL = (() => {
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
         return `${protocol}://${window.location.host}/ws/notifications/`;
@@ -47,12 +52,13 @@
             const res = await fetch(url);
             if (!res.ok) throw new Error('Failed to fetch notifications');
             const data = await res.json();
+            const list = IS_PAGE ? (data.results || []) : data;
 
             const container = getContainer();
             if (!container) return;
 
             container.innerHTML = '';
-            data.forEach(n => renderNotification(n, true));
+            list.forEach(n => renderNotification(n, true));
             loadedOld = true;
 
             toggleMarkAllReadButton();
@@ -198,7 +204,10 @@
             btn?.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                await fetch(`/notifications/api/${notification.id}/read/`);
+                await fetch(`/notifications/api/${notification.id}/read/`, {
+                    method: 'POST',
+                    headers: csrfHeader(),
+                });
                 li.classList.remove('unread');
                 btn.remove();
                 if (!IS_PAGE) await loadUnreadCount();
@@ -272,7 +281,10 @@
         if (e.target.matches('.mark-all-read-btn')) {
             e.preventDefault();
             try {
-                const res = await fetch('/notifications/api/mark_all_read/');
+                const res = await fetch('/notifications/api/mark_all_read/', {
+                    method: 'POST',
+                    headers: csrfHeader(),
+                });
                 if (!res.ok) throw new Error('Failed to mark all read');
                 
                 document.querySelectorAll('.unread').forEach(el => {

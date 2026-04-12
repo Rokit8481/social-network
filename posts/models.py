@@ -98,7 +98,12 @@ class PostLike(BaseModel):
     class Meta:
         verbose_name = 'Post Like'
         verbose_name_plural = 'Post Likes'
-        unique_together = ('user', 'post')
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'post'),
+                name='posts_postlike_user_post_uniq',
+            ),
+        ]
 
 class CommentLike(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_likes', verbose_name='User')
@@ -110,5 +115,10 @@ class CommentLike(BaseModel):
     class Meta:
         verbose_name = 'Comment Like'
         verbose_name_plural = 'Comment Likes'
-        unique_together = ('user', 'comment')
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'comment'),
+                name='posts_commentlike_user_comment_uniq',
+            ),
+        ]
 

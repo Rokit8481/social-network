@@ -53,7 +53,12 @@ class Follow(BaseModel):
     class Meta:
         verbose_name = 'Follow'
         verbose_name_plural = 'Follows'
-        unique_together = ('follower', 'following')
+        constraints = [
+            models.UniqueConstraint(
+                fields=('follower', 'following'),
+                name='accounts_follow_follower_following_uniq',
+            ),
+        ]
 
     def __str__(self):
         return f"{self.follower} → {self.following}"

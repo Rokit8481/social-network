@@ -289,7 +289,6 @@ function maybeInsertDateDivider(messageDate) {
         if (divider) chatBox.appendChild(divider);
     }
 }
-
 function addMessageToDOM(data) {
     if (!chatBox) return;
 
@@ -301,45 +300,59 @@ function addMessageToDOM(data) {
     const clone = template.content.cloneNode(true);
     const row = clone.querySelector('.message-row');
     const content = clone.querySelector('.message-content');
-    const avatarLink = clone.querySelector('.message-avatar-link');
-    const avatarImg = clone.querySelector('.message-avatar');
-    const usernameLink = clone.querySelector('.message-username');
-    const ownReplyBtn   = clone.querySelector('.reply-btn-external-own');
-    const otherReplyBtn = clone.querySelector('.reply-btn-external-other');
 
     const isOwn = data.user === currentUser;
 
+    // Видаляємо обидві старі кнопки з шаблону
+    clone.querySelectorAll('.reply-btn-external-own, .reply-btn-external-other')
+         .forEach(btn => btn.remove());
+
+    // Створюємо одну кнопку
+    const replyBtn = document.createElement('div');
+    replyBtn.className = `reply-btn-external ${isOwn ? 'reply-btn-external-own' : 'reply-btn-external-other'}`;
+    replyBtn.title = "Reply";
+    replyBtn.innerHTML = `<i class="bi bi-reply-fill reply-text-inner"></i>`;
+
+    // === ВАЖЛИВО: Правильний порядок елементів ===
     if (isOwn) {
-        ownReplyBtn?.classList.remove('d-none');
-        otherReplyBtn?.classList.add('d-none');
+        // Для своїх повідомлень: кнопка → повідомлення (кнопка зліва)
+        row.appendChild(replyBtn);
+        row.appendChild(content);
     } else {
-        ownReplyBtn?.classList.add('d-none');
-        otherReplyBtn?.classList.remove('d-none');
+        // Для чужих повідомлень: аватар → кнопка → повідомлення (кнопка справа)
+        const avatarLink = clone.querySelector('.message-avatar-link');
+        row.appendChild(avatarLink);
+        row.appendChild(replyBtn);
+        row.appendChild(content);
     }
 
-
-    // Вирівнювання рядка
+    // Вирівнювання ряду
     row.classList.add(isOwn ? 'justify-content-end' : 'justify-content-start');
 
     content.classList.add(isOwn ? 'message-own' : 'message-other');
     content.dataset.messageId = data.id;
     if (data.reply_on_id) content.dataset.replyOnId = data.reply_on_id;
 
+    // Заповнюємо дані
+    const usernameLink = clone.querySelector('.message-username');
     usernameLink.textContent = data.user;
     usernameLink.href = `/users/${data.user_slug}/`;
 
-    if (!isOwn) {
-        if (data.avatar) {
-            avatarImg.src = data.avatar;
-            avatarLink.href = `/users/${data.user_slug}/`;
-        }
+    const avatarLink = clone.querySelector('.message-avatar-link');
+    const avatarImg = clone.querySelector('.message-avatar');
+
+    if (!isOwn && data.avatar) {
+        avatarImg.src = data.avatar;
+        avatarLink.href = `/users/${data.user_slug}/`;
         avatarLink.classList.remove('d-none');
+    } else {
+        avatarLink.classList.add('d-none');
     }
 
     clone.querySelector('.message-text').textContent = data.text || '';
     clone.querySelector('.message-time').textContent = data.created_time || '';
 
-    // Дії (edit/delete) тільки для своїх
+    // Дії тільки для своїх
     if (isOwn) {
         const actions = clone.querySelector('.message-actions');
         if (actions) {
@@ -356,13 +369,6 @@ function addMessageToDOM(data) {
         replyDiv.dataset.replyTo = data.reply_on_id;
         replyDiv.innerHTML = `↩️ Replying to: <span class="reply-user text-primary">${data.reply_on_user || '…'}</span> <span class="reply-text text-light opacity-75">${data.reply_on_text || ''}</span>`;
         content.insertBefore(replyDiv, clone.querySelector('.message-text'));
-    }
-
-    // Кнопка "Відповісти" — ЗБОКУ
-    const replyBtn = clone.querySelector('.reply-btn-external');
-    if (replyBtn) {
-        // Завжди показуємо кнопку (можна додати hover логіку в css якщо потрібно)
-        replyBtn.classList.remove('d-none'); // якщо була прихована
     }
 
     chatBox.appendChild(clone);
