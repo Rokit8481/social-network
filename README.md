@@ -271,17 +271,6 @@ original copyright notice is included.
 
 This project was fully designed and developed by **Rokit8481** as a personal portfolio and learning project.
 
-- Concept, backend, frontend, and UI logic: [**Rokit8481**](https://github.com/Rokit8481)
+- Concept, backend, frontend, and UI logic: [**Akrix0**](https://github.com/Akrix0)
 - Frameworks and libraries are credited to their respective authors
-
----
-
-## 🌍 Deployment
-
-SN PulSe is **already deployed and publicly available**.
-
-- Hosting platform: **Render**
-- Live demo: [https://social-network-kddy.onrender.com/](https://social-network-kddy.onrender.com/)
-
-The project is intended to be explored via the live demo or run locally for learning purposes.
 
